@@ -46,7 +46,7 @@ export default function Home() {
                 Get started by editing
               </Text>
               <Text className="text-typography-white font-medium ml-2">
-                ./App.tsx
+                ./Index.tsx
               </Text>
             </Box>
             <Link href="/tabs/">
