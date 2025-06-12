@@ -12,6 +12,7 @@ import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
 import AccountCard from "../components/feature/AccountCard";
+import SelectedFeature from "../components/feature/SelectedFeature";
 
 export default function Home() {
   return (
@@ -96,6 +97,7 @@ export default function Home() {
 
       <ScrollView className="flex-1 px-6">
         <AccountCard />
+        <SelectedFeature />
       </ScrollView>
     </Box>
   );
