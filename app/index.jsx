@@ -1,8 +1,9 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { Center } from "@/components/ui/center";
+import { Pressable } from "@/components/ui/pressable";
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { Button, ButtonText } from "@/components/ui/button";
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
@@ -56,16 +57,20 @@ export default function Home() {
             <Text className="text-xl font-bold text-gray-800">Hi, Mira!</Text>
           </Box>
 
-          <Box className="flex flex-row items-center justify-center gap-5">
-            <Button size="xs" className="bg-transparent p-1 h-12">
+          <Box className="flex flex-row items-center justify-center gap-4">
+            <Pressable
+              onPress={() => {}}
+              className="items-center justify-center"
+            >
               <Box className="flex flex-column items-center justify-center gap-1.5">
                 <Bell size={20} />
-                <ButtonText className="text-black text-xs">
-                  Notifikasi
-                </ButtonText>
+                <Text className="text-black text-xs">Notifikasi</Text>
               </Box>
-            </Button>
-            <Button size="xs" className="bg-transparent p-1 h-12">
+            </Pressable>
+            <Pressable
+              onPress={() => {}}
+              className="items-center justify-center"
+            >
               <Box className="flex flex-column items-center justify-center gap-1.5">
                 <Image
                   size="2xs"
@@ -73,11 +78,9 @@ export default function Home() {
                   className="aspect-square w-4"
                   alt="logout"
                 />
-                <ButtonText className="text-black text-xs">
-                  Bukti Transaksi
-                </ButtonText>
+                <Text className="text-black text-xs">Bukti Transaksi</Text>
               </Box>
-            </Button>
+            </Pressable>
           </Box>
         </Box>
 
