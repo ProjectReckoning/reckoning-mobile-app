@@ -11,6 +11,8 @@ import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
+import AccountCard from "../components/feature/AccountCard";
+
 export default function Home() {
   return (
     <Box className="flex-1 bg-white">
@@ -93,11 +95,7 @@ export default function Home() {
       </Box>
 
       <ScrollView className="flex-1 px-6">
-        <Box className="flex flex-row my-5">
-          <Text className="font-extrabold text-xl">
-            Rekening transaksi kamu
-          </Text>
-        </Box>
+        <AccountCard />
       </ScrollView>
     </Box>
   );
