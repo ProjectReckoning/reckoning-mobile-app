@@ -9,6 +9,11 @@ import {
   Earth,
   LayoutGrid,
 } from "lucide-react-native";
+import { router } from "expo-router";
+
+const GoToPocket = async () => {
+  router.push("/pocket");
+};
 
 export const features = [
   { icon: <Send />, label: "Transfer", bg: "#6EE0DB" },
@@ -39,6 +44,7 @@ export const features = [
     ),
     label: "Pocket",
     bg: "#C7B6F9",
+    onPress: GoToPocket,
   },
   { icon: <LayoutGrid />, label: "Lihat Semua", bg: "#fff", border: true },
 ];

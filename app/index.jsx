@@ -3,8 +3,8 @@ import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { Center } from "@/components/ui/center";
 import { Pressable } from "@/components/ui/pressable";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { Button, ButtonText } from "@/components/ui/button";
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
 
