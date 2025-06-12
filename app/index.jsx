@@ -3,12 +3,13 @@ import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { Center } from "@/components/ui/center";
-import { HStack } from "@/components/ui/hstack";
-import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { ScrollView } from "react-native";
+import { Bell } from "lucide-react-native";
 
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
+import BillIcon from "@/assets/images/icon/bill-icon.png";
 
 export default function Home() {
   return (
@@ -52,27 +53,26 @@ export default function Home() {
             <Text className="text-xl font-bold text-gray-800">Hi, Mira!</Text>
           </Box>
 
-          <Box className="flex flex-row items-center">
-            <Button size="xs" className="rounded-full bg-[#F9F9F9]">
+          <Box className="flex flex-row items-center justify-center gap-5">
+            <Button size="xs" className="bg-transparent p-1 h-12">
               <Box className="flex flex-column items-center justify-center gap-1.5">
-                <Image
-                  size="2xs"
-                  source={LogoutIcon}
-                  className="aspect-square w-4"
-                  alt="logout"
-                />
-                <ButtonText className="text-black">Notifikasi</ButtonText>
+                <Bell size={20} />
+                <ButtonText className="text-black text-xs">
+                  Notifikasi
+                </ButtonText>
               </Box>
             </Button>
-            <Button size="xs" className="rounded-full bg-[#F9F9F9]">
+            <Button size="xs" className="bg-transparent p-1 h-12">
               <Box className="flex flex-column items-center justify-center gap-1.5">
                 <Image
                   size="2xs"
-                  source={LogoutIcon}
+                  source={BillIcon}
                   className="aspect-square w-4"
                   alt="logout"
                 />
-                <ButtonText className="text-black">Bukti Transaksi</ButtonText>
+                <ButtonText className="text-black text-xs">
+                  Bukti Transaksi
+                </ButtonText>
               </Box>
             </Button>
           </Box>
