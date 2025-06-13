@@ -20,6 +20,10 @@ export default function CreatePocketOnboarding() {
     router.back();
   };
 
+  const GoToCreatePocket = () => {
+    router.push("pocket/createPocket");
+  };
+
   return (
     <Box className="flex-1 bg-white justify-stretch -z-20">
       <Box className="flex flex-col">
@@ -106,7 +110,11 @@ export default function CreatePocketOnboarding() {
             </HStack>
           </VStack>
         </Box>
-        <PrimaryButton buttonTitle="Lanjut" className="mb-8" />
+        <PrimaryButton
+          buttonAction={GoToCreatePocket}
+          buttonTitle="Lanjut"
+          className="mb-8"
+        />
       </Box>
     </Box>
   );

@@ -4,12 +4,12 @@ import { Image } from "@/components/ui/image";
 import { Pressable } from "@/components/ui/pressable";
 import { Link, LinkText } from "@/components/ui/link";
 
-import PortfolioDecorator from "../../assets/images/decorators/portfolio-decorator.png";
-import PortfolioIcon from "../../assets/images/icon/portfolio-icon.png";
+import PortfolioDecorator from "../../../assets/images/decorators/portfolio-decorator.png";
+import PortfolioIcon from "../../../assets/images/icon/portfolio-icon.png";
 import { useRef, useState } from "react";
 import { Animated, View } from "react-native";
 
-import AccountCardItem from "../common/AccountCardItem";
+import AccountCardItem from "../../common/AccountCardItem";
 
 export default function AccountCard() {
   const CARD_COUNT = 3; // Portfolio + 2 AccountCardItem
