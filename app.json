@@ -30,11 +30,12 @@
           "image": "./assets/images/splash.png",
           "imageWidth": "100%",
           "imageHeight": "100%",
-          "resizeMode": "contain"          
+          "resizeMode": "contain"
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
