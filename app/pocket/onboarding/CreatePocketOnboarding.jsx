@@ -9,7 +9,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import ButtonNav from "../../../components/common/ButtonNav";
+import ButtonNav from "../../../components/common/buttons/ButtonNav";
 import ScheduleIcon from "../../../assets/images/icon/pocketcreation1.png";
 import RoleIcon from "../../../assets/images/icon/pocketcreation2.png";
 import TransparentIcon from "../../../assets/images/icon/pocketcreation3.png";
