@@ -12,7 +12,7 @@ export default function PrimaryButton({
         className={`p-5 w-full rounded-full justify-items-center items-center bg-tosca-wondr active:bg-tosca-wondr-dark ${className || ""}`}
         onPress={buttonAction}
       >
-        <Text className="text-typography-0 text-center">{buttonTitle}</Text>
+        <Text className="text-black text-center font-bold">{buttonTitle}</Text>
       </Pressable>
     </>
   );

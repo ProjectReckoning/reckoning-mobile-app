@@ -59,7 +59,11 @@ export default function PocketOnboarding() {
         </Text>
       </Box>
 
-      <PrimaryButton onPress={handleNext} text="Buat Pocket" className="mb-8" />
+      <PrimaryButton
+        buttonAction={handleNext}
+        buttonTitle="Mulai Sekarang"
+        className="mb-8"
+      />
     </Box>
   );
 }

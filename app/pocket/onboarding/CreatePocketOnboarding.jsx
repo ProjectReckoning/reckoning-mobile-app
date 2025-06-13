@@ -106,7 +106,7 @@ export default function CreatePocketOnboarding() {
             </HStack>
           </VStack>
         </Box>
-        <PrimaryButton text="Lanjut" className="mb-8" />
+        <PrimaryButton buttonTitle="Lanjut" className="mb-8" />
       </Box>
     </Box>
   );
