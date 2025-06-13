@@ -9,7 +9,7 @@ import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import ButtonNav from "../../../components/common/buttons/ButtonNav";
+import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
 
 import OnboardingIllustration from "@/assets/images/onboarding.png";
 
@@ -59,7 +59,7 @@ export default function PocketOnboarding() {
         </Text>
       </Box>
 
-      <ButtonNav onPress={handleNext} text="Buat Pocket" className="mb-8" />
+      <PrimaryButton onPress={handleNext} text="Buat Pocket" className="mb-8" />
     </Box>
   );
 }
