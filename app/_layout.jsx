@@ -1,3 +1,4 @@
+// app/_layout.jsx
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
@@ -6,72 +7,78 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
-import { Slot } from "expo-router";
+import { Stack, Redirect, Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import "../global.css";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
-// export const unstable_settings = {
-//   // Ensure that reloading on `/modal` keeps a back button present.
-//   initialRouteName: "gluestack",
-// };
+const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      // Original: await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Original: const userToken = "temp_token";
+      // To ensure immediate rendering for debugging, we skip the async wait and token check.
+      // You can uncomment the original lines once the blank screen issue is resolved.
+      // await new Promise((resolve) => setTimeout(resolve, 1500));
+      const userToken = "temp_token"; //
+      if (userToken) {
+        setIsAuthenticated(true);
+      }
+      setIsLoading(false); //
+    };
+    // Original: checkAuthStatus();
+    // For debugging, we don't need to call it if isLoading is already false
+    // checkAuthStatus();
+  }, []);
+
+  return { isAuthenticated, isLoading };
+};
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
+  const fontsLoaded = true;
+  const fontError = undefined;
 
-  // const [styleLoaded, setStyleLoaded] = useState(false);
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  const { isAuthenticated, isLoading } = useAuth();
+  const colorScheme = useColorScheme();
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  // Original: useEffect(() => {
+  // Original:   if (fontError) throw fontError;
+  // Original: }, [fontError]);
+  // Commenting out this useEffect as useFonts is bypassed for debugging.
+  // useEffect(() => {
+  //   if (fontError) throw fontError;
+  // }, [fontError]);
 
-  // useLayoutEffect(() => {
-  //   setStyleLoaded(true);
-  // }, [styleLoaded]);
+  // useEffect for SplashScreen.hideAsync() was removed as per previous request
 
-  // if (!loaded || !styleLoaded) {
+  // Original: if (!fontsLoaded || isLoading) {
+  // Original:   return null;
+  // Original: }
+  // Commenting out this conditional return for debugging.
+  // This ensures the RootLayout always attempts to render its children.
+  // if (!fontsLoaded || isLoading) {
   //   return null;
   // }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
-        <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <Slot />
-          </ThemeProvider>
-        </GluestackUIProvider>
-      </SafeAreaView>
+      <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
+      <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          {isAuthenticated ? <Redirect href="/(main)/home" /> : <Slot />}
+        </ThemeProvider>
+      </GluestackUIProvider>
     </SafeAreaProvider>
   );
 }

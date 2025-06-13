@@ -1,25 +1,27 @@
 import { ImageBackground, View } from "react-native";
 import PrimaryButton from "../../components/common/buttons/PrimaryButton";
 import LoginBackground from "../../assets/images/background/LoginBackground.png";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { router } from "expo-router";
 
 export default function LoginScreen() {
-  const insets = useSafeAreaInsets();
+  const goToLoginForm = () => {
+    router.push("/(auth)/loginForm");
+  };
 
   return (
     <ImageBackground
       source={LoginBackground}
       style={{
         flex: 1,
-        marginTop: -insets.top,
-        marginBottom: -insets.bottom,
-        marginLeft: -insets.left,
-        marginRight: -insets.right,
       }}
       resizeMode="cover"
     >
+      <StatusBar style="light" translucent={true} />
+
       <View className="flex-1 relative px-8">
         <PrimaryButton
+          buttonAction={goToLoginForm}
           buttonTitle="Login"
           className="absolute bottom-40 self-center"
         />
