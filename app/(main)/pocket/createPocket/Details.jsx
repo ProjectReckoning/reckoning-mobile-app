@@ -2,6 +2,7 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { AlertCircleIcon } from "@/components/ui/icon";
@@ -18,7 +19,12 @@ import {
 
 import { router } from "expo-router";
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, CalendarClock } from "lucide-react-native";
+import {
+  ArrowLeft,
+  CalendarClock,
+  UserPlus,
+  ChevronRight,
+} from "lucide-react-native";
 
 import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
@@ -135,11 +141,11 @@ export default function Details() {
 
       <Box className="flex-1 justify-between px-6">
         <Box className="flex flex-col">
-          <Heading size="xl" className="font-bold mt-8 mb-5">
+          <Heading size="xl" className="font-bold mt-8">
             Detail Pocket
           </Heading>
 
-          <VStack space="md" className="w-full">
+          <VStack space="md" className="w-full my-8">
             <FormControl
               isInvalid={isNameInvalid}
               size="md"
@@ -232,7 +238,7 @@ export default function Details() {
                 className="w-full h-14 p-3 my-1 justify-center rounded-xl border border-gray-300 active:border-[#007BE5] focus:border-[#007BE5]"
               >
                 <Box className="flex flex-row gap-3 items-center">
-                  <CalendarClock size={16} className="text-gray-300" />
+                  <CalendarClock size={16} color={"#848688"} />
                   {range.startDate && range.endDate ? (
                     <Text className="text-black text-lg">
                       {range.startDate.toLocaleDateString("id-ID")} -{" "}
@@ -262,6 +268,19 @@ export default function Details() {
               </FormControlError>
             </FormControl>
           </VStack>
+
+          <Pressable className="w-full border-b border-gray-300 p-3">
+            <Box className="flex flex-row justify-between">
+              <HStack space="md">
+                <UserPlus size={24} color={"#848688"} />
+                <Text className="text-gray-500 text-lg">Undang teman</Text>
+              </HStack>
+
+              <HStack space="md">
+                <ChevronRight size={24} color={"#848688"} />
+              </HStack>
+            </Box>
+          </Pressable>
         </Box>
         <PrimaryButton
           buttonAction={handleSubmit}
