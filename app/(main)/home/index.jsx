@@ -12,8 +12,8 @@ import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
-import AccountCard from "@/components/feature/AccountCard";
-import SelectedFeature from "@/components/feature/SelectedFeature";
+import AccountCard from "../../../components/common/cards/AccountCard";
+import SelectedFeature from "../../../components/feature/SelectedFeature";
 
 export default function Home() {
   return (
