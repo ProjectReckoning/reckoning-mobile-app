@@ -12,7 +12,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Stack, Redirect, Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import "../global.css";
 
@@ -71,16 +71,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
-        <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            {isAuthenticated ? <Redirect href="/(main)/home" /> : <Slot />}
-          </ThemeProvider>
-        </GluestackUIProvider>
-      </SafeAreaView>
+      <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
+      <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          {isAuthenticated ? <Redirect href="/(main)/home" /> : <Slot />}
+        </ThemeProvider>
+      </GluestackUIProvider>
     </SafeAreaProvider>
   );
 }
