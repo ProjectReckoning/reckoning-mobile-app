@@ -18,7 +18,7 @@ export const goals = [
     title: "Wisata bersama",
     subtitle: "Wujudkan destinasi impianmu, ditemani orang-orang terdekat.",
     icon: WisataBersamaIcon,
-    imageClassName: "-top-2",
+    imageClassName: "",
   },
   {
     title: "Kolaborasi bisnis",
