@@ -7,30 +7,12 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
+import { pocketTypes } from "../../../utils/pocketTypeData";
 import PocketTypeCard from "../../../components/common/cards/PocketTypeCard";
 import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-
-  const cards = [
-    {
-      pocketType: "Personal",
-      title: "Saving",
-      content: "Capai impian pribadimu dengan menabung bersama.",
-    },
-    {
-      pocketType: "Personal",
-      title: "Spending",
-      content:
-        "Kelola pengeluaran bersama untuk kebutuhan harian atau acara spesial.",
-    },
-    {
-      pocketType: "Business",
-      title: "Enterprise Fund",
-      content: "Kumpulkan dana untuk proyek bisnis atau operasional tim Anda.",
-    },
-  ];
 
   const handleBack = () => {
     router.back();
@@ -57,12 +39,12 @@ export default function CreatePocket() {
 
         <Box className="flex-1 justify-between">
           <VStack space="md" reversed={false} className="mt-10">
-            {cards.map((card, idx) => (
+            {pocketTypes.map((pocketTypeProps, i) => (
               <PocketTypeCard
-                key={idx}
-                {...card}
-                selected={selectedIndex === idx}
-                onPress={() => setSelectedIndex(idx)}
+                key={i}
+                {...pocketTypeProps}
+                selected={selectedIndex === i}
+                onPress={() => setSelectedIndex(i)}
               />
             ))}
           </VStack>
