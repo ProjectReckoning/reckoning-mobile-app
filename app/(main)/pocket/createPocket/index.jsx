@@ -7,9 +7,9 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import { pocketTypes } from "../../../utils/pocketTypeData";
-import PocketTypeCard from "../../../components/common/cards/PocketTypeCard";
-import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
+import { pocketTypes } from "../../../../utils/pocketTypeData";
+import PocketTypeCard from "../../../../components/common/cards/PocketTypeCard";
+import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);

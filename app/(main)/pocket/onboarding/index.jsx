@@ -9,7 +9,7 @@ import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
+import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 import OnboardingIllustration from "@/assets/images/onboarding.png";
 

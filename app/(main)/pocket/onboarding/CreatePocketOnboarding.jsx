@@ -9,11 +9,11 @@ import { Pressable } from "@/components/ui/pressable";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
-import ScheduleIcon from "../../../assets/images/icon/pocketcreation1.png";
-import RoleIcon from "../../../assets/images/icon/pocketcreation2.png";
-import TransparentIcon from "../../../assets/images/icon/pocketcreation3.png";
-import OnboardingDecorator from "../../../assets/images/decorators/onboarding.png";
+import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
+import ScheduleIcon from "../../../../assets/images/icon/pocketcreation1.png";
+import RoleIcon from "../../../../assets/images/icon/pocketcreation2.png";
+import TransparentIcon from "../../../../assets/images/icon/pocketcreation3.png";
+import OnboardingDecorator from "../../../../assets/images/decorators/onboarding.png";
 
 export default function CreatePocketOnboarding() {
   const handleBack = () => {

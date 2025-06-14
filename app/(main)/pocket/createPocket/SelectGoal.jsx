@@ -10,10 +10,10 @@ import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 
-import { goals } from "../../../utils/goalData";
-import GoalDecorator from "../../../assets/images/decorators/goal-decorator.png";
-import GoalCard from "../../../components/common/cards/GoalCard";
-import PrimaryButton from "../../../components/common/buttons/PrimaryButton";
+import { goals } from "../../../../utils/goalData";
+import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
+import GoalCard from "../../../../components/common/cards/GoalCard";
+import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
