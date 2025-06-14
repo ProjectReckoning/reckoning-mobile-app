@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
 
 export default function AppEntry() {
-  return <Redirect href="/(main)/home" />;
+  return <Redirect href="/(auth)/login" />;
 }
