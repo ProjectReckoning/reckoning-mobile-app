@@ -13,7 +13,7 @@ import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
 import AccountCard from "../../../components/common/cards/AccountCard";
-import SelectedFeature from "../../../components/feature/SelectedFeature";
+import SelectedFeature from "../../../components/features/SelectedFeature";
 
 export default function Home() {
   return (
