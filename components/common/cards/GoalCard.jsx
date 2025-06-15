@@ -12,7 +12,7 @@ export default function GoalCard({
   subtitle,
   icon,
   className,
-  imageClassName,
+  iconClassName,
   selected = false,
   onPress,
   isCustom = false,
@@ -46,7 +46,7 @@ export default function GoalCard({
             <Image
               source={icon}
               alt={`${title}-icon`}
-              className={`w-32 h-32 absolute -top-1 -right-1 ${imageClassName}`}
+              className={`w-32 h-32 absolute -top-1 -right-1 ${iconClassName}`}
               resizeMode="contain"
             />
             <Heading size="md" className="leading-tight">

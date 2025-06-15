@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -6,9 +5,12 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+
 import { router } from "expo-router";
+import { goals } from "../../../../utils/goalData";
+import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
-import WisataBersamaDecorator from "../../../../assets/images/decorators/wisataBersamaDecorator.png";
+
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/features/FormPocketDetail";
 
@@ -50,6 +52,10 @@ export default function Details() {
     router.back();
   };
 
+  const GoToFriendsList = () => {
+    router.push("pocket/createPocket/FriendsList");
+  };
+
   useEffect(() => {
     if (inputName.length > 20 || inputName.length === null) {
       setNameIsInvalid(true);
@@ -75,10 +81,12 @@ export default function Details() {
 
   return (
     <Box className="flex-1 bg-white justify-stretch">
-      <Box className="w-full h-56 bg-[#C2F0ED]">
-        <Box className="w-52 absolute right-0 -bottom-4">
+      <Box className={`w-full h-56 bg-${goals[1].color}`}>
+        <Box
+          className={`w-52 absolute right-0 -bottom-4 ${goals[1].decoratorClassName}`}
+        >
           <Image
-            source={WisataBersamaDecorator}
+            source={goals[1].decorator}
             alt="pocket-type-decorator"
             className="w-full h-64"
             resizeMode="contain"
@@ -91,17 +99,15 @@ export default function Details() {
                 <ArrowLeft size={24} />
               </Pressable>
               <Heading size="lg" className="text-bold">
-                Wisata bersama
+                {goals[1].title}
               </Heading>
               <Box className="w-5 h-5" />
             </Box>
             <VStack space="xs" reversed={false}>
-              <Heading size="xl" className="text-bold">
-                Liburan impian kita!
+              <Heading size="xl" className="text-bold w-64">
+                {goals[1].title2}
               </Heading>
-              <Text className="w-72 text-lg">
-                Rencanakan petualangan seru bareng teman-teman!
-              </Text>
+              <Text className="w-64 text-lg">{goals[1].subtitle2}</Text>
             </VStack>
           </VStack>
         </Box>
@@ -130,7 +136,10 @@ export default function Details() {
             onConfirm={onConfirm}
           />
 
-          <Pressable className="w-full border-b border-gray-300 p-3">
+          <Pressable
+            onPress={GoToFriendsList}
+            className="w-full border-b border-gray-300 p-3"
+          >
             <Box className="flex flex-row justify-between">
               <HStack space="md">
                 <UserPlus size={24} color={"#848688"} />
