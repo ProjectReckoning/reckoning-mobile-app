@@ -17,16 +17,25 @@ import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/features/FormPocketDetail";
 
 export default function Details() {
-  const [pocketName, setPocketName] = useState("");
+  const pocketName = usePocketStore((state) => state.pocketName);
+  const setPocketName = usePocketStore((state) => state.setPocketName);
+
+  const pocketBalanceTarget = usePocketStore(
+    (state) => state.pocketBalanceTarget,
+  );
+  const setPocketBalanceTarget = usePocketStore(
+    (state) => state.setPocketBalanceTarget,
+  );
+
+  const targetDuration = usePocketStore((state) => state.targetDuration);
+  const setTargetDuration = usePocketStore((state) => state.setTargetDuration);
+
   const [isNameInvalid, setNameIsInvalid] = useState(false);
-  const [pocketBalanceTarget, setPocketBalanceTarget] = useState("");
   const [isBalanceInvalid, setBalanceIsInvalid] = useState(false);
   const [isDateInvalid, setDateIsInvalid] = useState(false);
-  const [targetDuration, setTargetDuration] = useState({
-    startDate: undefined,
-    endDate: undefined,
-  });
   const [open, setOpen] = useState(false);
+
+  const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
 
   const goalTitle = usePocketStore((state) => state.goalTitle);
@@ -43,10 +52,13 @@ export default function Details() {
     setOpen(false);
   }, []);
 
-  const onConfirm = useCallback(({ startDate, endDate }) => {
-    setOpen(false);
-    setTargetDuration({ startDate, endDate });
-  }, []);
+  const onConfirm = useCallback(
+    ({ startDate, endDate }) => {
+      setOpen(false);
+      setTargetDuration({ startDate, endDate });
+    },
+    [setTargetDuration],
+  );
 
   const handleSubmit = () => {
     if (!isNameInvalid && !isBalanceInvalid && !isDateInvalid) {
@@ -76,13 +88,8 @@ export default function Details() {
   }, [pocketName]);
 
   useEffect(() => {
-    const amountValue = parseInt(pocketBalanceTarget.replace(/\D/g, ""), 10);
-    if (amountValue < 10000) {
-      setBalanceIsInvalid(true);
-    } else {
-      setBalanceIsInvalid(false);
-    }
-  }, [pocketBalanceTarget]);
+    setBalanceIsInvalid(balanceTouched && pocketBalanceTarget < 10000);
+  }, [pocketBalanceTarget, balanceTouched]);
 
   useEffect(() => {
     if (dateTouched) {
@@ -144,7 +151,10 @@ export default function Details() {
                 setPocketName={setPocketName}
                 isNameInvalid={isNameInvalid}
                 pocketBalanceTarget={pocketBalanceTarget}
-                setPocketBalanceTarget={setPocketBalanceTarget}
+                setPocketBalanceTarget={(value) => {
+                  setBalanceTouched(true); // Mark as touched on first change
+                  setPocketBalanceTarget(value);
+                }}
                 isBalanceInvalid={isBalanceInvalid}
                 targetDuration={targetDuration}
                 setTargetDuration={setTargetDuration}

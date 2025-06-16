@@ -86,7 +86,11 @@ export default function FormPocketDetail({
           <InputField
             type="text"
             placeholder="5.000.000"
-            value={formatCurrency(pocketBalanceTarget)}
+            value={
+              pocketBalanceTarget && pocketBalanceTarget !== 0
+                ? formatCurrency(pocketBalanceTarget.toString())
+                : ""
+            }
             onChangeText={setPocketBalanceTarget}
             className="p-3 pl-0"
             keyboardType="numeric"
