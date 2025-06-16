@@ -45,7 +45,7 @@ export default function Details() {
   const handleSubmit = () => {
     if (!isNameInvalid && !isAmountInvalid && !isDateInvalid) {
       // handle submit logic
-      console.log("OK");
+      GoToCustomization();
     }
   };
 
@@ -55,6 +55,10 @@ export default function Details() {
 
   const GoToFriendsList = () => {
     router.push("pocket/createPocket/FriendsList");
+  };
+
+  const GoToCustomization = () => {
+    router.push("pocket/createPocket/Customization");
   };
 
   useEffect(() => {
