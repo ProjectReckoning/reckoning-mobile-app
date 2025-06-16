@@ -11,7 +11,7 @@ export default function PocketDashboard() {
     <>
       <Box className="flex-1 bg-white px-8">
         <PocketDashboardTopBar />
-        <InfoScreen />
+        <HistoryScreen />
       </Box>
     </>
   );
