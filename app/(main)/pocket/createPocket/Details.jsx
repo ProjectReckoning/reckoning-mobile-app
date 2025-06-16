@@ -82,7 +82,7 @@ export default function Details() {
 
   return (
     <Box className="flex-1 bg-white">
-      <Box className={`w-full h-56 ${goals[1].color}`}>
+      <Box className={`w-full h-56 ${goals[1].color || "bg-[#C2F0ED]"}`}>
         <Box
           className={`w-52 absolute right-0 -bottom-4 ${goals[1].decoratorClassName}`}
         >

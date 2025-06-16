@@ -76,7 +76,9 @@ export default function SelectGoal() {
                   <GoalCard
                     {...goalProps}
                     selected={selectedIndex === i}
-                    onPress={() => setSelectedIndex(i)}
+                    onPress={() =>
+                      setSelectedIndex(selectedIndex === i ? null : i)
+                    }
                   />
                 </Box>
               ))}
