@@ -114,9 +114,9 @@ export default function Customization() {
           <Box className="w-5 h-5" />
         </Box>
 
-        <Box className="w-fit h-fit bg-white border border-gray-300 rounded-2xl p-0">
+        <Box className="w-fit min-w-48 h-fit bg-white border border-gray-300 rounded-2xl p-0">
           <Box
-            className={`w-full h-fit rounded-t-2xl p-4 mb-10 ${selectedTranslucent}`}
+            className={`w-fit h-fit rounded-t-2xl p-4 mb-10 ${selectedTranslucent}`}
           >
             <Box
               className={`w-16 h-16 rounded-full ${selectedSolid} items-center justify-center`}

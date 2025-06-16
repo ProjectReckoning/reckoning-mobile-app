@@ -65,7 +65,7 @@ export default function FormPocketDetail({
         <FormControlError>
           <FormControlErrorIcon as={AlertCircleIcon} />
           <FormControlErrorText>
-            Nama pocket mu harus terisi & maksimal 20 karakter!
+            Nama harus terisi, valid, dan maksimal 20 karakter!
           </FormControlErrorText>
         </FormControlError>
       </FormControl>

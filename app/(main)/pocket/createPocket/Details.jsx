@@ -69,9 +69,32 @@ export default function Details() {
     [setTargetDuration],
   );
 
+  const validateForm = () => {
+    // Name: required, max 20 chars, not only whitespace
+    const nameTrimmed = pocketName.trim();
+    const nameInvalid =
+      !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
+
+    // Balance: required, integer, min 10000
+    const balanceInvalid =
+      typeof pocketBalanceTarget !== "number" ||
+      isNaN(pocketBalanceTarget) ||
+      pocketBalanceTarget < 10000 ||
+      !Number.isInteger(pocketBalanceTarget);
+
+    // Duration: required, both start and end date
+    const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+
+    setNameIsInvalid(nameInvalid);
+    setBalanceIsInvalid(balanceInvalid);
+    setDateIsInvalid(dateInvalid);
+
+    // Return true if all valid
+    return !nameInvalid && !balanceInvalid && !dateInvalid;
+  };
+
   const handleSubmit = () => {
-    if (!isNameInvalid && !isBalanceInvalid && !isDateInvalid) {
-      // handle submit logic
+    if (validateForm()) {
       GoToCustomization();
     }
   };
@@ -223,6 +246,14 @@ export default function Details() {
               buttonAction={handleSubmit}
               buttonTitle="Lanjut"
               className="mt-5 mb-8"
+              disabled={
+                isNameInvalid ||
+                isBalanceInvalid ||
+                isDateInvalid ||
+                pocketBalanceTarget === null ||
+                targetDuration.startDate === null ||
+                targetDuration.endDate === null
+              }
             />
           </Box>
         </ScrollView>
