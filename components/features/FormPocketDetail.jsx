@@ -16,13 +16,13 @@ import {
 import { CalendarClock } from "lucide-react-native";
 
 export default function FormPocketDetail({
-  inputName,
-  setInputName,
+  pocketName,
+  setPocketName,
   isNameInvalid,
-  inputAmount,
-  setInputAmount,
-  isAmountInvalid,
-  range,
+  pocketBalanceTarget,
+  setPocketBalanceTarget,
+  isBalanceInvalid,
+  targetDuration,
   isDateInvalid,
   open,
   handleOpenDatePicker,
@@ -50,15 +50,15 @@ export default function FormPocketDetail({
           <InputField
             type="text"
             placeholder="Tulis nama pocket"
-            value={inputName}
-            onChangeText={setInputName}
+            value={pocketName}
+            onChangeText={setPocketName}
             className="p-3"
           />
           <InputSlot className="mr-3">
             <Text
               className={`text-gray-500 text-xs ${isNameInvalid && "text-red-500"}`}
             >
-              {inputName.length}/20
+              {pocketName.length}/20
             </Text>
           </InputSlot>
         </Input>
@@ -70,7 +70,7 @@ export default function FormPocketDetail({
         </FormControlError>
       </FormControl>
 
-      <FormControl isInvalid={isAmountInvalid} size="md" isRequired>
+      <FormControl isInvalid={isBalanceInvalid} size="md" isRequired>
         <FormControlLabel>
           <FormControlLabelText className="font-light">
             Tentuin target saldo kalian
@@ -86,8 +86,8 @@ export default function FormPocketDetail({
           <InputField
             type="text"
             placeholder="5.000.000"
-            value={formatCurrency(inputAmount)}
-            onChangeText={setInputAmount}
+            value={formatCurrency(pocketBalanceTarget)}
+            onChangeText={setPocketBalanceTarget}
             className="p-3 pl-0"
             keyboardType="numeric"
           />
@@ -112,25 +112,14 @@ export default function FormPocketDetail({
         >
           <Box className="flex flex-row gap-3 items-center">
             <CalendarClock size={16} color={"#848688"} />
-            {range.startDate && range.endDate ? (
+            {targetDuration.startDate && targetDuration.endDate ? (
               <Text className="text-black text-lg">
-                {range.startDate.toLocaleDateString("id-ID")} -{" "}
-                {range.endDate.toLocaleDateString("id-ID")}
+                {targetDuration.startDate.toLocaleDateString("id-ID")} -{" "}
+                {targetDuration.endDate.toLocaleDateString("id-ID")}
               </Text>
             ) : (
               <Text className="text-gray-400 text-lg">Pilih tanggal</Text>
             )}
-
-            <DatePickerModal
-              locale="id"
-              mode="range"
-              visible={open}
-              startDate={range.startDate}
-              endDate={range.endDate}
-              onDismiss={onDismiss}
-              onConfirm={onConfirm}
-              presentationStyle="pageSheet"
-            />
           </Box>
         </Pressable>
         <FormControlError>
@@ -139,6 +128,17 @@ export default function FormPocketDetail({
             Target harus memiliki tanggal mulai dan selesai!
           </FormControlErrorText>
         </FormControlError>
+        {/* Move DatePickerModal here, outside Pressable */}
+        <DatePickerModal
+          locale="id"
+          mode="range"
+          visible={open}
+          startDate={targetDuration.startDate}
+          endDate={targetDuration.endDate}
+          onDismiss={onDismiss}
+          onConfirm={onConfirm}
+          presentationStyle="pageSheet"
+        />
       </FormControl>
     </VStack>
   );

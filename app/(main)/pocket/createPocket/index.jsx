@@ -7,19 +7,26 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
+import { usePocketStore } from "../../../../stores/pocketStore";
 import { pocketTypes } from "../../../../utils/pocketTypeData";
 import PocketTypeCard from "../../../../components/common/cards/PocketTypeCard";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const setPocketType = usePocketStore((state) => state.setPocketType);
+  const pocketType = usePocketStore((state) => state.pocketType);
 
   const handleBack = () => {
     router.back();
   };
 
-  const GoToGoal = () => {
-    router.push("pocket/createPocket/SelectGoal");
+  const GoToNext = () => {
+    if (pocketType === "Spending") {
+      router.push("pocket/createPocket/Customization");
+    } else if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+      router.push("pocket/createPocket/SelectGoal");
+    }
   };
 
   return (
@@ -38,20 +45,26 @@ export default function CreatePocket() {
         </VStack>
 
         <Box className="flex-1 justify-between">
-          <VStack space="md" reversed={false} className="mt-10">
+          <VStack space="xl" reversed={false} className="mt-10">
             {pocketTypes.map((pocketTypeProps, i) => (
               <PocketTypeCard
                 key={i}
                 {...pocketTypeProps}
                 selected={selectedIndex === i}
-                onPress={() => setSelectedIndex(selectedIndex === i ? null : i)}
+                onPress={() => {
+                  setSelectedIndex(selectedIndex === i ? null : i);
+                  setPocketType(
+                    selectedIndex === i ? null : pocketTypeProps.type,
+                  );
+                }}
               />
             ))}
           </VStack>
 
           <PrimaryButton
-            buttonAction={GoToGoal}
+            buttonAction={GoToNext}
             buttonTitle="Lanjut"
+            disabled={selectedIndex === null}
             className="mb-8"
           />
         </Box>

@@ -9,6 +9,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { router } from "expo-router";
 import { goals } from "../../../../utils/goalData";
 import { useState, useEffect, useCallback } from "react";
+import { usePocketStore } from "../../../../stores/pocketStore";
 import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
@@ -16,17 +17,22 @@ import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/features/FormPocketDetail";
 
 export default function Details() {
-  const [inputName, setInputName] = useState("");
+  const [pocketName, setPocketName] = useState("");
   const [isNameInvalid, setNameIsInvalid] = useState(false);
-  const [inputAmount, setInputAmount] = useState("");
-  const [isAmountInvalid, setAmountIsInvalid] = useState(false);
+  const [pocketBalanceTarget, setPocketBalanceTarget] = useState("");
+  const [isBalanceInvalid, setBalanceIsInvalid] = useState(false);
   const [isDateInvalid, setDateIsInvalid] = useState(false);
-  const [range, setRange] = useState({
+  const [targetDuration, setTargetDuration] = useState({
     startDate: undefined,
     endDate: undefined,
   });
   const [open, setOpen] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
+
+  const goalTitle = usePocketStore((state) => state.goalTitle);
+
+  const selectedGoal =
+    goals.find((goal) => goal.title === goalTitle) || goals[0];
 
   const handleOpenDatePicker = () => {
     setOpen(true);
@@ -39,11 +45,11 @@ export default function Details() {
 
   const onConfirm = useCallback(({ startDate, endDate }) => {
     setOpen(false);
-    setRange({ startDate, endDate });
+    setTargetDuration({ startDate, endDate });
   }, []);
 
   const handleSubmit = () => {
-    if (!isNameInvalid && !isAmountInvalid && !isDateInvalid) {
+    if (!isNameInvalid && !isBalanceInvalid && !isDateInvalid) {
       // handle submit logic
       GoToCustomization();
     }
@@ -62,36 +68,36 @@ export default function Details() {
   };
 
   useEffect(() => {
-    if (inputName.length > 20 || inputName.length === null) {
+    if (pocketName.length > 20 || pocketName.length === null) {
       setNameIsInvalid(true);
     } else {
       setNameIsInvalid(false);
     }
-  }, [inputName]);
+  }, [pocketName]);
 
   useEffect(() => {
-    const amountValue = parseInt(inputAmount.replace(/\D/g, ""), 10);
+    const amountValue = parseInt(pocketBalanceTarget.replace(/\D/g, ""), 10);
     if (amountValue < 10000) {
-      setAmountIsInvalid(true);
+      setBalanceIsInvalid(true);
     } else {
-      setAmountIsInvalid(false);
+      setBalanceIsInvalid(false);
     }
-  }, [inputAmount]);
+  }, [pocketBalanceTarget]);
 
   useEffect(() => {
     if (dateTouched) {
-      setDateIsInvalid(!range.startDate || !range.endDate);
+      setDateIsInvalid(!targetDuration.startDate || !targetDuration.endDate);
     }
-  }, [range, dateTouched]);
+  }, [targetDuration, dateTouched]);
 
   return (
     <Box className="flex-1 bg-white">
-      <Box className={`w-full h-56 ${goals[1].color || "bg-[#C2F0ED]"}`}>
+      <Box className={`w-full h-56 ${selectedGoal.color}`}>
         <Box
-          className={`w-52 absolute right-0 -bottom-4 ${goals[1].decoratorClassName}`}
+          className={`w-52 absolute right-0 -bottom-4 ${selectedGoal.decoratorClassName}`}
         >
           <Image
-            source={goals[1].decorator}
+            source={selectedGoal.decorator}
             alt="pocket-type-decorator"
             className="w-full h-64"
             resizeMode="contain"
@@ -104,15 +110,15 @@ export default function Details() {
                 <ArrowLeft size={24} />
               </Pressable>
               <Heading size="lg" className="text-bold">
-                {goals[1].title}
+                {selectedGoal.title}
               </Heading>
               <Box className="w-5 h-5" />
             </Box>
             <VStack space="xs" reversed={false}>
               <Heading size="xl" className="text-bold w-64">
-                {goals[1].title2}
+                {selectedGoal.title2}
               </Heading>
-              <Text className="w-64 text-lg">{goals[1].subtitle2}</Text>
+              <Text className="w-64 text-lg">{selectedGoal.subtitle2}</Text>
             </VStack>
           </VStack>
         </Box>
@@ -134,14 +140,14 @@ export default function Details() {
               </Heading>
 
               <FormPocketDetail
-                inputName={inputName}
-                setInputName={setInputName}
+                pocketName={pocketName}
+                setPocketName={setPocketName}
                 isNameInvalid={isNameInvalid}
-                inputAmount={inputAmount}
-                setInputAmount={setInputAmount}
-                isAmountInvalid={isAmountInvalid}
-                range={range}
-                setRange={setRange}
+                pocketBalanceTarget={pocketBalanceTarget}
+                setPocketBalanceTarget={setPocketBalanceTarget}
+                isBalanceInvalid={isBalanceInvalid}
+                targetDuration={targetDuration}
+                setTargetDuration={setTargetDuration}
                 isDateInvalid={isDateInvalid}
                 open={open}
                 setOpen={setOpen}
