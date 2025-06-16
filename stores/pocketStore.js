@@ -21,4 +21,13 @@ export const usePocketStore = create((set) => ({
 
   targetDuration: { startDate: undefined, endDate: undefined },
   setTargetDuration: (duration) => set({ targetDuration: duration }),
+
+  selectedFriends: [],
+  setSelectedFriends: (friends) => set({ selectedFriends: friends }),
+
+  pocketColor: null,
+  setPocketColor: (color) => set({ pocketColor: color }),
+
+  pocketIcon: null,
+  setPocketIcon: (icon) => set({ pocketIcon: icon }),
 }));

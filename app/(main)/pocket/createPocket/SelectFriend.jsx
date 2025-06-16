@@ -9,11 +9,16 @@ import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import FriendList from "../../../../components/common/FriendList";
 
+import { usePocketStore } from "../../../../stores/pocketStore";
 import CustomGoalIcon from "../../../../assets/images/icon/customGoal.png";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function FriendsList() {
   const [haveFriend, setHaveFriend] = useState(false);
+  const selectedFriends = usePocketStore((state) => state.selectedFriends);
+  const setSelectedFriends = usePocketStore(
+    (state) => state.setSelectedFriends,
+  );
 
   const handleBack = () => {
     router.back();
@@ -64,7 +69,10 @@ export default function FriendsList() {
           </Box>
         </Pressable>
 
-        <FriendList />
+        <FriendList
+          selectedFriends={selectedFriends}
+          setSelectedFriends={setSelectedFriends}
+        />
 
         <PrimaryButton
           buttonAction={handleMember}

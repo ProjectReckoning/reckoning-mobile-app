@@ -5,6 +5,11 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import {
+  Avatar,
+  AvatarFallbackText,
+  AvatarGroup,
+} from "@/components/ui/avatar";
 
 import { router } from "expo-router";
 import { goals } from "../../../../utils/goalData";
@@ -42,6 +47,10 @@ export default function Details() {
 
   const selectedGoal =
     goals.find((goal) => goal.title === goalTitle) || goals[0];
+
+  const selectedFriends = usePocketStore((state) => state.selectedFriends);
+  const extraAvatars = selectedFriends.slice(5);
+  const remainingCount = extraAvatars.length;
 
   const handleOpenDatePicker = () => {
     setOpen(true);
@@ -175,7 +184,36 @@ export default function Details() {
                     <UserPlus size={24} color={"#848688"} />
                     <Text className="text-gray-500 text-lg">Undang teman</Text>
                   </HStack>
-                  <HStack space="md">
+                  <HStack space="xs" className="items-center justify-center">
+                    {selectedFriends.length > 0 && (
+                      <AvatarGroup className="items-center justify-center gap-1">
+                        {selectedFriends.slice(0, 5).map((friend, index) => {
+                          return (
+                            <Avatar
+                              key={index}
+                              size="sm"
+                              className={
+                                "border-2 border-outline-0 bg-[#F2F2F2]"
+                              }
+                            >
+                              <AvatarFallbackText className="text-[#58ABA1]">
+                                {friend}
+                              </AvatarFallbackText>
+                            </Avatar>
+                          );
+                        })}
+                        {extraAvatars.length > 0 && (
+                          <Avatar
+                            size="sm"
+                            className={"border-2 border-outline-0 bg-[#F2F2F2]"}
+                          >
+                            <AvatarFallbackText className="text-[#58ABA1]">
+                              {"+ " + remainingCount + ""}
+                            </AvatarFallbackText>
+                          </Avatar>
+                        )}
+                      </AvatarGroup>
+                    )}
                     <ChevronRight size={24} color={"#848688"} />
                   </HStack>
                 </Box>

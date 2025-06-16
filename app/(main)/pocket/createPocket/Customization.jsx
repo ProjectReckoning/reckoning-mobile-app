@@ -10,6 +10,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { useState } from "react";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
+import { usePocketStore } from "../../../../stores/pocketStore";
 
 import {
   Pocket,
@@ -36,11 +37,64 @@ const colors = [
   "bg-pink-wondr",
 ];
 
+const colorMap = {
+  "bg-orange-wondr": {
+    solid: "bg-orange-wondr",
+    translucent: "bg-orange-wondr-light-translucent",
+  },
+  "bg-yellow-wondr": {
+    solid: "bg-yellow-wondr",
+    translucent: "bg-yellow-wondr-light-translucent",
+  },
+  "bg-lime-wondr": {
+    solid: "bg-lime-wondr",
+    translucent: "bg-lime-wondr-light-translucent",
+  },
+  "bg-tosca-wondr": {
+    solid: "bg-tosca-wondr",
+    translucent: "bg-tosca-wondr-light-translucent",
+  },
+  "bg-purple-wondr": {
+    solid: "bg-purple-wondr",
+    translucent: "bg-purple-wondr-light-translucent",
+  },
+  "bg-pink-wondr": {
+    solid: "bg-pink-wondr",
+    translucent: "bg-pink-wondr-light-translucent",
+  },
+};
+
 const icons = [Pocket, Laptop, Diamond, Airplane, Moonstar, Group];
+
+const iconWhiteMap = [
+  PocketWhite,
+  LaptopWhite,
+  DiamondWhite,
+  AirplaneWhite,
+  MoonstarWhite,
+  GroupWhite,
+];
 
 export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [selectedIconIndex, setSelectedIconIndex] = useState(null);
+
+  const selectedColor =
+    selectedColorIndex !== null
+      ? colors[selectedColorIndex]
+      : "bg-orange-wondr";
+  const selectedTranslucent =
+    colorMap[selectedColor]?.translucent || "bg-orange-wondr-light-translucent";
+  const selectedSolid = colorMap[selectedColor]?.solid || "bg-orange-wondr";
+
+  const SelectedIconWhite =
+    selectedIconIndex !== null ? iconWhiteMap[selectedIconIndex] : PocketWhite;
+
+  const pocketName = usePocketStore((state) => state.pocketName);
+  const pocketType = usePocketStore((state) => state.pocketType);
+
+  const setPocketColor = usePocketStore((state) => state.setPocketColor);
+  const setPocketIcon = usePocketStore((state) => state.setPocketIcon);
 
   const handleBack = () => {
     router.back();
@@ -61,15 +115,19 @@ export default function Customization() {
         </Box>
 
         <Box className="w-fit h-fit bg-white border border-gray-300 rounded-2xl p-0">
-          <Box className="w-full h-fit rounded-t-2xl p-4 mb-10 bg-[#FFE7CC]">
-            <Box className="w-16 h-16 rounded-full bg-orange-wondr items-center justify-center">
-              <Icon as={AirplaneWhite} size="xl" className="w-8 h-8" />
+          <Box
+            className={`w-full h-fit rounded-t-2xl p-4 mb-10 ${selectedTranslucent}`}
+          >
+            <Box
+              className={`w-16 h-16 rounded-full ${selectedSolid} items-center justify-center`}
+            >
+              <Icon as={SelectedIconWhite} size="xl" className="w-8 h-8" />
             </Box>
             <VStack space="2xs" className="my-7">
               <Heading size={"md"} className="pr-5">
-                Pergi ke Korea 2026
+                {pocketName}
               </Heading>
-              <Text size={"md"}>Saving pocket</Text>
+              <Text size={"md"}>{pocketType} pocket</Text>
             </VStack>
           </Box>
         </Box>
@@ -82,11 +140,12 @@ export default function Customization() {
             <HStack space="md" className="flex-wrap justify-between">
               {colors.map((color, index) => (
                 <Pressable
-                  onPress={() =>
+                  onPress={() => {
+                    setPocketColor(color);
                     setSelectedColorIndex(
                       selectedColorIndex === index ? null : index,
-                    )
-                  }
+                    );
+                  }}
                   key={index}
                   className={`w-8 h-8 rounded-full ${color} ${selectedColorIndex === index ? "border-2 border-[#007BE5]" : ""}`}
                 ></Pressable>
@@ -98,11 +157,12 @@ export default function Customization() {
             <HStack space="md" className="flex-wrap justify-between">
               {icons.map((icon, index) => (
                 <Pressable
-                  onPress={() =>
+                  onPress={() => {
+                    setPocketIcon(icon);
                     setSelectedIconIndex(
                       selectedIconIndex === index ? null : index,
-                    )
-                  }
+                    );
+                  }}
                   key={index}
                   className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
                 >
