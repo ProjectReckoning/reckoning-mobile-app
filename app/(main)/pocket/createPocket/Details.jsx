@@ -81,7 +81,7 @@ export default function Details() {
 
   return (
     <Box className="flex-1 bg-white justify-stretch">
-      <Box className={`w-full h-56 bg-${goals[1].color}`}>
+      <Box className={`w-full h-56 ${goals[1].color}`}>
         <Box
           className={`w-52 absolute right-0 -bottom-4 ${goals[1].decoratorClassName}`}
         >
@@ -138,7 +138,7 @@ export default function Details() {
 
           <Pressable
             onPress={GoToFriendsList}
-            className="w-full border-b border-gray-300 p-3"
+            className="w-full border-b border-gray-300 p-3 active:bg-gray-100 rounded-lg"
           >
             <Box className="flex flex-row justify-between">
               <HStack space="md">

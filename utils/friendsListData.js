@@ -6,7 +6,7 @@ export const friendsList = [
   },
   {
     id: 1915615851,
-    name: "IVANKA LARASATI KUSUMADEWI",
+    name: "IVANKA LARASATI KUSUMADEWI PUTRI SYALALALA",
     bank: "BNI",
   },
   {

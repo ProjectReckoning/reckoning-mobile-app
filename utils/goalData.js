@@ -15,7 +15,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "[#FFDDFF]",
+    color: "bg-[#FFDDFF]",
   },
   {
     title: "Pernikahan",
@@ -26,7 +26,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "[#FFDDFF]",
+    color: "bg-[#FFDDFF]",
   },
   {
     title: "Wisata bersama",
@@ -37,7 +37,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "[#C2F0ED]",
+    color: "bg-[#C2F0ED]",
   },
   {
     title: "Kolaborasi bisnis",
@@ -48,7 +48,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "[#C2F0ED]",
+    color: "bg-[#C2F0ED]",
   },
   {
     isCustom: true,
