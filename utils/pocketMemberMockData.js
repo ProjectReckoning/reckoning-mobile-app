@@ -7,6 +7,7 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 30000000,
     progressColor: "#3FD8D4", // Tosca
     initialsBgColor: "#E0E0E0",
+    role: "owner", // Added role: owner
   },
   {
     id: "2",
@@ -16,6 +17,7 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 30000000,
     progressColor: "#8C6FEE", // Purple
     initialsBgColor: "#E0E0E0",
+    role: "admin", // Added role: admin
   },
   {
     id: "3",
@@ -25,6 +27,7 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 30000000,
     progressColor: "#F2A4EE", // Pink
     initialsBgColor: "#E0E0E0",
+    role: "spender", // Added role: spender
   },
   {
     id: "4",
@@ -34,6 +37,7 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 30000000,
     progressColor: "#8C6FEE", // Purple
     initialsBgColor: "#E0E0E0",
+    role: "viewer", // Added role: viewer
   },
   // Add more data to test scrolling
   {
@@ -44,6 +48,7 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 20000000,
     progressColor: "#3FD8D4",
     initialsBgColor: "#E0E0E0",
+    role: "spender", // Added role: spender
   },
   {
     id: "6",
@@ -53,5 +58,6 @@ export const MEMBER_MOCK_DATA = [
     targetAmount: 15000000,
     progressColor: "#8C6FEE",
     initialsBgColor: "#E0E0E0",
+    role: "viewer", // Added role: viewer
   },
 ];
