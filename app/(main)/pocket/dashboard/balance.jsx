@@ -2,11 +2,11 @@ import React from "react";
 import { Dimensions } from "react-native";
 import { Box } from "@/components/ui/box";
 
-import AccountNumber from "@/components/feature/pocketDashboard/AccountNumber";
-import PaymentDateInfo from "@/components/feature/pocketDashboard/PaymentDateInfo";
-import CircularProgressBar from "@/components/feature/pocketDashboard/CircularProgressBar";
-import TransactionButtonGroup from "@/components/feature/pocketDashboard/TransactionButtonGroup";
-import BalanceMemberList from "@/components/feature/pocketDashboard/BalanceMemberList";
+import AccountNumber from "@/components/feature/pocketDashboard/balance/AccountNumber";
+import PaymentDateInfo from "@/components/feature/pocketDashboard/balance/PaymentDateInfo";
+import CircularProgressBar from "@/components/feature/pocketDashboard/balance/CircularProgressBar";
+import TransactionButtonGroup from "@/components/feature/pocketDashboard/balance/TransactionButtonGroup";
+import BalanceMemberList from "@/components/feature/pocketDashboard/balance/BalanceMemberList";
 
 import { MEMBER_MOCK_DATA } from "@/utils/pocketMemberMockData";
 
