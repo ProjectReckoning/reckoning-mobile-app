@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { goals } from "../../../../utils/goalData";
 import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
+import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/features/FormPocketDetail";
@@ -80,7 +81,7 @@ export default function Details() {
   }, [range, dateTouched]);
 
   return (
-    <Box className="flex-1 bg-white justify-stretch">
+    <Box className="flex-1 bg-white">
       <Box className={`w-full h-56 ${goals[1].color}`}>
         <Box
           className={`w-52 absolute right-0 -bottom-4 ${goals[1].decoratorClassName}`}
@@ -113,50 +114,61 @@ export default function Details() {
         </Box>
       </Box>
 
-      <Box className="flex-1 justify-between px-6">
-        <Box className="flex flex-col">
-          <Heading size="xl" className="font-bold mt-8">
-            Detail Pocket
-          </Heading>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={50}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <Box className="flex-1 justify-between px-6">
+            <Box className="flex flex-col">
+              <Heading size="xl" className="font-bold mt-8">
+                Detail Pocket
+              </Heading>
 
-          <FormPocketDetail
-            inputName={inputName}
-            setInputName={setInputName}
-            isNameInvalid={isNameInvalid}
-            inputAmount={inputAmount}
-            setInputAmount={setInputAmount}
-            isAmountInvalid={isAmountInvalid}
-            range={range}
-            setRange={setRange}
-            isDateInvalid={isDateInvalid}
-            open={open}
-            setOpen={setOpen}
-            handleOpenDatePicker={handleOpenDatePicker}
-            onDismiss={onDismiss}
-            onConfirm={onConfirm}
-          />
+              <FormPocketDetail
+                inputName={inputName}
+                setInputName={setInputName}
+                isNameInvalid={isNameInvalid}
+                inputAmount={inputAmount}
+                setInputAmount={setInputAmount}
+                isAmountInvalid={isAmountInvalid}
+                range={range}
+                setRange={setRange}
+                isDateInvalid={isDateInvalid}
+                open={open}
+                setOpen={setOpen}
+                handleOpenDatePicker={handleOpenDatePicker}
+                onDismiss={onDismiss}
+                onConfirm={onConfirm}
+              />
 
-          <Pressable
-            onPress={GoToFriendsList}
-            className="w-full border-b border-gray-300 p-3 active:bg-gray-100 rounded-lg"
-          >
-            <Box className="flex flex-row justify-between">
-              <HStack space="md">
-                <UserPlus size={24} color={"#848688"} />
-                <Text className="text-gray-500 text-lg">Undang teman</Text>
-              </HStack>
-              <HStack space="md">
-                <ChevronRight size={24} color={"#848688"} />
-              </HStack>
+              <Pressable
+                onPress={GoToFriendsList}
+                className="w-full border-b border-gray-300 p-3 active:bg-gray-100 rounded-lg"
+              >
+                <Box className="flex flex-row justify-between">
+                  <HStack space="md">
+                    <UserPlus size={24} color={"#848688"} />
+                    <Text className="text-gray-500 text-lg">Undang teman</Text>
+                  </HStack>
+                  <HStack space="md">
+                    <ChevronRight size={24} color={"#848688"} />
+                  </HStack>
+                </Box>
+              </Pressable>
             </Box>
-          </Pressable>
-        </Box>
-        <PrimaryButton
-          buttonAction={handleSubmit}
-          buttonTitle="Lanjut"
-          className="mt-3 mb-8"
-        />
-      </Box>
+            <PrimaryButton
+              buttonAction={handleSubmit}
+              buttonTitle="Lanjut"
+              className="mt-5 mb-8"
+            />
+          </Box>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Box>
   );
 }
