@@ -54,7 +54,7 @@ export default function Details() {
   };
 
   const GoToFriendsList = () => {
-    router.push("pocket/createPocket/FriendsList");
+    router.push("pocket/createPocket/SelectFriend");
   };
 
   const GoToCustomization = () => {
