@@ -71,10 +71,10 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
-      <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+      <StatusBar style="auto" backgroundColor="#F2F2F2" />
+      <GluestackUIProvider mode={colorScheme === "dark" ? "light" : "light"}>
         <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          value={colorScheme === "dark" ? DefaultTheme : DefaultTheme}
         >
           {isAuthenticated ? <Redirect href="/(main)/home" /> : <Slot />}
         </ThemeProvider>
