@@ -1,11 +1,17 @@
 import { Box } from "@/components/ui/box";
-import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import { Icon, AlertCircleIcon } from "@/components/ui/icon";
+import { Input, InputField, InputSlot } from "@/components/ui/input";
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlErrorIcon,
+} from "@/components/ui/form-control";
 
 import { useState } from "react";
 import { router } from "expo-router";
@@ -96,6 +102,9 @@ export default function Customization() {
   const setPocketColor = usePocketStore((state) => state.setPocketColor);
   const setPocketIcon = usePocketStore((state) => state.setPocketIcon);
 
+  const [isNameInvalid, setNameIsInvalid] = useState(false);
+  const setPocketName = usePocketStore((state) => state.setPocketName);
+
   const handleBack = () => {
     router.back();
   };
@@ -125,7 +134,7 @@ export default function Customization() {
             </Box>
             <VStack space="2xs" className="my-7">
               <Heading size={"md"} className="pr-5">
-                {pocketName}
+                {pocketName ? pocketName : "Nama Pocket"}
               </Heading>
               <Text size={"md"}>{pocketType} pocket</Text>
             </VStack>
@@ -135,6 +144,39 @@ export default function Customization() {
 
       <Box className="flex-1 flex-col mt-5 px-6 justify-between">
         <VStack space="2xl" className="w-full px-3">
+          {pocketType === "Spending" && (
+            <VStack space="md">
+              <Text size="lg">Masukkan nama pocket kamu</Text>
+
+              <FormControl isInvalid={isNameInvalid} size="md" isRequired>
+                <Input
+                  className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
+                  size="lg"
+                >
+                  <InputField
+                    type="text"
+                    placeholder="Tulis nama pocket"
+                    value={pocketName}
+                    onChangeText={setPocketName}
+                    className="p-3"
+                  />
+                  <InputSlot className="mr-3">
+                    <Text
+                      className={`text-gray-500 text-xs ${isNameInvalid && "text-red-500"}`}
+                    >
+                      {pocketName.length}/20
+                    </Text>
+                  </InputSlot>
+                </Input>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    Nama harus terisi, valid, dan maksimal 20 karakter!
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+            </VStack>
+          )}
           <VStack space="xl">
             <Text size="lg">Pilih warna pocket kamu</Text>
             <HStack space="md" className="flex-wrap justify-between">
