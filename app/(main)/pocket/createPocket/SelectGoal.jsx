@@ -22,6 +22,10 @@ export default function SelectGoal() {
     router.back();
   };
 
+  const GoToDetails = () => {
+    router.push("pocket/createPocket/Details");
+  };
+
   return (
     <Box className="flex-1 bg-white justify-stretch">
       <Box className="w-full h-56 bg-[#C2F0ED] absolute top-0"></Box>
@@ -37,9 +41,17 @@ export default function SelectGoal() {
 
       <Box className="flex-1 flex-col px-6 pt-5 justify-between">
         <VStack space="4xl" reversed={false}>
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
+          <Box className="flex flex-row justify-between items-center bg-[#C2F0ED]">
+            <Pressable onPress={handleBack}>
+              <ArrowLeft size={24} />
+            </Pressable>
+
+            <Heading size="lg" className="text-bold">
+              Saving
+            </Heading>
+
+            <Box className="w-5 h-5" />
+          </Box>
 
           <VStack space="xs" reversed={false}>
             <Heading size="xl" className="text-bold">
@@ -64,13 +76,19 @@ export default function SelectGoal() {
                   <GoalCard
                     {...goalProps}
                     selected={selectedIndex === i}
-                    onPress={() => setSelectedIndex(i)}
+                    onPress={() =>
+                      setSelectedIndex(selectedIndex === i ? null : i)
+                    }
                   />
                 </Box>
               ))}
             </Box>
           </ScrollView>
-          <PrimaryButton buttonTitle="Lanjut" className="mt-3 mb-8" />
+          <PrimaryButton
+            buttonAction={GoToDetails}
+            buttonTitle="Lanjut"
+            className="mt-3 mb-8"
+          />
         </Box>
       </Box>
     </Box>

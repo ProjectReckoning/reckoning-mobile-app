@@ -44,7 +44,7 @@ export default function CreatePocket() {
                 key={i}
                 {...pocketTypeProps}
                 selected={selectedIndex === i}
-                onPress={() => setSelectedIndex(i)}
+                onPress={() => setSelectedIndex(selectedIndex === i ? null : i)}
               />
             ))}
           </VStack>
