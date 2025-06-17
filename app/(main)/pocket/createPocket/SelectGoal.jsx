@@ -10,13 +10,16 @@ import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 
-import { goals } from "../../../../utils/goalData";
-import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
+import { savingGoals } from "../../../../utils/goalData";
+import { usePocketStore } from "../../../../stores/pocketStore";
 import GoalCard from "../../../../components/common/cards/GoalCard";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
+import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
 
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const pocketType = usePocketStore((state) => state.pocketType);
+  const setGoalTitle = usePocketStore((state) => state.setGoalTitle);
 
   const handleBack = () => {
     router.back();
@@ -47,7 +50,7 @@ export default function SelectGoal() {
             </Pressable>
 
             <Heading size="lg" className="text-bold">
-              Saving
+              {pocketType}
             </Heading>
 
             <Box className="w-5 h-5" />
@@ -71,14 +74,17 @@ export default function SelectGoal() {
             style={{ marginRight: -10 }}
           >
             <Box className="flex flex-row flex-wrap justify-between">
-              {goals.map((goalProps, i) => (
+              {savingGoals.map((goalProps, i) => (
                 <Box key={i} className="w-[48%] mb-5">
                   <GoalCard
                     {...goalProps}
                     selected={selectedIndex === i}
-                    onPress={() =>
-                      setSelectedIndex(selectedIndex === i ? null : i)
-                    }
+                    onPress={() => {
+                      setSelectedIndex(selectedIndex === i ? null : i);
+                      setGoalTitle(
+                        selectedIndex === i ? null : goalProps.title,
+                      );
+                    }}
                   />
                 </Box>
               ))}
@@ -87,6 +93,7 @@ export default function SelectGoal() {
           <PrimaryButton
             buttonAction={GoToDetails}
             buttonTitle="Lanjut"
+            disabled={selectedIndex === null}
             className="mt-3 mb-8"
           />
         </Box>

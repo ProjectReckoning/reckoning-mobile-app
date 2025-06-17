@@ -5,7 +5,7 @@ import KolaborasiBisnisIcon from "../assets/images/icon/kolaborasiBisnis.png";
 
 import WisataBersamaDecorator from "../assets/images/decorators/wisataBersamaDecorator.png";
 
-export const goals = [
+export const savingGoals = [
   {
     title: "Tabungan keluarga",
     title2: "Rencanakan masa depan keluarga",
@@ -15,7 +15,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "bg-[#FFDDFF]",
+    color: "bg-pink-wondr-light-translucent",
   },
   {
     title: "Pernikahan",
@@ -26,7 +26,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "bg-[#FFDDFF]",
+    color: "bg-pink-wondr-light-translucent",
   },
   {
     title: "Wisata bersama",
@@ -37,7 +37,7 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "bg-[#C2F0ED]",
+    color: "bg-tosca-wondr-light-translucent",
   },
   {
     title: "Kolaborasi bisnis",
@@ -48,9 +48,11 @@ export const goals = [
     iconClassName: "",
     decorator: WisataBersamaDecorator,
     decoratorClassName: "",
-    color: "bg-[#C2F0ED]",
+    color: "bg-tosca-wondr-light-translucent",
   },
   {
     isCustom: true,
   },
 ];
+
+export const businessGoals = [];

@@ -12,8 +12,8 @@ import {
   CheckboxGroup,
 } from "@/components/ui/checkbox";
 
-import { useState } from "react";
 import { ScrollView } from "react-native";
+import { useState, useEffect } from "react";
 import { Check } from "lucide-react-native";
 
 import { friendsList } from "../../utils/friendsListData";
@@ -29,12 +29,20 @@ const groupFriendsByInitial = (list) => {
   }, {});
 };
 
-export default function FriendsList() {
-  const [values, setValues] = useState([]);
+export default function FriendList({ selectedFriends, setSelectedFriends }) {
+  const [values, setValues] = useState(selectedFriends || []);
 
   // Group and sort friends
   const groupedFriends = groupFriendsByInitial(friendsList);
   const initials = Object.keys(groupedFriends).sort();
+
+  useEffect(() => {
+    setSelectedFriends(values);
+  }, [values, setSelectedFriends]);
+
+  useEffect(() => {
+    setValues(selectedFriends || []);
+  }, [selectedFriends]);
 
   return (
     <Box className="flex-1 pb-2">
@@ -55,6 +63,8 @@ export default function FriendsList() {
                     key={friend.id}
                     value={friend.name}
                     className="flex-row items-center px-0 py-3 rounded-lg bg-white"
+                    defaultIsChecked={false}
+                    isChecked={values.includes(friend.name) ? true : false}
                   >
                     <Avatar
                       size={"md"}

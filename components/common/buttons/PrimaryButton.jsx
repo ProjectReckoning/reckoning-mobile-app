@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text";
 export default function PrimaryButton({
   buttonAction = () => {},
   buttonTitle,
+  disabled = false,
   className,
 }) {
   return (
@@ -11,6 +12,7 @@ export default function PrimaryButton({
       <Pressable
         className={`p-5 w-full rounded-full justify-items-center items-center bg-tosca-wondr active:bg-tosca-wondr-dark ${className || ""}`}
         onPress={buttonAction}
+        disabled={disabled}
       >
         <Text className="text-black text-center font-bold">{buttonTitle}</Text>
       </Pressable>
