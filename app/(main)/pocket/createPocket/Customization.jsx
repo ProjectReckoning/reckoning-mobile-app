@@ -123,6 +123,11 @@ export default function Customization() {
     targetDuration,
     selectedFriends,
     setPocketName,
+    setPocketBalanceTarget,
+    setTargetDuration,
+    setGoalTitle,
+    setPocketType,
+    setSelectedFriends,
     setPocketColor,
     setPocketIcon,
   } = usePocketStore();
@@ -137,6 +142,26 @@ export default function Customization() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const resetData = () => {
+    setPocketName("");
+    setPocketColor("bg-orange-wondr");
+    setPocketIcon("Pocket");
+    setPocketBalanceTarget(null);
+    setTargetDuration({ startDate: undefined, endDate: undefined });
+    setPocketType(null);
+    setGoalTitle(null);
+    setSelectedFriends([]);
+    setAlertMessages([]);
+    setShowAlertDialog(false);
+    setNameIsInvalid(false);
+    setSelectedColorIndex(null);
+    setSelectedIconIndex(null);
+  };
+
+  const GoToNext = () => {
+    router.push("/(main)/home");
   };
 
   const pocketValidation = () => {
@@ -200,8 +225,10 @@ export default function Customization() {
       targetDuration,
     };
     allPocket.push(newPocket);
-
     console.log("Pocket created:", newPocket);
+
+    GoToNext();
+    resetData();
 
     return true;
   };
