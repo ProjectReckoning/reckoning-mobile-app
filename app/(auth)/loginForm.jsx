@@ -9,7 +9,8 @@ import {
   FormControlHelper, // Keeping if you have helper texts, otherwise can remove
   FormControlHelperText, // Keeping if you have helper texts, otherwise can remove
 } from "@/components/ui/form-control";
-import { Input, InputField } from "@/components/ui/input";
+// Import InputSlot along with Input and InputField
+import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { AlertCircleIcon } from "@/components/ui/icon";
 import { Box } from "@/components/ui/box";
@@ -28,12 +29,12 @@ const formatPhoneNumberForBackend = (phoneNumber) => {
   // Remove all non-digit characters
   let cleanedNumber = phoneNumber.replace(/\D/g, "");
 
-  // If it starts with '0', remove it
+  // If it starts with '0', remove it (this is for user convenience if they type 08...)
   if (cleanedNumber.startsWith("0")) {
     cleanedNumber = cleanedNumber.substring(1);
   }
 
-  // Prepend '62' if it doesn't already start with it
+  // Prepend '62' (assuming phoneNumberValue only contains digits after 62/0)
   if (!cleanedNumber.startsWith("62")) {
     cleanedNumber = "62" + cleanedNumber;
   }
@@ -52,9 +53,7 @@ const validatePhoneNumberLength = (phoneNumber) => {
 
 // Helper function to check for special characters
 const containsSpecialCharacters = (str) => {
-  // This regex matches any character that is NOT a letter (a-z, A-Z), digit (0-9), or common valid character for passwords
-  // For 'no special characters', we want to check if it contains anything *other than* alphanumeric.
-  // Assuming space is also a special character here.
+  // This regex matches any character that is NOT a letter (a-z, A-Z) or digit (0-9)
   const alphanumericRegex = /^[a-zA-Z0-9]*$/;
   return !alphanumericRegex.test(str);
 };
@@ -66,13 +65,12 @@ export default function LoginFormScreen() {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [phoneNumberError, setPhoneNumberError] = useState("");
-  const [passwordError, setPasswordError] = useState(""); // Change to string for specific messages
+  const [passwordError, setPasswordError] = useState("");
 
   const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async () => {
     setLoading(true);
-    // Clear all errors at the start
     setLoginError("");
     setPhoneNumberError("");
     setPasswordError("");
@@ -81,21 +79,18 @@ export default function LoginFormScreen() {
 
     // --- Frontend Validation ---
 
-    // Phone Number basic presence
+    // Phone Number basic presence and formatting
     if (!phoneNumberValue) {
       setPhoneNumberError("Nomor telepon wajib diisi.");
       isValid = false;
     } else {
       // Phone Number Length Check (after formatting)
       const formattedPhoneNumber =
-        formatPhoneNumberForBackend(phoneNumberValue);
+        formatPhoneNumberForBackend(phoneNumberValue); // Use phoneNumberValue which is just the digits
       if (!validatePhoneNumberLength(formattedPhoneNumber)) {
-        // Corrected error message to reflect the 7-15 range
         setPhoneNumberError("Panjang nomor telepon harus 7-15 digit.");
         isValid = false;
       }
-      // If phone number is valid, ensure it's used for the API call
-      // No need to set phoneNumberValue again, as it's already set by onChangeText
     }
 
     // Password basic presence
@@ -177,7 +172,7 @@ export default function LoginFormScreen() {
         <VStack className="w-full flex-1 justify-between">
           <VStack className="rounded-md mx-8">
             <FormControl
-              isInvalid={!!phoneNumberError || !!passwordError || !!loginError} // Combined invalid checks
+              isInvalid={!!phoneNumberError || !!passwordError || !!loginError}
               size="md"
               isDisabled={false}
               isReadOnly={false}
@@ -190,10 +185,15 @@ export default function LoginFormScreen() {
                 </FormControlLabelText>
               </FormControlLabel>
               <Input className="my-1">
+                {/* InputSlot for the "+62" prefix */}
+                <InputSlot pl="$3">
+                  <Text className="text-gray-500 font-bold">+62 </Text>
+                </InputSlot>
                 <InputField
                   type="text"
-                  placeholder="+62 87xxxx-xxxx-xxxx"
-                  value={phoneNumberValue}
+                  // Placeholder now only for the digits after +62
+                  placeholder="87xxxx-xxxx-xxxx"
+                  value={phoneNumberValue} // This state only holds the numbers user types
                   onChangeText={(text) => {
                     // Only allow digits for phoneNumberValue state
                     setPhoneNumberValue(text.replace(/\D/g, ""));
