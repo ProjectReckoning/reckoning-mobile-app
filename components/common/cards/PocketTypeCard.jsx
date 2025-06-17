@@ -8,8 +8,8 @@ import { Pressable } from "@/components/ui/pressable";
 import pocketTypeDecorator from "../../../assets/images/decorators/pocket-type.png";
 
 export default function PocketTypeCard({
-  pocketType,
-  title,
+  type,
+  subject,
   content,
   className,
   selected = false,
@@ -23,7 +23,7 @@ export default function PocketTypeCard({
         className={`bg-white border-[1.5px] ${selected ? "border-[#007BE5]" : "border-gray-300"} ${className} overflow-hidden rounded-xl`}
       >
         <Box className="bg-tosca-wondr w-40 h-9 justify-center pl-5 rounded-br-2xl rounded-tl-xl absolute -left-1 -top-1">
-          <Text className="font-semibold text-lg text-black">{pocketType}</Text>
+          <Text className="font-semibold text-lg text-black">{subject}</Text>
         </Box>
         <Box className="w-24 absolute -right-4">
           <Image
@@ -34,7 +34,7 @@ export default function PocketTypeCard({
           />
         </Box>
         <Heading size="md" className="mt-7 mb-1">
-          {title}
+          {type}
         </Heading>
         <Text size="sm">{content}</Text>
       </Card>

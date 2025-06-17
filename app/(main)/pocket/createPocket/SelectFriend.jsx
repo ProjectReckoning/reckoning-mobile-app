@@ -1,25 +1,29 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { useState } from "react";
 import { router } from "expo-router";
+import { ScrollView } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import FriendList from "../../../../components/common/FriendList";
 
+import { usePocketStore } from "../../../../stores/pocketStore";
 import CustomGoalIcon from "../../../../assets/images/icon/customGoal.png";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function FriendsList() {
-  const [haveFriend, setHaveFriend] = useState(false);
+  const selectedFriends = usePocketStore((state) => state.selectedFriends);
+  const setSelectedFriends = usePocketStore(
+    (state) => state.setSelectedFriends,
+  );
 
   const handleBack = () => {
-    router.back();
-  };
-
-  const handleMember = () => {
     router.back();
   };
 
@@ -37,12 +41,48 @@ export default function FriendsList() {
           <Box className="w-5 h-5" />
         </Box>
 
-        {haveFriend && (
-          <Box className="flex flex-col gap-3 mb-4">
-            <Heading size={"md"} className="font-bold">
+        {selectedFriends.length > 0 && (
+          <VStack size="2xl" className="mb-6">
+            <Heading size={"md"} className="font-bold mb-3">
               Siapa aja isi group kamu?
             </Heading>
-          </Box>
+            <HStack size="2xl" className="w-full overflow-hidden">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ flex: 1 }}
+              >
+                {selectedFriends.map((friend, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      // Remove the friend from selectedFriends
+                      setSelectedFriends(
+                        selectedFriends.filter((f) => f !== friend),
+                      );
+                    }}
+                  >
+                    <Avatar
+                      size="lg"
+                      className={
+                        "border-2 border-outline-0 bg-[#F2F2F2] items-center justify-center mr-3"
+                      }
+                    >
+                      <Badge
+                        className="z-10 self-end w-4 h-4 bg-red-wondr rounded-full -mr-1 items-center justify-center"
+                        variant="solid"
+                      >
+                        <BadgeText className="text-white text-xs">-</BadgeText>
+                      </Badge>
+                      <AvatarFallbackText className="text-[#58ABA1]">
+                        {friend}
+                      </AvatarFallbackText>
+                    </Avatar>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </HStack>
+          </VStack>
         )}
 
         <Pressable className="flex flex-row gap-5 items-center mb-6 active:bg-gray-100 rounded-xl">
@@ -64,10 +104,13 @@ export default function FriendsList() {
           </Box>
         </Pressable>
 
-        <FriendList />
+        <FriendList
+          selectedFriends={selectedFriends}
+          setSelectedFriends={setSelectedFriends}
+        />
 
         <PrimaryButton
-          buttonAction={handleMember}
+          buttonAction={handleBack}
           buttonTitle="Lanjut"
           className="mt-3 mb-8"
         />
