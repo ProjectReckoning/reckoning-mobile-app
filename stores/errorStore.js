@@ -1,3 +1,4 @@
+// stores/errorStore.js
 import { create } from "zustand";
 
 const useErrorStore = create((set) => ({

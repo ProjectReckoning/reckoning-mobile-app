@@ -1,6 +1,7 @@
+// app/(auth)/login.jsx
 import { ImageBackground, View } from "react-native";
-import PrimaryButton from "../../components/common/buttons/PrimaryButton";
-import LoginBackground from "../../assets/images/background/LoginBackground.png";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import LoginBackground from "@/assets/images/background/LoginBackground.png";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 
