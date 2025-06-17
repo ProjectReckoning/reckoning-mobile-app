@@ -4,6 +4,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Icon, AlertCircleIcon } from "@/components/ui/icon";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import {
@@ -12,11 +13,20 @@ import {
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogBody,
+  AlertDialogBackdrop,
+} from "@/components/ui/alert-dialog";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
+import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import {
@@ -100,12 +110,18 @@ export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [selectedIconIndex, setSelectedIconIndex] = useState(null);
   const [isNameInvalid, setNameIsInvalid] = useState(false);
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [alertMessages, setAlertMessages] = useState([]);
 
   const {
     pocketName,
     pocketType,
     pocketColor,
     pocketIcon,
+    goalTitle,
+    pocketBalanceTarget,
+    targetDuration,
+    selectedFriends,
     setPocketName,
     setPocketColor,
     setPocketIcon,
@@ -121,6 +137,73 @@ export default function Customization() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const pocketValidation = () => {
+    const nameTrimmed = pocketName.trim();
+    const isNameInvalid =
+      !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
+    setNameIsInvalid(isNameInvalid);
+
+    const isColorInvalid = !pocketColor || pocketColor === "";
+    const isIconInvalid = !pocketIcon || pocketIcon === "";
+
+    let isGoalInvalid = false;
+    let isBalanceInvalid = false;
+    let isDurationInvalid = false;
+
+    if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+      isGoalInvalid = !goalTitle || goalTitle === "";
+      isBalanceInvalid =
+        typeof pocketBalanceTarget !== "number" ||
+        isNaN(pocketBalanceTarget) ||
+        pocketBalanceTarget < 10000 ||
+        !Number.isInteger(pocketBalanceTarget);
+      isDurationInvalid =
+        !targetDuration || !targetDuration.startDate || !targetDuration.endDate;
+    }
+
+    // Collect error messages (except name)
+    const errors = [];
+    if (isColorInvalid) errors.push("Warna pocket harus dipilih.");
+    if (isIconInvalid) errors.push("Ikon pocket harus dipilih.");
+    if (isGoalInvalid) errors.push("Goal harus dipilih.");
+    if (isBalanceInvalid)
+      errors.push("Target saldo minimal 10.000 dan harus berupa angka bulat.");
+    if (isDurationInvalid)
+      errors.push("Durasi target harus diisi (mulai & selesai).");
+
+    if (
+      isNameInvalid ||
+      isColorInvalid ||
+      isIconInvalid ||
+      isGoalInvalid ||
+      isBalanceInvalid ||
+      isDurationInvalid
+    ) {
+      if (errors.length > 0) {
+        setAlertMessages(errors);
+        setShowAlertDialog(true);
+      }
+      return false;
+    }
+
+    const newPocket = {
+      id: allPocket.length > 0 ? allPocket[allPocket.length - 1].id + 1 : 1,
+      name: pocketName,
+      type: pocketType,
+      color: pocketColor,
+      icon: pocketIcon,
+      friends: selectedFriends,
+      goalTitle,
+      balanceTarget: pocketBalanceTarget,
+      targetDuration,
+    };
+    allPocket.push(newPocket);
+
+    console.log("Pocket created:", newPocket);
+
+    return true;
   };
 
   useEffect(() => {
@@ -248,10 +331,43 @@ export default function Customization() {
           </ScrollView>
         </KeyboardAvoidingView>
         <PrimaryButton
+          buttonAction={pocketValidation}
           buttonTitle="Buat Pocket"
           className="mt-3 mb-12"
           disabled={isNameInvalid || pocketName.length === 0}
         />
+
+        <AlertDialog
+          isOpen={showAlertDialog}
+          onClose={() => setShowAlertDialog(false)}
+          size="md"
+        >
+          <AlertDialogBackdrop />
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <Heading className="text-typography-950 font-semibold" size="md">
+                Lengkapi Data Pocket
+              </Heading>
+            </AlertDialogHeader>
+            <AlertDialogBody className="mt-3 mb-4">
+              {alertMessages.map((msg, idx) => (
+                <Text key={idx} size="sm" className="mb-1 text-red-600">
+                  {msg}
+                </Text>
+              ))}
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button
+                variant="outline"
+                action="secondary"
+                onPress={() => setShowAlertDialog(false)}
+                size="sm"
+              >
+                <ButtonText>Tutup</ButtonText>
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </Box>
     </Box>
   );
