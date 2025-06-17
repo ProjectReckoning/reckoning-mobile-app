@@ -4,6 +4,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Icon, AlertCircleIcon } from "@/components/ui/icon";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import {
@@ -12,6 +13,14 @@ import {
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogBody,
+  AlertDialogBackdrop,
+} from "@/components/ui/alert-dialog";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
@@ -100,6 +109,8 @@ export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [selectedIconIndex, setSelectedIconIndex] = useState(null);
   const [isNameInvalid, setNameIsInvalid] = useState(false);
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [alertMessages, setAlertMessages] = useState([]);
 
   const {
     pocketName,
@@ -109,6 +120,7 @@ export default function Customization() {
     goalTitle,
     pocketBalanceTarget,
     targetDuration,
+    selectedFriends,
     setPocketName,
     setPocketColor,
     setPocketIcon,
@@ -127,17 +139,14 @@ export default function Customization() {
   };
 
   const pocketValidation = () => {
-    // Validate pocketName: not only whitespace, max 20 chars, not empty
     const nameTrimmed = pocketName.trim();
     const isNameInvalid =
       !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
     setNameIsInvalid(isNameInvalid);
 
-    // Validate pocketColor and pocketIcon: not null or empty string
     const isColorInvalid = !pocketColor || pocketColor === "";
     const isIconInvalid = !pocketIcon || pocketIcon === "";
 
-    // For Saving or Enterprise Fund, validate additional fields
     let isGoalInvalid = false;
     let isBalanceInvalid = false;
     let isDurationInvalid = false;
@@ -153,15 +162,43 @@ export default function Customization() {
         !targetDuration || !targetDuration.startDate || !targetDuration.endDate;
     }
 
-    // Return true if all valid, false otherwise
-    return !(
+    // Collect error messages (except name)
+    const errors = [];
+    if (isColorInvalid) errors.push("Warna pocket harus dipilih.");
+    if (isIconInvalid) errors.push("Ikon pocket harus dipilih.");
+    if (isGoalInvalid) errors.push("Goal harus dipilih.");
+    if (isBalanceInvalid)
+      errors.push("Target saldo minimal 10.000 dan harus berupa angka bulat.");
+    if (isDurationInvalid)
+      errors.push("Durasi target harus diisi (mulai & selesai).");
+
+    if (
       isNameInvalid ||
       isColorInvalid ||
       isIconInvalid ||
       isGoalInvalid ||
       isBalanceInvalid ||
       isDurationInvalid
-    );
+    ) {
+      if (errors.length > 0) {
+        setAlertMessages(errors);
+        setShowAlertDialog(true);
+      }
+      return false;
+    }
+
+    console.log("Pocket created:", {
+      name: pocketName,
+      type: pocketType,
+      color: pocketColor,
+      icon: pocketIcon,
+      friends: selectedFriends,
+      goalTitle,
+      balanceTarget: pocketBalanceTarget,
+      targetDuration,
+    });
+
+    return true;
   };
 
   useEffect(() => {
@@ -294,6 +331,38 @@ export default function Customization() {
           className="mt-3 mb-12"
           disabled={isNameInvalid || pocketName.length === 0}
         />
+
+        <AlertDialog
+          isOpen={showAlertDialog}
+          onClose={() => setShowAlertDialog(false)}
+          size="md"
+        >
+          <AlertDialogBackdrop />
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <Heading className="text-typography-950 font-semibold" size="md">
+                Lengkapi Data Pocket
+              </Heading>
+            </AlertDialogHeader>
+            <AlertDialogBody className="mt-3 mb-4">
+              {alertMessages.map((msg, idx) => (
+                <Text key={idx} size="sm" className="mb-1 text-red-600">
+                  {msg}
+                </Text>
+              ))}
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button
+                variant="outline"
+                action="secondary"
+                onPress={() => setShowAlertDialog(false)}
+                size="sm"
+              >
+                <ButtonText>Tutup</ButtonText>
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </Box>
     </Box>
   );
