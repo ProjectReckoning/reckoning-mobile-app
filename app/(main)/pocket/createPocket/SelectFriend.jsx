@@ -18,10 +18,7 @@ import CustomGoalIcon from "../../../../assets/images/icon/customGoal.png";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function FriendsList() {
-  const selectedFriends = usePocketStore((state) => state.selectedFriends);
-  const setSelectedFriends = usePocketStore(
-    (state) => state.setSelectedFriends,
-  );
+  const { selectedFriends, setSelectedFriends } = usePocketStore();
 
   const handleBack = () => {
     router.back();

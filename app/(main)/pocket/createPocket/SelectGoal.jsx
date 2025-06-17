@@ -18,8 +18,7 @@ import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.p
 
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const pocketType = usePocketStore((state) => state.pocketType);
-  const setGoalTitle = usePocketStore((state) => state.setGoalTitle);
+  const { pocketType, setGoalTitle } = usePocketStore();
 
   const handleBack = () => {
     router.back();

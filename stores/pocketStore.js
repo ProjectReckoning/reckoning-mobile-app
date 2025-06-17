@@ -25,9 +25,9 @@ export const usePocketStore = create((set) => ({
   selectedFriends: [],
   setSelectedFriends: (friends) => set({ selectedFriends: friends }),
 
-  pocketColor: null,
+  pocketColor: "bg-orange-wondr",
   setPocketColor: (color) => set({ pocketColor: color }),
 
-  pocketIcon: null,
+  pocketIcon: "Pocket",
   setPocketIcon: (icon) => set({ pocketIcon: icon }),
 }));

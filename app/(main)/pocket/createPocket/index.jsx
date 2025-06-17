@@ -14,8 +14,7 @@ import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const setPocketType = usePocketStore((state) => state.setPocketType);
-  const pocketType = usePocketStore((state) => state.pocketType);
+  const { setPocketType, pocketType } = usePocketStore();
 
   const handleBack = () => {
     router.back();
