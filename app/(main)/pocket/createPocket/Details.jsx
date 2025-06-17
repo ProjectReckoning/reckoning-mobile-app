@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
-import { goals } from "../../../../utils/goalData";
+import { savingGoals } from "../../../../utils/goalData";
 import { useState, useEffect, useCallback } from "react";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
@@ -46,7 +46,7 @@ export default function Details() {
   const goalTitle = usePocketStore((state) => state.goalTitle);
 
   const selectedGoal =
-    goals.find((goal) => goal.title === goalTitle) || goals[0];
+    savingGoals.find((goal) => goal.title === goalTitle) || savingGoals[0];
 
   const selectedFriends = usePocketStore((state) => state.selectedFriends);
   const extraAvatars = selectedFriends.slice(5);
@@ -89,7 +89,6 @@ export default function Details() {
     setBalanceIsInvalid(balanceInvalid);
     setDateIsInvalid(dateInvalid);
 
-    // Return true if all valid
     return !nameInvalid && !balanceInvalid && !dateInvalid;
   };
 
@@ -133,12 +132,12 @@ export default function Details() {
     <Box className="flex-1 bg-white">
       <Box className={`w-full h-56 ${selectedGoal.color}`}>
         <Box
-          className={`w-52 absolute right-0 -bottom-4 ${selectedGoal.decoratorClassName}`}
+          className={`w-44 absolute right-[0.1rem] -bottom-[0.1rem] ${selectedGoal.decoratorClassName}`}
         >
           <Image
             source={selectedGoal.decorator}
             alt="pocket-type-decorator"
-            className="w-full h-64"
+            className="w-full h-48"
             resizeMode="contain"
           />
         </Box>
@@ -154,10 +153,10 @@ export default function Details() {
               <Box className="w-5 h-5" />
             </Box>
             <VStack space="xs" reversed={false}>
-              <Heading size="xl" className="text-bold w-64">
+              <Heading size="xl" className="text-bold w-56">
                 {selectedGoal.title2}
               </Heading>
-              <Text className="w-64 text-lg">{selectedGoal.subtitle2}</Text>
+              <Text className="w-56 text-lg">{selectedGoal.subtitle2}</Text>
             </VStack>
           </VStack>
         </Box>

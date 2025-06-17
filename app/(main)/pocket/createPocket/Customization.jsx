@@ -13,10 +13,11 @@ import {
   FormControlErrorIcon,
 } from "@/components/ui/form-control";
 
-import { useState } from "react";
 import { router } from "expo-router";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
+import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import {
   Pocket,
@@ -109,6 +110,14 @@ export default function Customization() {
     router.back();
   };
 
+  useEffect(() => {
+    if (pocketName.length > 20 || pocketName.length === null) {
+      setNameIsInvalid(true);
+    } else {
+      setNameIsInvalid(false);
+    }
+  }, [pocketName]);
+
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
@@ -143,78 +152,93 @@ export default function Customization() {
       </Box>
 
       <Box className="flex-1 flex-col mt-5 px-6 justify-between">
-        <VStack space="2xl" className="w-full px-3">
-          {pocketType === "Spending" && (
-            <VStack space="md">
-              <Text size="lg">Masukkan nama pocket kamu</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={50}
+          style={{ flex: 1 }}
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
+            <VStack space="2xl" className="w-full px-3">
+              {pocketType === "Spending" && (
+                <VStack space="md">
+                  <Text size="lg">Masukkan nama pocket kamu</Text>
 
-              <FormControl isInvalid={isNameInvalid} size="md" isRequired>
-                <Input
-                  className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
-                  size="lg"
-                >
-                  <InputField
-                    type="text"
-                    placeholder="Tulis nama pocket"
-                    value={pocketName}
-                    onChangeText={setPocketName}
-                    className="p-3"
-                  />
-                  <InputSlot className="mr-3">
-                    <Text
-                      className={`text-gray-500 text-xs ${isNameInvalid && "text-red-500"}`}
+                  <FormControl isInvalid={isNameInvalid} size="md" isRequired>
+                    <Input
+                      className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
+                      size="lg"
                     >
-                      {pocketName.length}/20
-                    </Text>
-                  </InputSlot>
-                </Input>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    Nama harus terisi, valid, dan maksimal 20 karakter!
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
+                      <InputField
+                        type="text"
+                        placeholder="Tulis nama pocket"
+                        value={pocketName}
+                        onChangeText={setPocketName}
+                        className="p-3"
+                      />
+                      <InputSlot className="mr-3">
+                        <Text
+                          className={`text-gray-500 text-xs ${isNameInvalid && "text-red-500"}`}
+                        >
+                          {pocketName.length}/20
+                        </Text>
+                      </InputSlot>
+                    </Input>
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Nama harus terisi, valid, dan maksimal 20 karakter!
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </FormControl>
+                </VStack>
+              )}
+              <VStack space="xl">
+                <Text size="lg">Pilih warna pocket kamu</Text>
+                <HStack space="md" className="flex-wrap justify-between">
+                  {colors.map((color, index) => (
+                    <Pressable
+                      onPress={() => {
+                        setPocketColor(color);
+                        setSelectedColorIndex(
+                          selectedColorIndex === index ? null : index,
+                        );
+                      }}
+                      key={index}
+                      className={`w-8 h-8 rounded-full ${color} ${selectedColorIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+                    ></Pressable>
+                  ))}
+                </HStack>
+              </VStack>
+              <VStack space="xl">
+                <Text size="lg">Pilih ikon pocket kamu</Text>
+                <HStack space="md" className="flex-wrap justify-between">
+                  {icons.map((icon, index) => (
+                    <Pressable
+                      onPress={() => {
+                        setPocketIcon(icon);
+                        setSelectedIconIndex(
+                          selectedIconIndex === index ? null : index,
+                        );
+                      }}
+                      key={index}
+                      className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+                    >
+                      <Icon as={icon} size="sm" />
+                    </Pressable>
+                  ))}
+                </HStack>
+              </VStack>
             </VStack>
-          )}
-          <VStack space="xl">
-            <Text size="lg">Pilih warna pocket kamu</Text>
-            <HStack space="md" className="flex-wrap justify-between">
-              {colors.map((color, index) => (
-                <Pressable
-                  onPress={() => {
-                    setPocketColor(color);
-                    setSelectedColorIndex(
-                      selectedColorIndex === index ? null : index,
-                    );
-                  }}
-                  key={index}
-                  className={`w-8 h-8 rounded-full ${color} ${selectedColorIndex === index ? "border-2 border-[#007BE5]" : ""}`}
-                ></Pressable>
-              ))}
-            </HStack>
-          </VStack>
-          <VStack space="xl">
-            <Text size="lg">Pilih ikon pocket kamu</Text>
-            <HStack space="md" className="flex-wrap justify-between">
-              {icons.map((icon, index) => (
-                <Pressable
-                  onPress={() => {
-                    setPocketIcon(icon);
-                    setSelectedIconIndex(
-                      selectedIconIndex === index ? null : index,
-                    );
-                  }}
-                  key={index}
-                  className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
-                >
-                  <Icon as={icon} size="sm" />
-                </Pressable>
-              ))}
-            </HStack>
-          </VStack>
-        </VStack>
-        <PrimaryButton buttonTitle="Buat Pocket" className="mt-3 mb-12" />
+          </ScrollView>
+        </KeyboardAvoidingView>
+        <PrimaryButton
+          buttonTitle="Buat Pocket"
+          className="mt-3 mb-12"
+          disabled={isNameInvalid || pocketName.length === 0}
+        />
       </Box>
     </Box>
   );

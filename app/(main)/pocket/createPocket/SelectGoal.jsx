@@ -10,7 +10,7 @@ import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 
-import { goals } from "../../../../utils/goalData";
+import { savingGoals } from "../../../../utils/goalData";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import GoalCard from "../../../../components/common/cards/GoalCard";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
@@ -74,7 +74,7 @@ export default function SelectGoal() {
             style={{ marginRight: -10 }}
           >
             <Box className="flex flex-row flex-wrap justify-between">
-              {goals.map((goalProps, i) => (
+              {savingGoals.map((goalProps, i) => (
                 <Box key={i} className="w-[48%] mb-5">
                   <GoalCard
                     {...goalProps}
