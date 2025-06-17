@@ -7,15 +7,28 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
+import { router } from "expo-router"; // Import router for navigation after logout
 
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
-import AccountCard from "../../../components/common/cards/AccountCard";
-import SelectedFeature from "../../../components/features/SelectedFeature";
+import AccountCard from "@/components/common/cards/AccountCard";
+import SelectedFeature from "@/components/features/SelectedFeature";
+
+import useAuthStore from "@/stores/authStore"; // Import your auth store
 
 export default function Home() {
+  // Get the removeToken function from your auth store
+  const removeToken = useAuthStore((state) => state.removeToken);
+
+  const handleLogout = async () => {
+    console.log("Logout button pressed. Attempting to clear token...");
+    await removeToken(); // Call the function to clear token from SecureStore and Zustand state
+    console.log("Token cleared. Redirecting to login screen.");
+    router.replace("/(auth)/login"); // Redirect to the login page after successful logout
+  };
+
   return (
     <Box className="flex-1 bg-white">
       {/* Header */}
@@ -32,6 +45,7 @@ export default function Home() {
           <Button
             size="xs"
             className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center"
+            onPress={handleLogout} // Attach the handleLogout function here
           >
             <Image
               size="2xs"
