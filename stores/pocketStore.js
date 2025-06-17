@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { PocketWhite } from "../assets/Icons/PocketIcon";
 
 export const usePocketStore = create((set) => ({
   pocketType: null,
@@ -25,9 +26,9 @@ export const usePocketStore = create((set) => ({
   selectedFriends: [],
   setSelectedFriends: (friends) => set({ selectedFriends: friends }),
 
-  pocketColor: null,
+  pocketColor: "bg-orange-wondr",
   setPocketColor: (color) => set({ pocketColor: color }),
 
-  pocketIcon: null,
+  pocketIcon: PocketWhite,
   setPocketIcon: (icon) => set({ pocketIcon: icon }),
 }));

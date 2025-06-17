@@ -85,26 +85,26 @@ const iconWhiteMap = [
 export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [selectedIconIndex, setSelectedIconIndex] = useState(null);
+  const [isNameInvalid, setNameIsInvalid] = useState(false);
+
+  const {
+    pocketName,
+    pocketType,
+    pocketColor,
+    pocketIcon,
+    setPocketName,
+    setPocketColor,
+    setPocketIcon,
+  } = usePocketStore();
 
   const selectedColor =
-    selectedColorIndex !== null
-      ? colors[selectedColorIndex]
-      : "bg-orange-wondr";
-  const selectedTranslucent =
-    colorMap[selectedColor]?.translucent || "bg-orange-wondr-light-translucent";
-  const selectedSolid = colorMap[selectedColor]?.solid || "bg-orange-wondr";
+    selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
+
+  const selectedTranslucent = colorMap[selectedColor]?.translucent;
+  const selectedSolid = colorMap[selectedColor]?.solid;
 
   const SelectedIconWhite =
-    selectedIconIndex !== null ? iconWhiteMap[selectedIconIndex] : PocketWhite;
-
-  const pocketName = usePocketStore((state) => state.pocketName);
-  const pocketType = usePocketStore((state) => state.pocketType);
-
-  const setPocketColor = usePocketStore((state) => state.setPocketColor);
-  const setPocketIcon = usePocketStore((state) => state.setPocketIcon);
-
-  const [isNameInvalid, setNameIsInvalid] = useState(false);
-  const setPocketName = usePocketStore((state) => state.setPocketName);
+    selectedIconIndex !== null ? iconWhiteMap[selectedIconIndex] : pocketIcon;
 
   const handleBack = () => {
     router.back();
