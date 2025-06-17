@@ -22,18 +22,16 @@ import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/features/FormPocketDetail";
 
 export default function Details() {
-  const pocketName = usePocketStore((state) => state.pocketName);
-  const setPocketName = usePocketStore((state) => state.setPocketName);
-
-  const pocketBalanceTarget = usePocketStore(
-    (state) => state.pocketBalanceTarget,
-  );
-  const setPocketBalanceTarget = usePocketStore(
-    (state) => state.setPocketBalanceTarget,
-  );
-
-  const targetDuration = usePocketStore((state) => state.targetDuration);
-  const setTargetDuration = usePocketStore((state) => state.setTargetDuration);
+  const {
+    pocketName,
+    setPocketName,
+    pocketBalanceTarget,
+    setPocketBalanceTarget,
+    targetDuration,
+    setTargetDuration,
+    goalTitle,
+    selectedFriends,
+  } = usePocketStore();
 
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [isBalanceInvalid, setBalanceIsInvalid] = useState(false);
@@ -43,12 +41,9 @@ export default function Details() {
   const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
 
-  const goalTitle = usePocketStore((state) => state.goalTitle);
-
   const selectedGoal =
     savingGoals.find((goal) => goal.title === goalTitle) || savingGoals[0];
 
-  const selectedFriends = usePocketStore((state) => state.selectedFriends);
   const extraAvatars = selectedFriends.slice(5);
   const remainingCount = extraAvatars.length;
 

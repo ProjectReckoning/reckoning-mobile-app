@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { PocketWhite } from "../assets/Icons/PocketIcon";
 
 export const usePocketStore = create((set) => ({
   pocketType: null,
@@ -29,6 +28,6 @@ export const usePocketStore = create((set) => ({
   pocketColor: "bg-orange-wondr",
   setPocketColor: (color) => set({ pocketColor: color }),
 
-  pocketIcon: PocketWhite,
+  pocketIcon: "Pocket",
   setPocketIcon: (icon) => set({ pocketIcon: icon }),
 }));

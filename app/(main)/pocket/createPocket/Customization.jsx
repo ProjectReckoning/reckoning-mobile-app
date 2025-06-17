@@ -71,16 +71,30 @@ const colorMap = {
   },
 };
 
-const icons = [Pocket, Laptop, Diamond, Airplane, Moonstar, Group];
-
-const iconWhiteMap = [
-  PocketWhite,
-  LaptopWhite,
-  DiamondWhite,
-  AirplaneWhite,
-  MoonstarWhite,
-  GroupWhite,
+const iconKeys = [
+  "Pocket",
+  "Laptop",
+  "Diamond",
+  "Airplane",
+  "Moonstar",
+  "Group",
 ];
+const iconMap = {
+  Pocket,
+  Laptop,
+  Diamond,
+  Airplane,
+  Moonstar,
+  Group,
+};
+const iconWhiteMap = {
+  Pocket: PocketWhite,
+  Laptop: LaptopWhite,
+  Diamond: DiamondWhite,
+  Airplane: AirplaneWhite,
+  Moonstar: MoonstarWhite,
+  Group: GroupWhite,
+};
 
 export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
@@ -103,8 +117,7 @@ export default function Customization() {
   const selectedTranslucent = colorMap[selectedColor]?.translucent;
   const selectedSolid = colorMap[selectedColor]?.solid;
 
-  const SelectedIconWhite =
-    selectedIconIndex !== null ? iconWhiteMap[selectedIconIndex] : pocketIcon;
+  const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 
   const handleBack = () => {
     router.back();
@@ -215,18 +228,18 @@ export default function Customization() {
               <VStack space="xl">
                 <Text size="lg">Pilih ikon pocket kamu</Text>
                 <HStack space="md" className="flex-wrap justify-between">
-                  {icons.map((icon, index) => (
+                  {iconKeys.map((iconKey, index) => (
                     <Pressable
                       onPress={() => {
-                        setPocketIcon(icon);
+                        setPocketIcon(iconKey);
                         setSelectedIconIndex(
                           selectedIconIndex === index ? null : index,
                         );
                       }}
-                      key={index}
+                      key={iconKey}
                       className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
                     >
-                      <Icon as={icon} size="sm" />
+                      <Icon as={iconMap[iconKey]} size="sm" />
                     </Pressable>
                   ))}
                 </HStack>
