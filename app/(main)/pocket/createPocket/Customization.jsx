@@ -26,6 +26,7 @@ import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
+import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import {
@@ -187,7 +188,8 @@ export default function Customization() {
       return false;
     }
 
-    console.log("Pocket created:", {
+    const newPocket = {
+      id: allPocket.length > 0 ? allPocket[allPocket.length - 1].id + 1 : 1,
       name: pocketName,
       type: pocketType,
       color: pocketColor,
@@ -196,7 +198,10 @@ export default function Customization() {
       goalTitle,
       balanceTarget: pocketBalanceTarget,
       targetDuration,
-    });
+    };
+    allPocket.push(newPocket);
+
+    console.log("Pocket created:", newPocket);
 
     return true;
   };
