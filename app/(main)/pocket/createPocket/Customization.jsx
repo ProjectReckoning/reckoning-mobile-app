@@ -106,6 +106,9 @@ export default function Customization() {
     pocketType,
     pocketColor,
     pocketIcon,
+    goalTitle,
+    pocketBalanceTarget,
+    targetDuration,
     setPocketName,
     setPocketColor,
     setPocketIcon,
@@ -121,6 +124,44 @@ export default function Customization() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const pocketValidation = () => {
+    // Validate pocketName: not only whitespace, max 20 chars, not empty
+    const nameTrimmed = pocketName.trim();
+    const isNameInvalid =
+      !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
+    setNameIsInvalid(isNameInvalid);
+
+    // Validate pocketColor and pocketIcon: not null or empty string
+    const isColorInvalid = !pocketColor || pocketColor === "";
+    const isIconInvalid = !pocketIcon || pocketIcon === "";
+
+    // For Saving or Enterprise Fund, validate additional fields
+    let isGoalInvalid = false;
+    let isBalanceInvalid = false;
+    let isDurationInvalid = false;
+
+    if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+      isGoalInvalid = !goalTitle || goalTitle === "";
+      isBalanceInvalid =
+        typeof pocketBalanceTarget !== "number" ||
+        isNaN(pocketBalanceTarget) ||
+        pocketBalanceTarget < 10000 ||
+        !Number.isInteger(pocketBalanceTarget);
+      isDurationInvalid =
+        !targetDuration || !targetDuration.startDate || !targetDuration.endDate;
+    }
+
+    // Return true if all valid, false otherwise
+    return !(
+      isNameInvalid ||
+      isColorInvalid ||
+      isIconInvalid ||
+      isGoalInvalid ||
+      isBalanceInvalid ||
+      isDurationInvalid
+    );
   };
 
   useEffect(() => {
@@ -248,6 +289,7 @@ export default function Customization() {
           </ScrollView>
         </KeyboardAvoidingView>
         <PrimaryButton
+          buttonAction={pocketValidation}
           buttonTitle="Buat Pocket"
           className="mt-3 mb-12"
           disabled={isNameInvalid || pocketName.length === 0}
