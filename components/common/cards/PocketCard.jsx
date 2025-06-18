@@ -2,7 +2,10 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Icon } from "@/components/ui/icon";
 import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
+import { EllipsisVertical } from "lucide-react-native";
 import { iconWhiteMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
 
 const PocketWhite = iconWhiteMap.Pocket;
@@ -12,12 +15,12 @@ export default function PocketCard({
   pocketName,
   pocketType = "Saving",
   pocketBalance = "0",
-  solidColor = "bg-orange-wondr",
-  translucentColor = "bg-orange-wondr-light-translucent",
+  color = "bg-orange-wondr",
   icon = PocketWhite,
   iconSize = "16",
   space = "my-7",
   cardWidth = "w-fit",
+  editButton = false,
 }) {
   const IconComponent = iconWhiteMap[icon] || PocketWhite;
 
@@ -33,13 +36,29 @@ export default function PocketCard({
       className={`h-fit bg-white border border-gray-300 rounded-2xl p-0 ${cardWidth}`}
     >
       <Box
-        className={`w-fit h-fit rounded-t-2xl p-4 mb-10 ${translucentColor}`}
+        className={`w-fit h-fit rounded-t-2xl p-4 mb-10 ${color}-light-translucent`}
       >
-        <Box
-          className={`w-${iconSize} h-${iconSize} ${solidColor} rounded-full items-center justify-center ${mode === "icon" && "mb-2 mr-6"}`}
-        >
-          <Icon as={IconComponent} className="w-1/2 h-1/2" />
-        </Box>
+        <HStack className="justify-between items-start">
+          <Box
+            className={`w-${iconSize} h-${iconSize} ${color} rounded-full items-center justify-center ${mode === "icon" && "mb-2 mr-6"}`}
+          >
+            <Icon as={IconComponent} className="w-1/2 h-1/2" />
+          </Box>
+          {editButton && (
+            <Pressable
+              onPress={() => console.log("Edit button pressed")}
+              className="mt-2 -mr-2"
+            >
+              {({ pressed }) => (
+                <EllipsisVertical
+                  color={pressed ? "#000" : "#C6C6C6"}
+                  size={27}
+                  strokeWidth={2}
+                />
+              )}
+            </Pressable>
+          )}
+        </HStack>
         {mode !== "icon" && (
           <VStack className={space}>
             <Heading

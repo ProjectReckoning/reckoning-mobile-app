@@ -5,9 +5,8 @@ import { Image } from "@/components/ui/image";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { WondrColors } from "../../../utils/colorUtils";
 import { CirclePlus } from "lucide-react-native";
-import CustomGoalIcon from "../../../assets/images/icon/customGoal.png";
+import { WondrColors } from "../../../utils/colorUtils";
 
 export default function GoalCard({
   title,
