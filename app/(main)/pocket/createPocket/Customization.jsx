@@ -122,6 +122,8 @@ export default function Customization() {
     pocketBalanceTarget,
     targetDuration,
     selectedFriends,
+    pocketSubject,
+    setPocketSubject,
     setPocketName,
     setPocketBalanceTarget,
     setTargetDuration,
@@ -153,6 +155,7 @@ export default function Customization() {
     setPocketType(null);
     setGoalTitle(null);
     setSelectedFriends([]);
+    setPocketSubject(null);
     setAlertMessages([]);
     setShowAlertDialog(false);
     setNameIsInvalid(false);
@@ -216,6 +219,7 @@ export default function Customization() {
     const newPocket = {
       id: allPocket.length > 0 ? allPocket[allPocket.length - 1].id + 1 : 1,
       name: pocketName,
+      subject: pocketSubject,
       type: pocketType,
       color: pocketColor,
       icon: pocketIcon,
@@ -227,8 +231,8 @@ export default function Customization() {
     allPocket.push(newPocket);
     console.log("Pocket created:", newPocket);
 
-    GoToNext();
     resetData();
+    GoToNext();
 
     return true;
   };

@@ -14,7 +14,7 @@ import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const { setPocketType, pocketType } = usePocketStore();
+  const { pocketType, setPocketSubject, setPocketType } = usePocketStore();
 
   const handleBack = () => {
     router.back();
@@ -54,6 +54,9 @@ export default function CreatePocket() {
                   setSelectedIndex(selectedIndex === i ? null : i);
                   setPocketType(
                     selectedIndex === i ? null : pocketTypeProps.type,
+                  );
+                  setPocketSubject(
+                    selectedIndex === i ? null : pocketTypeProps.subject,
                   );
                 }}
               />

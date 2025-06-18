@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
 export const usePocketStore = create((set) => ({
+  pocketSubject: null,
+  setPocketSubject: (subject) => set({ pocketSubject: subject }),
+
   pocketType: null,
   setPocketType: (type) => set({ pocketType: type }),
 
