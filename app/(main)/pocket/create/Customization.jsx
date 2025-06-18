@@ -92,7 +92,6 @@ export default function Customization() {
 
   const selectedColor =
     selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
-  const selectedTranslucent = colorMap[selectedColor]?.translucent;
   const selectedSolid = colorMap[selectedColor]?.solid;
   const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 

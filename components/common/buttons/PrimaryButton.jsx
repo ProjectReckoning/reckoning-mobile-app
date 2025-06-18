@@ -6,15 +6,23 @@ export default function PrimaryButton({
   buttonTitle,
   disabled = false,
   className,
+  textPressable = "",
 }) {
   return (
     <>
       <Pressable
-        className={`p-5 w-full rounded-full justify-items-center items-center bg-tosca-wondr active:bg-tosca-wondr-dark ${className || ""}`}
+        className={`px-5 py-4 w-full rounded-full justify-items-center items-center bg-tosca-wondr active:bg-tosca-wondr-dark ${className || ""}`}
         onPress={buttonAction}
         disabled={disabled}
       >
-        <Text className="text-black text-center font-bold">{buttonTitle}</Text>
+        {({ pressed }) => (
+          <Text
+            size={"lg"}
+            className={`text-black text-center font-bold ${pressed ? textPressable : ""}`}
+          >
+            {buttonTitle}
+          </Text>
+        )}
       </Pressable>
     </>
   );

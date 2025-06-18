@@ -14,11 +14,12 @@ export default function PocketCard({
   mode = "balance", // mode can be "icon", "type", or "balance"
   pocketName,
   pocketType = "Saving",
-  pocketBalance = "0",
+  pocketBalance = 0,
   color = "bg-orange-wondr",
   icon = PocketWhite,
   iconSize = "16",
   space = "my-7",
+  whiteSpace = "mb-10",
   cardWidth = "w-fit",
   editButton = false,
   onEdit = () => {},
@@ -40,11 +41,11 @@ export default function PocketCard({
       className={`h-fit bg-white border border-gray-300 rounded-2xl p-0 ${cardWidth}`}
     >
       <Box
-        className={`w-fit h-fit rounded-t-2xl p-4 mb-10 ${color}-light-translucent`}
+        className={`w-fit h-fit rounded-t-2xl p-4 ${whiteSpace} ${color}-light-translucent ${mode === "icon" && "p-3"}`}
       >
         <HStack className="justify-between items-start">
           <Box
-            className={`w-${iconSize} h-${iconSize} ${color} rounded-full items-center justify-center ${mode === "icon" && "mb-2 mr-6"}`}
+            className={`w-${iconSize} h-${iconSize} ${color} rounded-full items-center justify-center ${mode === "icon" && "mb-0 mr-4"}`}
           >
             <Icon as={IconComponent} className="w-1/2 h-1/2" />
           </Box>

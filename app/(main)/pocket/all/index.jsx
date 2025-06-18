@@ -13,6 +13,7 @@ import AppBar from "../../../../components/common/AppBar";
 import { allPocket } from "@/utils/mockData/mockPocketDb";
 import { WondrColors } from "../../../../utils/colorUtils";
 import PocketCard from "@/components/common/cards/PocketCard";
+import PocketActionSheet from "../../../../components/feature/allPocket/PocketActionSheet";
 
 const tabList = [
   { key: "personal", label: "Personal" },
@@ -21,12 +22,29 @@ const tabList = [
 
 export default function AllPocket() {
   const [activeTab, setActiveTab] = useState("personal");
+  const [showActionsheet, setShowActionsheet] = useState(false);
+  const [selectedPocket, setSelectedPocket] = useState(null);
 
   const filteredPockets = allPocket.filter(
     (pocket) =>
       (activeTab === "personal" && pocket.subject === "Personal") ||
       (activeTab === "business" && pocket.subject === "Business"),
   );
+
+  const handleEditButton = (pocket) => {
+    setSelectedPocket(pocket);
+    setShowActionsheet(true);
+  };
+
+  const handleEdit = () => {
+    // router.push("/(main)/pocket/create/Customization", {
+    //   params: { pocketId: selectedPocket.id },
+    // });
+  };
+
+  const handleDelete = () => {
+    console.log(`Deleting pocket with ID: ${selectedPocket.id}`);
+  };
 
   const GoToHome = () => {
     router.replace("/(main)/home");
@@ -52,7 +70,7 @@ export default function AllPocket() {
         contentContainerStyle={{ paddingRight: 10 }}
         style={{ marginRight: -10 }}
       >
-        <Box className="flex flex-row flex-wrap justify-between">
+        <Box className="flex flex-row flex-wrap justify-between px-2">
           {filteredPockets.length === 0 ? (
             <Box className="w-full items-center mt-10">
               <Text className="text-gray-400">Belum ada pocket.</Text>
@@ -60,7 +78,7 @@ export default function AllPocket() {
           ) : (
             <>
               {filteredPockets.map((pocket) => (
-                <Pressable key={pocket.id} className="w-[48%] mb-8">
+                <Pressable key={pocket.id} className="w-[47%] mb-8">
                   {({ pressed }) => (
                     <PocketCard
                       pocketName={pocket.name}
@@ -71,13 +89,14 @@ export default function AllPocket() {
                       space="mt-5 mb-1"
                       cardWidth={`${pressed ? "bg-gray-50" : ""}`}
                       editButton={true}
+                      onEdit={() => handleEditButton(pocket)}
                     />
                   )}
                 </Pressable>
               ))}
 
               {/* Create Pocket Card */}
-              <Pressable onPress={GoToCreatePocket} className="w-[48%] mb-8">
+              <Pressable onPress={GoToCreatePocket} className="w-[47%] mb-8">
                 {({ pressed }) => (
                   <Box
                     className={`h-fit min-h-60 bg-white border-2 border-dashed border-gray-300 rounded-2xl items-center justify-end px-4 py-6 ${pressed ? "bg-gray-50" : ""}`}
@@ -105,6 +124,17 @@ export default function AllPocket() {
           )}
         </Box>
       </ScrollView>
+
+      <PocketActionSheet
+        isOpen={showActionsheet}
+        onClose={() => setShowActionsheet(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        pocketName={selectedPocket?.name}
+        pocketType={selectedPocket?.type}
+        color={selectedPocket?.color}
+        icon={selectedPocket?.icon}
+      />
     </Box>
   );
 }
