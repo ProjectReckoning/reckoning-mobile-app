@@ -14,6 +14,7 @@ import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
+import PocketCard from "@/components/common/cards/PocketCard";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
@@ -247,23 +248,16 @@ export default function Customization() {
           <Box className="w-5 h-5" />
         </Box>
 
-        <Box className="w-fit min-w-48 h-fit bg-white border border-gray-300 rounded-2xl p-0">
-          <Box
-            className={`w-fit h-fit rounded-t-2xl p-4 mb-10 ${selectedTranslucent}`}
-          >
-            <Box
-              className={`w-16 h-16 rounded-full ${selectedSolid} items-center justify-center`}
-            >
-              <Icon as={SelectedIconWhite} size="xl" className="w-8 h-8" />
-            </Box>
-            <VStack space="2xs" className="my-7">
-              <Heading size={"md"} className="pr-5">
-                {pocketName ? pocketName : "Nama Pocket"}
-              </Heading>
-              <Text size={"md"}>{pocketType} pocket</Text>
-            </VStack>
-          </Box>
-        </Box>
+        <PocketCard
+          mode="type"
+          pocketName={pocketName}
+          pocketType={pocketType}
+          solidColor={selectedSolid}
+          translucentColor={selectedTranslucent}
+          iconWhite={SelectedIconWhite}
+          iconSize="16"
+          space="my-7"
+        />
       </Box>
 
       <Box className="flex-1 flex-col mt-5 px-6 justify-between">
