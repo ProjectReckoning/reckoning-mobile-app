@@ -1,11 +1,14 @@
-import { useState } from "react";
 import { Box } from "@/components/ui/box";
-import { ScrollView } from "react-native";
 import { Text } from "@/components/ui/text";
+import { Pressable } from "@/components/ui/pressable";
+
+import { useState } from "react";
+import { ScrollView } from "react-native";
+
+import TabBar from "@/components/common/TabBar";
 import AppBar from "../../../../components/common/AppBar";
-import TabBar from "../../../../components/common/TabBar";
-import { allPocket } from "../../../../utils/mockData/mockPocketDb";
-import PocketCard from "../../../../components/common/cards/PocketCard";
+import { allPocket } from "@/utils/mockData/mockPocketDb";
+import PocketCard from "@/components/common/cards/PocketCard";
 
 const tabList = [
   { key: "personal", label: "Personal" },
@@ -14,7 +17,6 @@ const tabList = [
 
 export default function AllPocket() {
   const [activeTab, setActiveTab] = useState("personal");
-  const [selectedIndex, setSelectedIndex] = useState(null);
 
   const filteredPockets = allPocket.filter(
     (pocket) =>
@@ -45,18 +47,22 @@ export default function AllPocket() {
             </Box>
           ) : (
             filteredPockets.map((pocket) => (
-              <Box key={pocket.id} className="w-[48%] mb-8">
-                <PocketCard
-                  pocketName={pocket.name}
-                  pocketType={pocket.type}
-                  pocketBalance={10000}
-                  solidColor={pocket.color}
-                  translucentColor={`${pocket.color}-light-translucent`}
-                  icon={pocket.icon}
-                  space="mt-5 mb-1"
-                />
-              </Box>
+              <Pressable key={pocket.id} className="w-[48%] mb-8">
+                {({ pressed }) => (
+                  <PocketCard
+                    pocketName={pocket.name}
+                    pocketType={pocket.type}
+                    pocketBalance={10000}
+                    solidColor={pocket.color}
+                    translucentColor={`${pocket.color}-light-translucent`}
+                    icon={pocket.icon}
+                    space="mt-5 mb-1"
+                    cardWidth={`${pressed ? "bg-gray-50" : ""}`}
+                  />
+                )}
+              </Pressable>
             ))
+            // Create Pocket card
           )}
         </Box>
       </ScrollView>
