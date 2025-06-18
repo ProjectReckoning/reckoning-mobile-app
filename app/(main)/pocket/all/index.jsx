@@ -14,6 +14,7 @@ import { allPocket } from "@/utils/mockData/mockPocketDb";
 import { WondrColors } from "../../../../utils/colorUtils";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketActionSheet from "../../../../components/feature/allPocket/PocketActionSheet";
+import DeletePocketAlert from "../../../../components/feature/allPocket/DeletePocketAlert";
 
 const tabList = [
   { key: "personal", label: "Personal" },
@@ -24,6 +25,7 @@ export default function AllPocket() {
   const [activeTab, setActiveTab] = useState("personal");
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const filteredPockets = allPocket.filter(
     (pocket) =>
@@ -37,13 +39,14 @@ export default function AllPocket() {
   };
 
   const handleEdit = () => {
-    // router.push("/(main)/pocket/create/Customization", {
-    //   params: { pocketId: selectedPocket.id },
-    // });
+    router.push("/(main)/pocket/create/Customization", {
+      params: { pocketId: selectedPocket.id },
+    });
   };
 
   const handleDelete = () => {
-    console.log(`Deleting pocket with ID: ${selectedPocket.id}`);
+    setShowActionsheet(false);
+    setShowDeleteAlert(true);
   };
 
   const GoToHome = () => {
@@ -129,6 +132,15 @@ export default function AllPocket() {
         isOpen={showActionsheet}
         onClose={() => setShowActionsheet(false)}
         onEdit={handleEdit}
+        onDelete={handleDelete}
+        pocketName={selectedPocket?.name}
+        pocketType={selectedPocket?.type}
+        color={selectedPocket?.color}
+        icon={selectedPocket?.icon}
+      />
+      <DeletePocketAlert
+        isOpen={showDeleteAlert}
+        onClose={() => setShowDeleteAlert(false)}
         onDelete={handleDelete}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}

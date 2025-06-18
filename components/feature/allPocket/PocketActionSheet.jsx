@@ -33,7 +33,7 @@ export default function PocketActionSheet({
         </ActionsheetDragIndicatorWrapper>
 
         {/* Pocket preview */}
-        <HStack space="2xl" className="w-full justify-start items-center my-8">
+        <HStack space="xl" className="w-full justify-start items-center my-8">
           <PocketCard
             mode="icon"
             pocketName={pocketName}
@@ -59,7 +59,7 @@ export default function PocketActionSheet({
             onClose();
           }}
           buttonTitle="Ubah pocket"
-          className="bg-yellow-wondr mb-4 active:bg-yellow-wondr-dark"
+          className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
         />
 
         {/* Delete */}

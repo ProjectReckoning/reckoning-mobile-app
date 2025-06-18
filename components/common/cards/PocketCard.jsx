@@ -54,7 +54,7 @@ export default function PocketCard({
               {({ pressed }) => (
                 <EllipsisVertical
                   color={pressed ? "#000" : "#C6C6C6"}
-                  size={27}
+                  size={24}
                   strokeWidth={2}
                 />
               )}
