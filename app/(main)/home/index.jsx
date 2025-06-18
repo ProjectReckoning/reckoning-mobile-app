@@ -1,21 +1,31 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
-import { Center } from "@/components/ui/center";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
+import TabBar from "../../../components/common/TabBar";
 
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
+import { useState } from "react";
 import AccountCard from "../../../components/common/cards/AccountCard";
 import SelectedFeature from "../../../components/features/SelectedFeature";
 
+const tabList = [
+  { key: "insight", label: "Insight" },
+  { key: "transaksi", label: "Transaksi" },
+  { key: "growth", label: "Growth" },
+];
+
 export default function Home() {
+  const [activeTab, setActiveTab] = useState("transaksi");
+
   return (
     <Box className="flex-1 bg-white">
       {/* Header */}
@@ -85,17 +95,14 @@ export default function Home() {
         </Box>
 
         {/* Menu */}
-        <Box className="flex flex-row items-center justify-between bg-white p-1 rounded-full">
-          <Center className="bg-white py-3 px-8 rounded-full">
-            <Text className="font-normal">Insight</Text>
-          </Center>
-          <Center className="bg-[#D9F634] py-3 px-8 rounded-full">
-            <Text className="font-extrabold">Transaksi</Text>
-          </Center>
-          <Center className="bg-white py-3 px-8 rounded-full">
-            <Text className="font-normal">Growth</Text>
-          </Center>
-        </Box>
+        <TabBar
+          tabList={tabList}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          size={16}
+          backgroundColor="#FFF"
+          marginVertical={0}
+        />
       </Box>
 
       <ScrollView className="flex-1 px-6">

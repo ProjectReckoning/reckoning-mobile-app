@@ -36,7 +36,7 @@ export default function AccountCard() {
       {/* Title Rekening Transaksi */}
       <Box className="flex flex-row my-5 justify-between items-end">
         <Text className="font-extrabold text-xl">Rekening transaksi kamu</Text>
-        <Link href="#">
+        <Link href="">
           <LinkText className="text-sm text-[#FF7F00] font-bold">
             Lihat Semua
           </LinkText>

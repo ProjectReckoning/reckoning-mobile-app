@@ -11,7 +11,7 @@ export default function SelectedFeature() {
       {/* Title */}
       <Box className="flex flex-row my-5 justify-between items-end">
         <Text className="font-extrabold text-xl">Fitur pilihan kamu</Text>
-        <Link href="#">
+        <Link href="">
           <LinkText className="text-sm text-[#FF7F00] font-bold">Atur</LinkText>
         </Link>
       </Box>
