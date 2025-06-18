@@ -10,9 +10,9 @@ import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 
-import { savingGoals } from "../../../../utils/goalData";
 import { usePocketStore } from "../../../../stores/pocketStore";
-import GoalCard from "../../../../components/common/cards/GoalCard";
+import { savingGoals } from "../../../../utils/createPocket/goalData";
+import GoalCard from "../../../../components/feature/createPocket/GoalCard";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
 

@@ -9,7 +9,7 @@ import PortfolioIcon from "../../../assets/images/icon/portfolio-icon.png";
 import { useRef, useState } from "react";
 import { Animated, View } from "react-native";
 
-import AccountCardItem from "../../common/AccountCardItem";
+import AccountCardItem from "./AccountCardItem";
 
 export default function AccountCard() {
   const CARD_COUNT = 3; // Portfolio + 2 AccountCardItem

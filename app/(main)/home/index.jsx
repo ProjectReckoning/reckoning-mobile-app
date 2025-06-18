@@ -14,8 +14,8 @@ import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 
 import { useState } from "react";
-import AccountCard from "../../../components/common/cards/AccountCard";
-import SelectedFeature from "../../../components/features/SelectedFeature";
+import AccountCard from "../../../components/feature/home/AccountCard";
+import SelectedFeature from "../../../components/feature/home/SelectedFeature";
 
 const tabList = [
   { key: "insight", label: "Insight" },

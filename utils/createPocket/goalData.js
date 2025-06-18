@@ -1,9 +1,9 @@
-import TabunganKeluargaIcon from "../assets/images/icon/tabunganKeluarga.png";
-import PernikahanIcon from "../assets/images/icon/pernikahan.png";
-import WisataBersamaIcon from "../assets/images/icon/wisataBersama.png";
-import KolaborasiBisnisIcon from "../assets/images/icon/kolaborasiBisnis.png";
+import TabunganKeluargaIcon from "../../assets/images/icon/tabunganKeluarga.png";
+import PernikahanIcon from "../../assets/images/icon/pernikahan.png";
+import WisataBersamaIcon from "../../assets/images/icon/wisataBersama.png";
+import KolaborasiBisnisIcon from "../../assets/images/icon/kolaborasiBisnis.png";
 
-import WisataBersamaDecorator from "../assets/images/decorators/wisataBersamaDecorator.png";
+import WisataBersamaDecorator from "../../assets/images/decorators/wisataBersamaDecorator.png";
 
 export const savingGoals = [
   {

@@ -2,8 +2,8 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Link, LinkText } from "@/components/ui/link";
 
-import FeatureButton from "../common/buttons/FeatureButton";
-import { features } from "../../utils/featureData";
+import FeatureButton from "../../common/buttons/FeatureButton";
+import { features } from "../../../utils/mockData/featureData";
 
 export default function SelectedFeature() {
   return (

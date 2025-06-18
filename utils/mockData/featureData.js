@@ -1,6 +1,6 @@
 import { Image } from "@/components/ui/image";
-import TapCashIcon from "../assets/images/icon/tapcash-logo.png";
-import PocketIcon from "../assets/images/icon/pocket.png";
+import TapCashIcon from "../../assets/images/icon/tapcash-logo.png";
+import PocketIcon from "../../assets/images/icon/pocket.png";
 import {
   Send,
   HandCoins,

@@ -8,8 +8,8 @@ import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
 import { usePocketStore } from "../../../../stores/pocketStore";
-import { pocketTypes } from "../../../../utils/pocketTypeData";
-import PocketTypeCard from "../../../../components/common/cards/PocketTypeCard";
+import { pocketTypes } from "../../../../utils/createPocket/pocketTypeData";
+import PocketTypeCard from "../../../../components/feature/createPocket/PocketTypeCard";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 export default function CreatePocket() {

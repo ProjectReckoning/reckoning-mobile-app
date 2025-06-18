@@ -22,7 +22,7 @@ export default function AccountCardItem({
     >
       {/* Orange Decorator */}
       <Image
-        source={require("../../assets/images/decorators/account-decorator.png")}
+        source={require("../../../assets/images/decorators/account-decorator.png")}
         className="absolute right-0 top-0 w-40 h-40 object-cover opacity-60"
         alt="account-decorator"
       />

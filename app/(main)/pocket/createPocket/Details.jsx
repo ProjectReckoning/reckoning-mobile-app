@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
-import { savingGoals } from "../../../../utils/goalData";
 import { useState, useEffect, useCallback } from "react";
 import { usePocketStore } from "../../../../stores/pocketStore";
+import { savingGoals } from "../../../../utils/createPocket/goalData";
 import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-import FormPocketDetail from "../../../../components/features/FormPocketDetail";
+import FormPocketDetail from "../../../../components/feature/createPocket/FormPocketDetail";
 
 export default function Details() {
   const {
