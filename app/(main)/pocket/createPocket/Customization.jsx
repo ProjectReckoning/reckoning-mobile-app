@@ -4,14 +4,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { Icon, AlertCircleIcon } from "@/components/ui/icon";
-import { Input, InputField, InputSlot } from "@/components/ui/input";
-import {
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
-  FormControlErrorIcon,
-} from "@/components/ui/form-control";
+import { Icon } from "@/components/ui/icon";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
@@ -19,7 +12,12 @@ import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
-import PocketErrorAlert from "../../../../components/feature/pocketCustomization/PocketErrorAlert";
+import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
+
+import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
+import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
+import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
+import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
 
 import {
   Pocket,
@@ -35,7 +33,31 @@ import {
   Group,
   GroupWhite,
 } from "../../../../assets/Icons/PocketIcon";
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
+
+const iconKeys = [
+  "Pocket",
+  "Laptop",
+  "Diamond",
+  "Airplane",
+  "Moonstar",
+  "Group",
+];
+const iconMap = {
+  Pocket,
+  Laptop,
+  Diamond,
+  Airplane,
+  Moonstar,
+  Group,
+};
+const iconWhiteMap = {
+  Pocket: PocketWhite,
+  Laptop: LaptopWhite,
+  Diamond: DiamondWhite,
+  Airplane: AirplaneWhite,
+  Moonstar: MoonstarWhite,
+  Group: GroupWhite,
+};
 
 const colors = [
   "bg-orange-wondr",
@@ -45,7 +67,6 @@ const colors = [
   "bg-purple-wondr",
   "bg-pink-wondr",
 ];
-
 const colorMap = {
   "bg-orange-wondr": {
     solid: "bg-orange-wondr",
@@ -71,31 +92,6 @@ const colorMap = {
     solid: "bg-pink-wondr",
     translucent: "bg-pink-wondr-light-translucent",
   },
-};
-
-const iconKeys = [
-  "Pocket",
-  "Laptop",
-  "Diamond",
-  "Airplane",
-  "Moonstar",
-  "Group",
-];
-const iconMap = {
-  Pocket,
-  Laptop,
-  Diamond,
-  Airplane,
-  Moonstar,
-  Group,
-};
-const iconWhiteMap = {
-  Pocket: PocketWhite,
-  Laptop: LaptopWhite,
-  Diamond: DiamondWhite,
-  Airplane: AirplaneWhite,
-  Moonstar: MoonstarWhite,
-  Group: GroupWhite,
 };
 
 export default function Customization() {
@@ -282,74 +278,25 @@ export default function Customization() {
           >
             <VStack space="2xl" className="w-full px-3">
               {pocketType === "Spending" && (
-                <VStack space="md">
-                  <Text size="lg">Masukkan nama pocket kamu</Text>
-
-                  <FormControl isInvalid={isNameInvalid} size="md" isRequired>
-                    <Input
-                      className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
-                      size="lg"
-                    >
-                      <InputField
-                        type="text"
-                        placeholder="Tulis nama pocket"
-                        value={pocketName}
-                        onChangeText={setPocketName}
-                        className="p-3"
-                      />
-                      <InputSlot className="mr-3">
-                        <Text
-                          className={`text-gray-500 text-xs ${isNameInvalid && "text-red-500"}`}
-                        >
-                          {pocketName.length}/20
-                        </Text>
-                      </InputSlot>
-                    </Input>
-                    <FormControlError>
-                      <FormControlErrorIcon as={AlertCircleIcon} />
-                      <FormControlErrorText>
-                        Nama harus terisi, valid, dan maksimal 20 karakter!
-                      </FormControlErrorText>
-                    </FormControlError>
-                  </FormControl>
-                </VStack>
+                <PocketNameInput
+                  pocketName={pocketName}
+                  setPocketName={setPocketName}
+                  isNameInvalid={isNameInvalid}
+                />
               )}
-              <VStack space="xl">
-                <Text size="lg">Pilih warna pocket kamu</Text>
-                <HStack space="md" className="flex-wrap justify-between">
-                  {colors.map((color, index) => (
-                    <Pressable
-                      onPress={() => {
-                        setPocketColor(color);
-                        setSelectedColorIndex(
-                          selectedColorIndex === index ? null : index,
-                        );
-                      }}
-                      key={index}
-                      className={`w-8 h-8 rounded-full ${color} ${selectedColorIndex === index ? "border-2 border-[#007BE5]" : ""}`}
-                    ></Pressable>
-                  ))}
-                </HStack>
-              </VStack>
-              <VStack space="xl">
-                <Text size="lg">Pilih ikon pocket kamu</Text>
-                <HStack space="md" className="flex-wrap justify-between">
-                  {iconKeys.map((iconKey, index) => (
-                    <Pressable
-                      onPress={() => {
-                        setPocketIcon(iconKey);
-                        setSelectedIconIndex(
-                          selectedIconIndex === index ? null : index,
-                        );
-                      }}
-                      key={iconKey}
-                      className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
-                    >
-                      <Icon as={iconMap[iconKey]} size="sm" />
-                    </Pressable>
-                  ))}
-                </HStack>
-              </VStack>
+              <PocketColorSelector
+                colors={colors}
+                selectedColorIndex={selectedColorIndex}
+                setSelectedColorIndex={setSelectedColorIndex}
+                setPocketColor={setPocketColor}
+              />
+              <PocketIconSelector
+                iconKeys={iconKeys}
+                iconMap={iconMap}
+                selectedIconIndex={selectedIconIndex}
+                setSelectedIconIndex={setSelectedIconIndex}
+                setPocketIcon={setPocketIcon}
+              />
             </VStack>
           </ScrollView>
         </KeyboardAvoidingView>
