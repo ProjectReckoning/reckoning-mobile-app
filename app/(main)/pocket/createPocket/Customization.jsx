@@ -4,7 +4,6 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { Button, ButtonText } from "@/components/ui/button";
 import { Icon, AlertCircleIcon } from "@/components/ui/icon";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import {
@@ -13,14 +12,6 @@ import {
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogBody,
-  AlertDialogBackdrop,
-} from "@/components/ui/alert-dialog";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
@@ -28,6 +19,7 @@ import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import PocketErrorAlert from "../../../../components/feature/pocketCustomization/PocketErrorAlert";
 
 import {
   Pocket,
@@ -368,37 +360,14 @@ export default function Customization() {
           disabled={isNameInvalid || pocketName.length === 0}
         />
 
-        <AlertDialog
+        <PocketErrorAlert
           isOpen={showAlertDialog}
           onClose={() => setShowAlertDialog(false)}
-          size="md"
-        >
-          <AlertDialogBackdrop />
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <Heading className="text-typography-950 font-semibold" size="md">
-                Lengkapi Data Pocket
-              </Heading>
-            </AlertDialogHeader>
-            <AlertDialogBody className="mt-3 mb-4">
-              {alertMessages.map((msg, idx) => (
-                <Text key={idx} size="sm" className="mb-1 text-red-600">
-                  {msg}
-                </Text>
-              ))}
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button
-                variant="outline"
-                action="secondary"
-                onPress={() => setShowAlertDialog(false)}
-                size="sm"
-              >
-                <ButtonText>Tutup</ButtonText>
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          Add
+          commentMore
+          actions
+          messages={alertMessages}
+        />
       </Box>
     </Box>
   );
