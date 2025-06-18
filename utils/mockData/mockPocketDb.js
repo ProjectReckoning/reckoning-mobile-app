@@ -7,6 +7,7 @@ export const allPocket = [
     icon: "Airplane",
     id: 1,
     name: "Pergi ke Swiss",
+    subject: "Personal",
     targetDuration: {
       endDate: "2026-01-30T23:59:59.999Z",
       startDate: "2025-06-17T17:00:00.000Z",
@@ -21,6 +22,7 @@ export const allPocket = [
     icon: "Pocket",
     id: 2,
     name: "Uang Bulanan",
+    subject: "Personal",
     targetDuration: { endDate: undefined, startDate: undefined },
     type: "Spending",
   },
@@ -40,6 +42,7 @@ export const allPocket = [
     icon: "Group",
     id: 3,
     name: "OKJEK",
+    subject: "Personal",
     targetDuration: {
       endDate: "2025-10-30T23:59:59.999Z",
       startDate: "2025-06-17T17:00:00.000Z",
@@ -57,6 +60,7 @@ export const allPocket = [
     icon: "Diamond",
     id: 4,
     name: "Get Married by 2027",
+    subject: "Personal",
     targetDuration: {
       endDate: "2025-11-29T23:59:59.999Z",
       startDate: "2025-06-17T17:00:00.000Z",

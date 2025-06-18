@@ -9,7 +9,7 @@ import PortfolioIcon from "../../../assets/images/icon/portfolio-icon.png";
 import { useRef, useState } from "react";
 import { Animated, View } from "react-native";
 
-import AccountCardItem from "../../common/AccountCardItem";
+import AccountCardItem from "./AccountCardItem";
 
 export default function AccountCard() {
   const CARD_COUNT = 3; // Portfolio + 2 AccountCardItem
@@ -36,7 +36,7 @@ export default function AccountCard() {
       {/* Title Rekening Transaksi */}
       <Box className="flex flex-row my-5 justify-between items-end">
         <Text className="font-extrabold text-xl">Rekening transaksi kamu</Text>
-        <Link href="#">
+        <Link href="">
           <LinkText className="text-sm text-[#FF7F00] font-bold">
             Lihat Semua
           </LinkText>
