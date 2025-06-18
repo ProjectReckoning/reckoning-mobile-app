@@ -15,9 +15,10 @@ import { router } from "expo-router";
 import { useState, useEffect, useCallback } from "react";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { savingGoals } from "../../../../utils/createPocket/goalData";
-import { ArrowLeft, UserPlus, ChevronRight } from "lucide-react-native";
+import { UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
+import AppBar from "../../../../components/common/AppBar";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import FormPocketDetail from "../../../../components/feature/createPocket/FormPocketDetail";
 
@@ -93,16 +94,12 @@ export default function Details() {
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const GoToFriendsList = () => {
-    router.push("pocket/createPocket/SelectFriend");
+    router.push("pocket/create/SelectFriend");
   };
 
   const GoToCustomization = () => {
-    router.push("pocket/createPocket/Customization");
+    router.push("pocket/create/Customization");
   };
 
   useEffect(() => {
@@ -138,15 +135,7 @@ export default function Details() {
         </Box>
         <Box className="flex-1 flex-col px-6 pt-5 justify-between">
           <VStack space="4xl" reversed={false}>
-            <Box className="flex flex-row justify-between items-center">
-              <Pressable onPress={handleBack}>
-                <ArrowLeft size={24} />
-              </Pressable>
-              <Heading size="lg" className="text-bold">
-                {selectedGoal.title}
-              </Heading>
-              <Box className="w-5 h-5" />
-            </Box>
+            <AppBar title={selectedGoal.title} />
             <VStack space="xs" reversed={false}>
               <Heading size="xl" className="text-bold w-56">
                 {selectedGoal.title2}

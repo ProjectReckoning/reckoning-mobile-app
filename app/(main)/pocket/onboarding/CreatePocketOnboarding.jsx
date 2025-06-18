@@ -4,11 +4,9 @@ import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
-import { Pressable } from "@/components/ui/pressable";
 
 import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
-
+import AppBar from "../../../../components/common/AppBar";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 import ScheduleIcon from "../../../../assets/images/icon/pocketcreation1.png";
 import RoleIcon from "../../../../assets/images/icon/pocketcreation2.png";
@@ -16,28 +14,14 @@ import TransparentIcon from "../../../../assets/images/icon/pocketcreation3.png"
 import OnboardingDecorator from "../../../../assets/images/decorators/onboarding.png";
 
 export default function CreatePocketOnboarding() {
-  const handleBack = () => {
-    router.back();
-  };
-
   const GoToCreatePocket = () => {
-    router.push("pocket/createPocket");
+    router.push("pocket/create");
   };
 
   return (
     <Box className="flex-1 bg-white justify-stretch -z-20">
       <Box className="flex flex-col">
-        <Box className="flex flex-row px-6 pt-5 justify-between items-center bg-[#C2F0ED]">
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
-
-          <Heading size="lg" className="text-bold">
-            Buat Pocket
-          </Heading>
-
-          <Box className="w-5 h-5" />
-        </Box>
+        <AppBar title="Buat Pocket" className="bg-[#C2F0ED] px-6 pt-5" />
         <Box className="w-full h-64 -z-10">
           <Image
             source={OnboardingDecorator}

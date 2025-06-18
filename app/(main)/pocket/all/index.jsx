@@ -7,8 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
 import { useState } from "react";
-import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import AppBar from "../../../../components/common/AppBar";
 import TabBar from "../../../../components/common/TabBar";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 
@@ -26,23 +25,10 @@ export default function AllPocket() {
       (activeTab === "business" && pocket.subject === "Business"),
   );
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
     <Box className="flex-1 bg-white">
       <Box className="w-full flex-1 flex-col px-6 pt-5">
-        {/* App Bar */}
-        <Box className="flex flex-row justify-between items-center">
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
-          <Heading size="lg" className="font-bold">
-            Pocket
-          </Heading>
-          <Box className="w-5 h-5" />
-        </Box>
+        <AppBar title="Pocket" />
 
         <TabBar
           tabList={tabList}
