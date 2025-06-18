@@ -59,7 +59,7 @@ export function pocketValidation({
   let isBalanceInvalid = false;
   let isDurationInvalid = false;
 
-  if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+  if (pocketType === "Saving" || pocketType === "Business Fund") {
     isGoalInvalid = !goalTitle || goalTitle === "";
     isBalanceInvalid =
       typeof pocketBalanceTarget !== "number" ||

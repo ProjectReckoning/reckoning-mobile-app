@@ -12,7 +12,7 @@ export const pocketTypes = [
   },
   {
     subject: "Business",
-    type: "Enterprise Fund",
+    type: "Business Fund",
     content: "Kumpulkan dana untuk proyek bisnis atau operasional tim Anda.",
   },
 ];

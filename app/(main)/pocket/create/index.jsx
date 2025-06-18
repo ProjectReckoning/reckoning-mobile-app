@@ -18,7 +18,7 @@ export default function CreatePocket() {
   const GoToNext = () => {
     if (pocketType === "Spending") {
       router.push("pocket/create/Customization");
-    } else if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+    } else if (pocketType === "Saving" || pocketType === "Business Fund") {
       router.push("pocket/create/SelectGoal");
     }
   };

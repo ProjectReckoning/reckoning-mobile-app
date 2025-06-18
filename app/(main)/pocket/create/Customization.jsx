@@ -157,9 +157,10 @@ export default function Customization() {
           pocketType={pocketType}
           solidColor={selectedSolid}
           translucentColor={selectedTranslucent}
-          iconWhite={SelectedIconWhite}
+          icon={SelectedIconWhite}
           iconSize="16"
           space="my-7"
+          cardWidth="min-w-48"
         />
       </Box>
 
