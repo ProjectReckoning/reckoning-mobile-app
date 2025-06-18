@@ -20,46 +20,11 @@ import {
   resetPocketData,
   pocketValidation,
 } from "../../../../utils/pocketCustomization/pocketValidation";
-
 import {
-  Pocket,
-  PocketWhite,
-  Laptop,
-  LaptopWhite,
-  Diamond,
-  DiamondWhite,
-  Airplane,
-  AirplaneWhite,
-  Moonstar,
-  MoonstarWhite,
-  Group,
-  GroupWhite,
-} from "../../../../assets/Icons/PocketIcon";
-
-const iconKeys = [
-  "Pocket",
-  "Laptop",
-  "Diamond",
-  "Airplane",
-  "Moonstar",
-  "Group",
-];
-const iconMap = {
-  Pocket,
-  Laptop,
-  Diamond,
-  Airplane,
-  Moonstar,
-  Group,
-};
-const iconWhiteMap = {
-  Pocket: PocketWhite,
-  Laptop: LaptopWhite,
-  Diamond: DiamondWhite,
-  Airplane: AirplaneWhite,
-  Moonstar: MoonstarWhite,
-  Group: GroupWhite,
-};
+  iconKeys,
+  iconMap,
+  iconWhiteMap,
+} from "../../../../utils/pocketCustomization/personalPocketIconUtils";
 
 const colors = [
   "bg-orange-wondr",
@@ -102,6 +67,7 @@ export default function Customization() {
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [alertMessages, setAlertMessages] = useState([]);
+  const PocketWhite = iconWhiteMap.Pocket;
 
   const {
     pocketName,
