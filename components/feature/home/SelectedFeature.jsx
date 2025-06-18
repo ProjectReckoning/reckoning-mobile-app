@@ -2,8 +2,8 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Link, LinkText } from "@/components/ui/link";
 
-import FeatureButton from "../common/buttons/FeatureButton";
-import { features } from "../../utils/featureData";
+import FeatureButton from "../../common/buttons/FeatureButton";
+import { features } from "../../../utils/mockData/featureData";
 
 export default function SelectedFeature() {
   return (
@@ -11,7 +11,7 @@ export default function SelectedFeature() {
       {/* Title */}
       <Box className="flex flex-row my-5 justify-between items-end">
         <Text className="font-extrabold text-xl">Fitur pilihan kamu</Text>
-        <Link href="#">
+        <Link href="">
           <LinkText className="text-sm text-[#FF7F00] font-bold">Atur</LinkText>
         </Link>
       </Box>

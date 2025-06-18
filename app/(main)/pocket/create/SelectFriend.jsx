@@ -10,9 +10,9 @@ import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
 import { ScrollView } from "react-native";
-import { ArrowLeft } from "lucide-react-native";
 import FriendList from "../../../../components/common/FriendList";
 
+import AppBar from "../../../../components/common/AppBar";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import CustomGoalIcon from "../../../../assets/images/icon/customGoal.png";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
@@ -27,16 +27,7 @@ export default function FriendsList() {
   return (
     <Box className="flex-1 bg-white">
       <Box className="w-full flex-1 flex-col px-6 pt-5">
-        {/* App Bar */}
-        <Box className="flex flex-row justify-between items-center mb-6">
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
-          <Heading size="lg" className="font-bold">
-            Pilih Teman
-          </Heading>
-          <Box className="w-5 h-5" />
-        </Box>
+        <AppBar title="Pilih teman" className="mb-6" />
 
         {selectedFriends.length > 0 && (
           <VStack size="2xl" className="mb-6">
