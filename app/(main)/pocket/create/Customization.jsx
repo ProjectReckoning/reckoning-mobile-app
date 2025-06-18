@@ -135,7 +135,7 @@ export default function Customization() {
     });
 
   const GoToNext = () => {
-    router.push("/(main)/home");
+    router.push("/(main)/pocket/all");
   };
 
   useEffect(() => {
@@ -155,8 +155,7 @@ export default function Customization() {
           mode="type"
           pocketName={pocketName}
           pocketType={pocketType}
-          solidColor={selectedSolid}
-          translucentColor={selectedTranslucent}
+          color={selectedSolid}
           icon={SelectedIconWhite}
           iconSize="16"
           space="my-7"

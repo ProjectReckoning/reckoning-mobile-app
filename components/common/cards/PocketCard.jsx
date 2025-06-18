@@ -21,8 +21,12 @@ export default function PocketCard({
   space = "my-7",
   cardWidth = "w-fit",
   editButton = false,
+  onEdit = () => {},
 }) {
-  const IconComponent = iconWhiteMap[icon] || PocketWhite;
+  const IconComponent =
+    typeof icon === "string"
+      ? iconWhiteMap[icon] || PocketWhite
+      : icon || PocketWhite;
 
   const formatRupiah = (value) =>
     new Intl.NumberFormat("id-ID", {
@@ -45,10 +49,7 @@ export default function PocketCard({
             <Icon as={IconComponent} className="w-1/2 h-1/2" />
           </Box>
           {editButton && (
-            <Pressable
-              onPress={() => console.log("Edit button pressed")}
-              className="mt-2 -mr-2"
-            >
+            <Pressable onPress={onEdit} className="mt-2 -mr-2">
               {({ pressed }) => (
                 <EllipsisVertical
                   color={pressed ? "#000" : "#C6C6C6"}

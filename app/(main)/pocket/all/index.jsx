@@ -28,13 +28,17 @@ export default function AllPocket() {
       (activeTab === "business" && pocket.subject === "Business"),
   );
 
+  const GoToHome = () => {
+    router.replace("/(main)/home");
+  };
+
   const GoToCreatePocket = () => {
     router.push("/(main)/pocket/create");
   };
 
   return (
     <Box className="w-full flex-1 flex-col px-6 pt-5 bg-white">
-      <AppBar title="Pocket" />
+      <AppBar title="Pocket" onBack={GoToHome} />
 
       <TabBar
         tabList={tabList}
