@@ -52,6 +52,12 @@ export const savingGoals = [
   },
   {
     isCustom: true,
+    title: "Custom Goal",
+    title2: "Buat tujuan unikmu sendiri",
+    subtitle: "Buat tujuan unikmu sendiri dan wujudkan bersama!",
+    subtitle2: "Wujudkan impian dan tujuanmu dengan wondr.",
+    decorator: WisataBersamaDecorator,
+    color: "bg-lime-wondr-light-translucent",
   },
 ];
 
