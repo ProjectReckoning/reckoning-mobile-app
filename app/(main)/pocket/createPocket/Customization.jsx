@@ -1,16 +1,14 @@
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
-import { Heading } from "@/components/ui/heading";
-import { Pressable } from "@/components/ui/pressable";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react-native";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
+import AppBar from "../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
@@ -27,46 +25,41 @@ import {
   iconWhiteMap,
 } from "../../../../utils/pocketCustomization/personalPocketIconUtils";
 
-import {
-  colors,
-  colorMap,
-} from "../../../../utils/pocketCustomization/pocketColorUtils";
+const colors = [
+  "bg-orange-wondr",
+  "bg-yellow-wondr",
+  "bg-lime-wondr",
+  "bg-tosca-wondr",
+  "bg-purple-wondr",
+  "bg-pink-wondr",
+];
 
-// const colors = [
-//   "bg-orange-wondr",
-//   "bg-yellow-wondr",
-//   "bg-lime-wondr",
-//   "bg-tosca-wondr",
-//   "bg-purple-wondr",
-//   "bg-pink-wondr",
-// ];
-
-// const colorMap = {
-//   "bg-orange-wondr": {
-//     solid: "bg-orange-wondr",
-//     translucent: "bg-orange-wondr-light-translucent",
-//   },
-//   "bg-yellow-wondr": {
-//     solid: "bg-yellow-wondr",
-//     translucent: "bg-yellow-wondr-light-translucent",
-//   },
-//   "bg-lime-wondr": {
-//     solid: "bg-lime-wondr",
-//     translucent: "bg-lime-wondr-light-translucent",
-//   },
-//   "bg-tosca-wondr": {
-//     solid: "bg-tosca-wondr",
-//     translucent: "bg-tosca-wondr-light-translucent",
-//   },
-//   "bg-purple-wondr": {
-//     solid: "bg-purple-wondr",
-//     translucent: "bg-purple-wondr-light-translucent",
-//   },
-//   "bg-pink-wondr": {
-//     solid: "bg-pink-wondr",
-//     translucent: "bg-pink-wondr-light-translucent",
-//   },
-// };
+const colorMap = {
+  "bg-orange-wondr": {
+    solid: "bg-orange-wondr",
+    translucent: "bg-orange-wondr-light-translucent",
+  },
+  "bg-yellow-wondr": {
+    solid: "bg-yellow-wondr",
+    translucent: "bg-yellow-wondr-light-translucent",
+  },
+  "bg-lime-wondr": {
+    solid: "bg-lime-wondr",
+    translucent: "bg-lime-wondr-light-translucent",
+  },
+  "bg-tosca-wondr": {
+    solid: "bg-tosca-wondr",
+    translucent: "bg-tosca-wondr-light-translucent",
+  },
+  "bg-purple-wondr": {
+    solid: "bg-purple-wondr",
+    translucent: "bg-purple-wondr-light-translucent",
+  },
+  "bg-pink-wondr": {
+    solid: "bg-pink-wondr",
+    translucent: "bg-pink-wondr-light-translucent",
+  },
+};
 
 export default function Customization() {
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
@@ -141,10 +134,6 @@ export default function Customization() {
       GoToNext,
     });
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const GoToNext = () => {
     router.push("/(main)/home");
   };
@@ -160,16 +149,7 @@ export default function Customization() {
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
-        {/* App Bar */}
-        <Box className="w-full flex flex-row justify-between items-center mb-6">
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
-          <Heading size="lg" className="font-bold">
-            Pocket kamu
-          </Heading>
-          <Box className="w-5 h-5" />
-        </Box>
+        <AppBar title="Pocket kamu" className="mb-6" />
 
         <PocketCard
           mode="type"
