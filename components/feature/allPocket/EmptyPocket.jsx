@@ -14,7 +14,7 @@ export default function EmptyPocket() {
   };
   return (
     <Box className="flex-1 bg-white justify-between">
-      <Box className="flex flex-col justify-center items-center my-10">
+      <Box className="flex flex-col justify-center items-center my-5">
         <Image
           source={EmptyPocketDecorator}
           alt="pocket-type-decorator"
