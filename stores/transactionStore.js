@@ -13,7 +13,12 @@ export const useTransactionStore = create((set) => ({
           : amount,
     }),
 
-  source: { id: 1916837397, name: "AMIRA FERIAL", type: "TAPLUS PEGAWAI BNI" },
+  source: {
+    id: 1916837397,
+    name: "AMIRA FERIAL",
+    type: "TAPLUS PEGAWAI BNI",
+    balance: 19546250,
+  },
   setSource: (source) => set({ source }),
 
   destination: {

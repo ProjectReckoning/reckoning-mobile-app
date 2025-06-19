@@ -28,7 +28,7 @@ export default function SelectNominal() {
     }).format(value);
 
   return (
-    <Box className="flex flex-col w-full gap-1 my-6">
+    <Box className="flex flex-col w-full gap-1 mt-6 mb-3">
       <Text className="text-sm text-black font-light mb-4">Pilih Nominal</Text>
 
       <Box className="flex flex-row flex-wrap justify-between">

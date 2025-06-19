@@ -12,6 +12,7 @@ import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import SelectNominal from "@/components/common/buttons/SelectNominal";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import TransactionCard from "@/components/common/cards/TransactionCard";
 
 export default function Topup() {
   // Static data for mockup
@@ -35,7 +36,7 @@ export default function Topup() {
   }, [amount, amountTouched]);
 
   return (
-    <Box className="flex-1 bg-white justify-between px-6 py-5">
+    <Box className="flex-1 bg-white justify-between px-8 py-5">
       <VStack space="xs">
         <AppBar transaction={type} />
 
@@ -65,6 +66,14 @@ export default function Topup() {
         />
 
         <SelectNominal />
+
+        <TransactionCard
+          title="Sumber dana"
+          heading={source.type}
+          subheading={source.id}
+          showBalance={true}
+          balance={source.balance}
+        />
       </VStack>
 
       <PrimaryButton
