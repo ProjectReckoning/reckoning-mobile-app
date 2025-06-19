@@ -28,7 +28,8 @@ export default function BalanceMemberListCell({
   targetAmount,
   index,
 }) {
-  const progress = targetAmount > 0 ? currentAmount / targetAmount : 0;
+  const progress =
+    targetAmount > 0 ? Number(currentAmount) / Number(targetAmount) : 0;
   const percentage = (progress * 100).toFixed(0);
 
   const displayInitials = getConsistentInitials(name);

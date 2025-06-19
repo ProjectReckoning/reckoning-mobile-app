@@ -6,9 +6,9 @@ import { MEMBER_MOCK_DATA } from "@/utils/pocketMemberMockData";
 import PocketDetail from "@/components/feature/pocketDashboard/information/PocketDetail";
 import OwnerDetail from "@/components/feature/pocketDashboard/information/OwnerDetail";
 import MemberDetail from "@/components/feature/pocketDashboard/information/MemberDetail";
-import MemberDetailList from "../../../../components/feature/pocketDashboard/information/MemberDetailList";
+import MemberDetailList from "./information/MemberDetailList";
 
-export default function InfoScreen() {
+export default function InfoScreen({ pocketId }) {
   return (
     <>
       <Box className="flex-1">
