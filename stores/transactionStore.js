@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 export const useTransactionStore = create((set) => ({
-  type: "topup",
+  type: { id: "topup", name: "Top-Up" },
   setType: (type) => set({ type }),
 
   amount: null,

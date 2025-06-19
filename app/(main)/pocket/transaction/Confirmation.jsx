@@ -3,38 +3,31 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
+import { Divider } from "@/components/ui/divider";
 
 import { router } from "expo-router";
-import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
 
-import AppBar from "../../../../../components/common/AppBar";
+import AppBar from "../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
-import NominalInput from "@/components/common/forms/NominalInput";
-import { maskPocketId } from "../../../../../utils/helperFunction";
-import SelectNominal from "@/components/common/buttons/SelectNominal";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
+import { maskPocketId, formatRupiah } from "../../../../utils/helperFunction";
+import DetailConfirmation from "@/components/feature/transaction/DetailConfirmation";
 
-export default function Topup() {
+export default function Confirmation() {
   // Static data for mockup
   const pocketName = "Pergi ke Korea 2026";
   const pocketColor = "bg-orange-wondr";
   const pocketIcon = "Airplane";
   const pocketId = "0238928039";
 
-  const { type, amount, source, setAmount } = useTransactionStore();
-  const [isAmountInvalid, setIsAmountInvalid] = useState(false);
-  const [amountTouched, setAmountTouched] = useState(false);
-
-  useEffect(() => {
-    setIsAmountInvalid(amountTouched && amount === 0);
-  }, [amount, amountTouched]);
+  const { type, source, amount } = useTransactionStore();
 
   return (
     <Box className="flex-1 bg-white justify-between px-8 py-5">
       <VStack space="xs">
-        <AppBar transaction={type.id} />
+        <AppBar transaction={type.id} prefix="Konfirmasi" />
 
         {/* Pocket preview */}
         <HStack
@@ -57,32 +50,33 @@ export default function Topup() {
           </VStack>
         </HStack>
 
-        <NominalInput
-          amount={amount}
-          setAmount={setAmount}
-          isAmountInvalid={isAmountInvalid}
-          setAmountTouched={setAmountTouched}
-        />
-
-        <SelectNominal />
-
         <TransactionCard
           title="Sumber dana"
-          heading={source.type}
-          subheading={source.id}
-          showBalance={true}
-          balance={source.balance}
+          heading={source.name}
+          subheading={`${source.type} - ${source.id}`}
         />
+
+        <DetailConfirmation />
       </VStack>
 
-      <PrimaryButton
-        buttonAction={() => {
-          router.push("/pocket/transaction/Confirmation");
-        }}
-        buttonTitle="Lanjut"
-        className={"mb-3"}
-        disabled={amount === null}
-      />
+      <VStack className="gap-8">
+        <Divider className="w-screen h-0.5 border-light-gray-wondr shadow-md my-2 relative -left-8" />
+
+        <HStack className="justify-between">
+          <Text className="text-sm text-black font-light">Total</Text>
+          <Text className="text-lg text-black font-extrabold">
+            {formatRupiah(amount)}
+          </Text>
+        </HStack>
+
+        <PrimaryButton
+          buttonAction={() => {
+            router.push("/pocket/transaction/Confirmation");
+          }}
+          buttonTitle={`${type.name} sekarang`}
+          className={"mb-3"}
+        />
+      </VStack>
     </Box>
   );
 }

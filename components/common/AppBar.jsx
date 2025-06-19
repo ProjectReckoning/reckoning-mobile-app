@@ -13,6 +13,7 @@ export default function AppBar({
   onBack = handleBack,
   className = "",
   transaction = null,
+  prefix = "",
 }) {
   return (
     <Box
@@ -23,7 +24,7 @@ export default function AppBar({
       </Pressable>
       <Heading size="lg" className="font-bold">
         {transaction
-          ? `${transaction === "topup" ? "Top-Up" : transaction === "transfer" ? "Transfer" : "Withdraw"}`
+          ? `${transaction === "topup" ? (prefix ? `${prefix} Top-Up` : "Top-Up") : transaction === "transfer" ? (prefix ? `${prefix} Transfer` : "Transfer") : prefix ? `${prefix} Withdraw` : "Withdraw"}`
           : title || "AppBar"}
       </Heading>
       <Box className="w-5 h-5" />

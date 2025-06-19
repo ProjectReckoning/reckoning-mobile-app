@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
 
 import { useState, useEffect } from "react";
+import { formatRupiah } from "../../../utils/helperFunction";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 const nominalList = [200000, 300000, 400000, 500000, 600000, 700000];
@@ -19,13 +20,6 @@ export default function SelectNominal() {
       setSelectedIndex(nominalList.indexOf(amount));
     }
   }, [amount]);
-
-  const formatRupiah = (value) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(value);
 
   return (
     <Box className="flex flex-col w-full gap-1 mt-6 mb-3">

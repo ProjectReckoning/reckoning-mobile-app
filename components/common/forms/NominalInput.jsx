@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/form-control";
 
 import { AlertCircleIcon, CircleX } from "lucide-react-native";
+import { formatDigitCurrency } from "../../../utils/helperFunction";
 
 export default function NominalInput({
   amount,
@@ -15,12 +16,6 @@ export default function NominalInput({
   isAmountInvalid,
   setAmountTouched,
 }) {
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    const numeric = value.replace(/\D/g, "");
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
   return (
     <FormControl isInvalid={isAmountInvalid} size="md" isRequired>
       <Text className="text-sm text-black font-light">Nominal</Text>
@@ -36,7 +31,7 @@ export default function NominalInput({
           type="number"
           placeholder="0"
           value={
-            amount && amount !== 0 ? formatCurrency(amount.toString()) : ""
+            amount && amount !== 0 ? formatDigitCurrency(amount.toString()) : ""
           }
           onChangeText={(value) => {
             setAmountTouched(true);

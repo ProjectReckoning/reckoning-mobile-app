@@ -6,6 +6,7 @@ import { Pressable } from "@/components/ui/pressable";
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react-native";
+import { formatRupiah, maskBalance } from "../../../utils/helperFunction";
 
 export default function TransactionCard({
   title,
@@ -15,18 +16,6 @@ export default function TransactionCard({
   balance = 0,
 }) {
   const [isShowBalance, setIsShowBalance] = useState(true);
-
-  const formatRupiah = (value) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(value);
-
-  const maskBalance = (value) => {
-    const digits = value.toString().replace(/\D/g, "").length;
-    return "Rp" + "*".repeat(digits);
-  };
 
   return (
     <VStack space="lg">
@@ -41,11 +30,11 @@ export default function TransactionCard({
           </Pressable>
         )}
       </HStack>
-      <VStack className="border border-[#C3C3C3] rounded-xl p-4">
-        <Heading size={"md"} className="font-normal">
+      <VStack space="xs" className="border border-[#C3C3C3] rounded-xl p-4">
+        <Heading size={"sm"} className="font-normal">
           {heading}
         </Heading>
-        <Text className="text-lg">{subheading}</Text>
+        <Text className="text-md">{subheading}</Text>
         {showBalance && (
           <Text className="text-md font-bold">
             {isShowBalance ? formatRupiah(balance) : maskBalance(balance)}
