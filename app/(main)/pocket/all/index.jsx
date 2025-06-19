@@ -40,7 +40,8 @@ export default function AllPocket() {
   };
 
   const handleEdit = () => {
-    router.push("/(main)/pocket/create/Customization", {
+    router.push({
+      pathname: "/(main)/pocket/create/Customization",
       params: { pocketId: selectedPocket.id },
     });
   };
