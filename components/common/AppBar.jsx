@@ -8,7 +8,12 @@ const handleBack = () => {
   router.back();
 };
 
-export default function AppBar({ title, onBack = handleBack, className = "" }) {
+export default function AppBar({
+  title,
+  onBack = handleBack,
+  className = "",
+  transaction = null,
+}) {
   return (
     <Box
       className={`w-full flex flex-row justify-between items-center ${className}`}
@@ -17,7 +22,9 @@ export default function AppBar({ title, onBack = handleBack, className = "" }) {
         <ArrowLeft size={24} />
       </Pressable>
       <Heading size="lg" className="font-bold">
-        {title}
+        {transaction
+          ? `${transaction === "topup" ? "Top-Up" : transaction === "transfer" ? "Transfer" : "Withdraw"}`
+          : title || "AppBar"}
       </Heading>
       <Box className="w-5 h-5" />
     </Box>

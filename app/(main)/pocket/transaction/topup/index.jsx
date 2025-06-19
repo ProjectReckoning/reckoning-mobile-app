@@ -20,9 +20,15 @@ export default function Topup() {
   const pocketIcon = "Airplane";
   const pocketId = "0238928039";
 
-  const { type, amount, source, setType, setAmount } = useTransactionStore();
+  const { type, amount, source, setAmount } = useTransactionStore();
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
+
+  const maskPocketId = (id, numDigits) => {
+    if (!id) return "";
+    const visible = id.slice(-numDigits);
+    return "*".repeat(id.length - numDigits) + visible;
+  };
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
@@ -31,7 +37,7 @@ export default function Topup() {
   return (
     <Box className="flex-1 bg-white justify-between px-6 py-5">
       <VStack space="xs">
-        <AppBar title="Pocket kamu" />
+        <AppBar transaction={type} />
 
         {/* Pocket preview */}
         <HStack space="xl" className="w-full justify-start items-center my-8">
@@ -47,7 +53,7 @@ export default function Topup() {
             <Heading size={"lg"}>
               {pocketName ? pocketName : "Nama Pocket"}
             </Heading>
-            <Text size={"md"}>{pocketId}</Text>
+            <Text size={"md"}>{maskPocketId(pocketId, 3)}</Text>
           </VStack>
         </HStack>
 
