@@ -48,5 +48,9 @@ export default function AppEntry() {
 
   // Redirect based on token status
   console.log("AppEntry: Redirecting. Token present:", !!token);
-  return <Redirect href={token ? "/(main)/pocket/1" : "/(auth)/login"} />;
+  return (
+    <Redirect
+      href={token ? "/(main)/pocket/transaction/topup" : "/(auth)/login"}
+    />
+  );
 }
