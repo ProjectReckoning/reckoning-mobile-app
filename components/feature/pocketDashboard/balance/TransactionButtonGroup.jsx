@@ -1,10 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box } from "@/components/ui/box";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
 import { Send } from "lucide-react-native";
-import { HStack } from "@/components/ui/hstack";
-
 import SquaredButton from "@/components/common/buttons/SquaredButton";
 
 export default function TransactionButtonGroup() {

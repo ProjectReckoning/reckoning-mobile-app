@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 
-export default function PaymentDateInfo() {
-  const [lastPaymentDate, setLastPaymentDate] = useState("18 Nov 2025");
-  const [targetDate, setTargetDate] = useState("25 Juni 2026");
+export default function PaymentDateInfo({ deadline }) {
+  // lastPaymentDate can be a fixed value or fetched elsewhere if dynamic.
+  // For now, it's hardcoded as it wasn't part of the 'data' prop from PocketDashboardScreen.
+  const lastPaymentDate = "18 Nov 2025";
 
   return (
     <>
@@ -24,7 +25,7 @@ export default function PaymentDateInfo() {
           <Box>
             <VStack>
               <Text className="text-white font-light">Target Selesai</Text>
-              <Text className="text-white font-semibold">{targetDate}</Text>
+              <Text className="text-white font-semibold">{deadline}</Text>
             </VStack>
           </Box>
         </HStack>

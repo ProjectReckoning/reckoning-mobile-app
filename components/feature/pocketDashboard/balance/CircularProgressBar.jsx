@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Animated, Easing, View } from "react-native"; // Added View import
+import { Animated, Easing, View } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import * as Progress from "react-native-progress";
-import { WondrColors } from "@/utils/colorUtils"; // Import WondrColors
-import { formatCurrency } from "@/utils/helperFunction"; // Import formatCurrency from helper
+import { WondrColors } from "@/utils/colorUtils";
+import { formatCurrency } from "@/utils/helperFunction";
 
 export default function CircularProgressBar({
   calculatedCircleDimension,
-  currentAmount = 75000,
+  currentAmount = 100000,
   targetAmount = 100000,
 }) {
   const safeCalculatedCircleDimension =
@@ -163,8 +163,8 @@ export default function CircularProgressBar({
           size={circleSizeForProgressComponent}
           progress={displayProgress}
           showsText={false}
-          color={WondrColors["tosca-wondr"]} // Use WondrColors
-          unfilledColor={WondrColors["light-gray-wondr"]} // Use WondrColors
+          color={WondrColors["tosca-wondr"]}
+          unfilledColor={WondrColors["light-gray-wondr"]}
           thickness={progressLineThickness}
           borderWidth={0}
           strokeCap="round"
@@ -212,7 +212,7 @@ export default function CircularProgressBar({
               width: innerToscaCircleSize,
               height: innerToscaCircleSize,
               borderRadius: innerToscaCircleSize / 2,
-              backgroundColor: WondrColors["tosca-wondr"], // Use WondrColors
+              backgroundColor: WondrColors["tosca-wondr"],
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -223,7 +223,7 @@ export default function CircularProgressBar({
                 lineHeight: 14,
               }}
             >
-              {((safeCurrentAmount / safeTargetAmount) * 100).toFixed(0)}%
+              {Math.floor((safeCurrentAmount / safeTargetAmount) * 100)}%
             </Text>
           </Box>
         </Animated.View>

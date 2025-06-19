@@ -4,16 +4,16 @@ import { Picker } from "@react-native-picker/picker";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import BalanceMemberListCell from "@/components/common/tableCells/BalanceMemberListCell";
-import { WondrColors } from "@/utils/colorUtils"; // Import WondrColors
+import { WondrColors } from "@/utils/colorUtils";
 
-export default function BalanceMemberList({ data }) {
+export default function BalanceMemberList({ members, targetNominal }) {
   const [sortBy, setSortBy] = useState("none");
 
   const renderItem = ({ item, index }) => (
     <BalanceMemberListCell
       name={item.name}
-      currentAmount={item.currentAmount}
-      targetAmount={item.targetAmount}
+      currentAmount={item.PocketMember.contribution_amount}
+      targetAmount={targetNominal}
       index={index}
     />
   );
@@ -50,7 +50,7 @@ export default function BalanceMemberList({ data }) {
         style={{ borderColor: WondrColors["light-gray-wondr"] }}
       >
         <FlatList
-          data={data}
+          data={members}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
