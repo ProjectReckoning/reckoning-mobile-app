@@ -4,26 +4,20 @@ import { Text } from "@/components/ui/text";
 export default function PrimaryButton({
   buttonAction = () => {},
   buttonTitle,
+  buttonColor = "bg-tosca-wondr",
+  buttonActiveColor = "active:bg-tosca-wondr-dark",
   disabled = false,
   className,
-  textClassName = "",
-  textPressable = "",
+  textClassName = "text-black text-sm text-center font-bold",
 }) {
   return (
     <>
       <Pressable
-        className={`px-5 py-4 w-full rounded-full justify-items-center items-center bg-tosca-wondr active:bg-tosca-wondr-dark ${className || ""}`}
+        className={`p-4 w-full rounded-full justify-items-center items-center ${buttonColor} ${buttonActiveColor} ${className || ""}`}
         onPress={buttonAction}
         disabled={disabled}
       >
-        {({ pressed }) => (
-          <Text
-            size={"lg"}
-            className={`text-black text-center font-bold ${textClassName} ${pressed ? textPressable : ""}`}
-          >
-            {buttonTitle}
-          </Text>
-        )}
+        <Text className={`${textClassName}`}>{buttonTitle}</Text>
       </Pressable>
     </>
   );
