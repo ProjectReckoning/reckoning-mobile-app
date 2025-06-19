@@ -3,11 +3,11 @@ import { Text } from "@/components/ui/text";
 
 import InfoMemberDetailCell from "@/components/common/tableCells/InfoMemberDetailCell";
 
-export default function OwnerDetail() {
+export default function OwnerDetail({ data }) {
   return (
     <Box className="mb-4">
       <Text className="font-extrabold text-xl mb-2">Owner</Text>
-      <InfoMemberDetailCell />
+      <InfoMemberDetailCell member={data} />
     </Box>
   );
 }

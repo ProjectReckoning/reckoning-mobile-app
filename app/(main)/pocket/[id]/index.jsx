@@ -53,7 +53,7 @@ export default function PocketDashboardScreen() {
       case "balance":
         return <BalanceScreen data={pocketData} />;
       case "info":
-        return <InfoScreen pocketData={pocketData} />;
+        return <InfoScreen data={pocketData} />;
       case "history":
         return <HistoryScreen pocketId={id} />;
       default:

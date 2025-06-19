@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import React from "react"; // No need for useEffect, useState if data is directly from props
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Avatar } from "@/components/ui/avatar";
 import { VStack } from "@/components/ui/vstack";
-import * as Progress from "react-native-progress";
 import {
   WondrColors,
   COLOR_PALETTE_LIGHT_TRANSLUCENT,
 } from "@/utils/colorUtils";
-import { formatCurrency } from "@/utils/helperFunction";
 import { Crown, EllipsisVertical } from "lucide-react-native";
 
 const getConsistentInitials = (name) => {
@@ -28,32 +25,23 @@ const getConsistentInitials = (name) => {
 };
 
 export default function InfoMemberDetailCell({
-  name = "Amira Ferial",
-  role = "owner",
-  index = 1,
+  member, // Renamed 'data' prop to 'member' for clarity
+  index = 0, // Changed default index to 0 for better array access
 }) {
-  // Initialize state based on props, handling the "owner is admin" logic
-  const [userData, setUserData] = useState(() => {
-    const isOwnerCreator = role.toLowerCase() === "owner";
-    return {
-      name: name,
-      // If the role prop is 'owner', display 'ADMIN'. Otherwise, display role in uppercase.
-      role: isOwnerCreator ? "ADMIN" : role.toUpperCase(),
-      owner: isOwnerCreator, // True if the original role prop was 'owner'
-    };
-  });
+  // Defensive checks for member and PocketMember
+  if (!member || !member.PocketMember) {
+    console.warn("InfoMemberDetailCell received invalid member data:", member);
+    return null; // Render nothing or a placeholder if data is invalid
+  }
 
-  // Use useEffect to update userData if the 'name' or 'role' props change
-  useEffect(() => {
-    const isOwnerCreator = role.toLowerCase() === "owner";
-    setUserData({
-      name: name,
-      role: isOwnerCreator ? "ADMIN" : role.toUpperCase(),
-      owner: isOwnerCreator,
-    });
-  }, [name, role]); // Depend on name and role props
+  const memberName = member.name || "Unknown Member";
+  const memberRoleRaw = member.PocketMember.role || "viewer"; // Default to 'viewer' if role is missing
 
-  const displayInitials = getConsistentInitials(name);
+  // Determine if this member is the owner and what role to display
+  const isOwnerCreator = memberRoleRaw.toLowerCase() === "owner";
+  const displayRole = isOwnerCreator ? "ADMIN" : memberRoleRaw.toUpperCase();
+
+  const displayInitials = getConsistentInitials(memberName);
   const selectedColor =
     COLOR_PALETTE_LIGHT_TRANSLUCENT[
       index % COLOR_PALETTE_LIGHT_TRANSLUCENT.length
@@ -86,30 +74,28 @@ export default function InfoMemberDetailCell({
       <Box className="flex-1">
         <VStack>
           <Box className="flex-row justify-start items-center gap-1">
-            {/* CORRECTED: Apply dynamic background color using the style prop */}
             <Box
-              className="p-1 rounded-full" // Keep static Tailwind classes here
-              style={{ backgroundColor: selectedColor }} // Apply dynamic color via style prop
+              className="p-1 rounded-full"
+              style={{ backgroundColor: selectedColor }}
             >
-              <Text className="text-xs">{userData.role}</Text>
+              <Text className="text-xs">{displayRole}</Text>
             </Box>
-            {/* Display crown if userData.owner is true */}
-            {userData.owner ? <Crown size={12} /> : <></>}
+            {/* Display crown if this member is the owner/creator */}
+            {isOwnerCreator ? <Crown size={12} /> : null}
           </Box>
           <Text className="text-lg font-extrabold">
-            {userData.name.toUpperCase()}
+            {memberName.toUpperCase()}
           </Text>
         </VStack>
       </Box>
 
-      {/* Conditionally render EllipsisVertical based on userData.owner */}
-      {userData.owner ? (
-        <></>
-      ) : (
+      {/* Conditionally render EllipsisVertical */}
+      {/* Show ellipsis for non-owner members */}
+      {!isOwnerCreator ? (
         <Box className="justify-center items-center p-4">
           <EllipsisVertical />
         </Box>
-      )}
+      ) : null}
     </Box>
   );
 }
