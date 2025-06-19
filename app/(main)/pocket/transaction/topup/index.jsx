@@ -4,9 +4,14 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
+import { useState, useEffect } from "react";
+import { useTransactionStore } from "@/stores/transactionStore";
+
 import AppBar from "../../../../../components/common/AppBar";
-import PocketCard from "../../../../../components/common/cards/PocketCard";
-import PrimaryButton from "../../../../../components/common/buttons/PrimaryButton";
+import PocketCard from "@/components/common/cards/PocketCard";
+import NominalInput from "@/components/common/forms/NominalInput";
+import SelectNominal from "@/components/common/buttons/SelectNominal";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 export default function Topup() {
   // Static data for mockup
@@ -14,6 +19,14 @@ export default function Topup() {
   const pocketColor = "bg-orange-wondr";
   const pocketIcon = "Airplane";
   const pocketId = "0238928039";
+
+  const { type, amount, source, setType, setAmount } = useTransactionStore();
+  const [isAmountInvalid, setIsAmountInvalid] = useState(false);
+  const [amountTouched, setAmountTouched] = useState(false);
+
+  useEffect(() => {
+    setIsAmountInvalid(amountTouched && amount === 0);
+  }, [amount, amountTouched]);
 
   return (
     <Box className="flex-1 bg-white justify-between px-6 py-5">
@@ -37,12 +50,22 @@ export default function Topup() {
             <Text size={"md"}>{pocketId}</Text>
           </VStack>
         </HStack>
+
+        <NominalInput
+          amount={amount}
+          setAmount={setAmount}
+          isAmountInvalid={isAmountInvalid}
+          setAmountTouched={setAmountTouched}
+        />
+
+        <SelectNominal />
       </VStack>
 
       <PrimaryButton
         buttonAction={() => {}}
         buttonTitle="Lanjut"
         className={"mb-3"}
+        disabled={isAmountInvalid || !amountTouched}
       />
     </Box>
   );
