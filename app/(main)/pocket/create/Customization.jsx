@@ -1,8 +1,8 @@
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 
-import { router } from "expo-router";
 import { useState, useEffect } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
@@ -62,6 +62,9 @@ const colorMap = {
 };
 
 export default function Customization() {
+  const { pocketId } = useLocalSearchParams();
+  const isEditMode = !!pocketId;
+
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
   const [selectedIconIndex, setSelectedIconIndex] = useState(null);
   const [isNameInvalid, setNameIsInvalid] = useState(false);
@@ -92,7 +95,6 @@ export default function Customization() {
 
   const selectedColor =
     selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
-  const selectedTranslucent = colorMap[selectedColor]?.translucent;
   const selectedSolid = colorMap[selectedColor]?.solid;
   const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 
@@ -132,10 +134,12 @@ export default function Customization() {
       allPocket,
       resetData,
       GoToNext,
+      isEditMode,
+      pocketId,
     });
 
   const GoToNext = () => {
-    router.push("/(main)/home");
+    router.push("/(main)/pocket/all");
   };
 
   useEffect(() => {
@@ -146,6 +150,18 @@ export default function Customization() {
     }
   }, [pocketName]);
 
+  useEffect(() => {
+    if (pocketId) {
+      const pocket = allPocket.find((p) => p.id === Number(pocketId));
+      if (pocket) {
+        setPocketName(pocket.name);
+        setPocketType(pocket.type);
+        setPocketColor(pocket.color);
+        setPocketIcon(pocket.icon);
+      }
+    }
+  }, [pocketId]);
+
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
@@ -155,11 +171,11 @@ export default function Customization() {
           mode="type"
           pocketName={pocketName}
           pocketType={pocketType}
-          solidColor={selectedSolid}
-          translucentColor={selectedTranslucent}
-          iconWhite={SelectedIconWhite}
+          color={selectedSolid}
+          icon={SelectedIconWhite}
           iconSize="16"
           space="my-7"
+          cardWidth="min-w-48"
         />
       </Box>
 
@@ -174,7 +190,7 @@ export default function Customization() {
             contentContainerStyle={{ flexGrow: 1 }}
           >
             <VStack space="2xl" className="w-full px-3">
-              {pocketType === "Spending" && (
+              {(pocketType === "Spending" || isEditMode) && (
                 <PocketNameInput
                   pocketName={pocketName}
                   setPocketName={setPocketName}
@@ -197,12 +213,30 @@ export default function Customization() {
             </VStack>
           </ScrollView>
         </KeyboardAvoidingView>
-        <PrimaryButton
-          buttonAction={handlePocketValidation}
-          buttonTitle="Buat Pocket"
-          className="mt-3 mb-12"
-          disabled={isNameInvalid || pocketName.length === 0}
-        />
+        {isEditMode ? (
+          <>
+            <PrimaryButton
+              buttonAction={handlePocketValidation}
+              buttonTitle="Simpan"
+              className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
+              disabled={isNameInvalid || pocketName.length === 0}
+            />
+            <PrimaryButton
+              buttonAction={() => {
+                router.back();
+              }}
+              buttonTitle="Batal"
+              className="bg-white border border-gray-wondr active:bg-light-gray-wondr"
+            />
+          </>
+        ) : (
+          <PrimaryButton
+            buttonAction={handlePocketValidation}
+            buttonTitle="Buat Pocket"
+            className="mt-3 mb-12"
+            disabled={isNameInvalid || pocketName.length === 0}
+          />
+        )}
 
         <PocketErrorAlert
           isOpen={showAlertDialog}

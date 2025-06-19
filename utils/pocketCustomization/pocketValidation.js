@@ -46,6 +46,8 @@ export function pocketValidation({
   allPocket,
   resetData,
   GoToNext,
+  isEditMode = false,
+  pocketId = null,
 }) {
   const nameTrimmed = pocketName.trim();
   const isNameInvalid =
@@ -55,11 +57,40 @@ export function pocketValidation({
   const isColorInvalid = !pocketColor || pocketColor === "";
   const isIconInvalid = !pocketIcon || pocketIcon === "";
 
+  if (isEditMode) {
+    const errors = [];
+    if (isNameInvalid)
+      errors.push("Nama harus terisi, valid, dan maksimal 20 karakter!");
+    if (isColorInvalid) errors.push("Warna pocket harus dipilih.");
+    if (isIconInvalid) errors.push("Ikon pocket harus dipilih.");
+
+    if (errors.length > 0) {
+      setAlertMessages(errors);
+      setShowAlertDialog(true);
+      return false;
+    }
+
+    // === Update in mock DB ===
+    const idx = allPocket.findIndex((p) => p.id === Number(pocketId));
+    if (idx !== -1) {
+      allPocket[idx] = {
+        ...allPocket[idx],
+        name: pocketName,
+        color: pocketColor,
+        icon: pocketIcon,
+      };
+      // In the future, replace this with an API call to update the pocket
+    }
+    resetData();
+    GoToNext();
+    return true;
+  }
+
   let isGoalInvalid = false;
   let isBalanceInvalid = false;
   let isDurationInvalid = false;
 
-  if (pocketType === "Saving" || pocketType === "Enterprise Fund") {
+  if (pocketType === "Saving" || pocketType === "Business Fund") {
     isGoalInvalid = !goalTitle || goalTitle === "";
     isBalanceInvalid =
       typeof pocketBalanceTarget !== "number" ||
