@@ -71,7 +71,7 @@ export default function Topup() {
         buttonAction={() => {}}
         buttonTitle="Lanjut"
         className={"mb-3"}
-        disabled={isAmountInvalid || !amountTouched}
+        disabled={amount === null}
       />
     </Box>
   );

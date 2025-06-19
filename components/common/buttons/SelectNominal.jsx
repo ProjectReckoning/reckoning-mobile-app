@@ -2,14 +2,23 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 const nominalList = [200000, 300000, 400000, 500000, 600000, 700000];
 
 export default function SelectNominal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const amount = useTransactionStore((state) => state.amount);
   const setAmount = useTransactionStore((state) => state.setAmount);
+
+  useEffect(() => {
+    if (amount === null) {
+      setSelectedIndex(null);
+    } else if (nominalList.includes(amount)) {
+      setSelectedIndex(nominalList.indexOf(amount));
+    }
+  }, [amount]);
 
   const formatRupiah = (value) =>
     new Intl.NumberFormat("id-ID", {
@@ -20,7 +29,7 @@ export default function SelectNominal() {
 
   return (
     <Box className="flex flex-col w-full gap-1 my-6">
-      <Text className="text-sm text-black font-light mb-5">Pilih Nominal</Text>
+      <Text className="text-sm text-black font-light mb-4">Pilih Nominal</Text>
 
       <Box className="flex flex-row flex-wrap justify-between">
         {nominalList.map((nominal, i) => (

@@ -34,7 +34,7 @@ export default function NominalInput({
         </InputSlot>
         <InputField
           type="number"
-          placeholder="5.000.000"
+          placeholder="0"
           value={
             amount && amount !== 0 ? formatCurrency(amount.toString()) : ""
           }
@@ -51,7 +51,7 @@ export default function NominalInput({
             color="#000"
             onPress={() => {
               setAmountTouched(false);
-              setAmount(0);
+              setAmount(null);
             }}
             className="pr-2"
           />
