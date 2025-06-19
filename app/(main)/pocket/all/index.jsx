@@ -10,7 +10,7 @@ import { CirclePlus } from "lucide-react-native";
 
 import TabBar from "@/components/common/TabBar";
 import AppBar from "../../../../components/common/AppBar";
-import { allPocket } from "@/utils/mockData/mockPocketDb";
+import { allPocket as mockAllPocket } from "@/utils/mockData/mockPocketDb";
 import { WondrColors } from "../../../../utils/colorUtils";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketActionSheet from "../../../../components/feature/allPocket/PocketActionSheet";
@@ -26,8 +26,9 @@ export default function AllPocket() {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [pockets, setPockets] = useState(mockAllPocket);
 
-  const filteredPockets = allPocket.filter(
+  const filteredPockets = pockets.filter(
     (pocket) =>
       (activeTab === "personal" && pocket.subject === "Personal") ||
       (activeTab === "business" && pocket.subject === "Business"),
@@ -45,8 +46,11 @@ export default function AllPocket() {
   };
 
   const handleDelete = () => {
-    setShowActionsheet(false);
-    setShowDeleteAlert(true);
+    setPockets((prevPockets) =>
+      prevPockets.filter((pocket) => pocket.id !== selectedPocket.id),
+    );
+    setShowDeleteAlert(false);
+    setSelectedPocket(null);
   };
 
   const GoToHome = () => {
@@ -132,7 +136,10 @@ export default function AllPocket() {
         isOpen={showActionsheet}
         onClose={() => setShowActionsheet(false)}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={() => {
+          setShowActionsheet(false);
+          setShowDeleteAlert(true);
+        }}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}
         color={selectedPocket?.color}

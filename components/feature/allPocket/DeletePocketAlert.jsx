@@ -6,13 +6,14 @@ import {
   AlertDialogBody,
   AlertDialogBackdrop,
 } from "@/components/ui/alert-dialog";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
 import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+
 import PocketCard from "../../common/cards/PocketCard";
+import PrimaryButton from "../../common/buttons/PrimaryButton";
 
 export default function DeletePocketAlert({
   isOpen,
@@ -26,19 +27,20 @@ export default function DeletePocketAlert({
   return (
     <AlertDialog isOpen={isOpen} onClose={onClose} size="md">
       <AlertDialogBackdrop />
-      <AlertDialogContent className="bg-white px-6 pt-8 pb-6 rounded-2xl">
+      <AlertDialogContent className="bg-white px-6 py-8 rounded-2xl items-center justify-center">
         <AlertDialogHeader>
-          <Heading size="2xl" className="text-center font-bold mb-2">
+          <Heading size="xl" className="text-center font-bold">
             Hapus pocket?
           </Heading>
         </AlertDialogHeader>
         <AlertDialogBody className="mb-6">
-          <Text size="md" className="text-center text-gray-500 mb-6">
+          <Text size="sm" className="text-center text-dark-gray-wondr my-2">
             Pocket dan riwayat transaksi akan dihapus secara permanen.
           </Text>
+          {/* Pocket preview */}
           <HStack
-            space="xl"
-            className="w-full justify-center items-center mb-4"
+            space="lg"
+            className="w-full justify-center items-center my-3"
           >
             <PocketCard
               mode="icon"
@@ -46,41 +48,38 @@ export default function DeletePocketAlert({
               pocketType={pocketType}
               color={color}
               icon={icon}
-              iconSize="8"
-              whiteSpace="mb-5"
+              iconSize="6"
+              whiteSpace="mb-4"
             />
             <Divider orientation="vertical" className="h-2/3" />
-            <Box className="flex-1 ml-4">
-              <Text className="font-bold text-xl text-typography-950">
-                {pocketName}
-              </Text>
-              <Text className="text-gray-400 text-base">
-                {pocketType} pocket
-              </Text>
-            </Box>
+            <VStack space="xs" className="gap-0">
+              <Heading size={"md"}>
+                {pocketName ? pocketName : "Nama Pocket"}
+              </Heading>
+              <Text size={"sm"}>{pocketType} pocket</Text>
+            </VStack>
           </HStack>
         </AlertDialogBody>
-        <AlertDialogFooter className="flex-col gap-3">
-          <Button
-            onPress={onDelete}
-            className="bg-red-wondr rounded-full w-full mb-2"
-            size="lg"
-          >
-            <ButtonText className="font-bold text-lg">
-              Hapus sekarang
-            </ButtonText>
-          </Button>
-          <Button
-            variant="outline"
-            action="secondary"
-            onPress={onClose}
-            className="rounded-full w-full border-2 border-gray-300"
-            size="lg"
-          >
-            <ButtonText className="font-bold text-lg text-black">
-              Batal
-            </ButtonText>
-          </Button>
+        <AlertDialogFooter className="w-full flex-col gap-3">
+          {/* Delete */}
+          <PrimaryButton
+            buttonAction={() => {
+              onDelete();
+              onClose();
+            }}
+            buttonTitle="Hapus pocket"
+            className="w-full bg-red-wondr mb-1 text-white active:bg-red-wondr-dark"
+            textClassName="text-white"
+          />
+          {/* Edit */}
+          <PrimaryButton
+            buttonAction={() => {
+              onClose();
+            }}
+            buttonTitle="Batal"
+            className="bg-white border border-gray-wondr active:bg-light-gray-wondr"
+            textClassName="font-semibold"
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

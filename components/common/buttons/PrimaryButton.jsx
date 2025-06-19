@@ -6,6 +6,7 @@ export default function PrimaryButton({
   buttonTitle,
   disabled = false,
   className,
+  textClassName = "",
   textPressable = "",
 }) {
   return (
@@ -18,7 +19,7 @@ export default function PrimaryButton({
         {({ pressed }) => (
           <Text
             size={"lg"}
-            className={`text-black text-center font-bold ${pressed ? textPressable : ""}`}
+            className={`text-black text-center font-bold ${textClassName} ${pressed ? textPressable : ""}`}
           >
             {buttonTitle}
           </Text>
