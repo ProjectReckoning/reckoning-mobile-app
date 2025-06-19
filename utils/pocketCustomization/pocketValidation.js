@@ -81,6 +81,7 @@ export function pocketValidation({
       };
       // In the future, replace this with an API call to update the pocket
     }
+    resetData();
     GoToNext();
     return true;
   }

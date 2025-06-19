@@ -10,9 +10,10 @@ import { CirclePlus } from "lucide-react-native";
 
 import TabBar from "@/components/common/TabBar";
 import AppBar from "../../../../components/common/AppBar";
-import { allPocket as mockAllPocket } from "@/utils/mockData/mockPocketDb";
+import { allPocket } from "@/utils/mockData/mockPocketDb";
 import { WondrColors } from "../../../../utils/colorUtils";
 import PocketCard from "@/components/common/cards/PocketCard";
+import EmptyPocket from "../../../../components/feature/allPocket/EmptyPocket";
 import PocketActionSheet from "../../../../components/feature/allPocket/PocketActionSheet";
 import DeletePocketAlert from "../../../../components/feature/allPocket/DeletePocketAlert";
 
@@ -26,7 +27,7 @@ export default function AllPocket() {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [pockets, setPockets] = useState(mockAllPocket);
+  const [pockets, setPockets] = useState(allPocket);
 
   const filteredPockets = pockets.filter(
     (pocket) =>
@@ -47,9 +48,15 @@ export default function AllPocket() {
   };
 
   const handleDelete = () => {
+    // Remove from local state
     setPockets((prevPockets) =>
       prevPockets.filter((pocket) => pocket.id !== selectedPocket.id),
     );
+    // Remove from mock DB (mutate the array)
+    const idx = allPocket.findIndex((p) => p.id === selectedPocket.id);
+    if (idx !== -1) {
+      allPocket.splice(idx, 1);
+    }
     setShowDeleteAlert(false);
     setSelectedPocket(null);
   };
@@ -73,65 +80,58 @@ export default function AllPocket() {
         size={16}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ paddingRight: 10 }}
-        style={{ marginRight: -10 }}
-      >
-        <Box className="flex flex-row flex-wrap justify-between px-2">
-          {filteredPockets.length === 0 ? (
-            <Box className="w-full items-center mt-10">
-              <Text className="text-gray-400">Belum ada pocket.</Text>
-            </Box>
-          ) : (
-            <>
-              {filteredPockets.map((pocket) => (
-                <Pressable key={pocket.id} className="w-[47%] mb-8">
-                  {({ pressed }) => (
-                    <PocketCard
-                      pocketName={pocket.name}
-                      pocketType={pocket.type}
-                      pocketBalance={1000000}
-                      color={pocket.color}
-                      icon={pocket.icon}
-                      space="mt-5 mb-1"
-                      cardWidth={`${pressed ? "bg-gray-50" : ""}`}
-                      editButton={true}
-                      onEdit={() => handleEditButton(pocket)}
-                    />
-                  )}
-                </Pressable>
-              ))}
-
-              {/* Create Pocket Card */}
-              <Pressable onPress={GoToCreatePocket} className="w-[47%] mb-8">
+      {filteredPockets.length === 0 ? (
+        <EmptyPocket />
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingRight: 10 }}
+          style={{ marginRight: -10 }}
+        >
+          <Box className="flex flex-row flex-wrap justify-between px-2">
+            {filteredPockets.map((pocket) => (
+              <Pressable key={pocket.id} className="w-[47%] mb-8">
                 {({ pressed }) => (
-                  <Box
-                    className={`h-fit min-h-60 bg-white border-2 border-dashed border-gray-300 rounded-2xl items-center justify-end px-4 py-6 ${pressed ? "bg-gray-50" : ""}`}
-                  >
-                    <CirclePlus
-                      color={WondrColors["tosca-wondr"]}
-                      size={40}
-                      strokeWidth={2}
-                    />
-                    <VStack
-                      size="xs"
-                      className="justify-center items-start my-3"
-                    >
-                      <Text className="font-extrabold text-lg mt-4 text-typography-950 text-center">
-                        Buat pocket
-                      </Text>
-                      <Text className="text-gray-500 text-sm">
-                        Buat tujuan unikmu sendiri dan wujudkan bersama!
-                      </Text>
-                    </VStack>
-                  </Box>
+                  <PocketCard
+                    pocketName={pocket.name}
+                    pocketType={pocket.type}
+                    pocketBalance={1000000}
+                    color={pocket.color}
+                    icon={pocket.icon}
+                    space="mt-5 mb-1"
+                    cardWidth={`${pressed ? "bg-gray-50" : ""}`}
+                    editButton={true}
+                    onEdit={() => handleEditButton(pocket)}
+                  />
                 )}
               </Pressable>
-            </>
-          )}
-        </Box>
-      </ScrollView>
+            ))}
+
+            {/* Create Pocket Card */}
+            <Pressable onPress={GoToCreatePocket} className="w-[47%] mb-8">
+              {({ pressed }) => (
+                <Box
+                  className={`h-fit min-h-60 bg-white border-2 border-dashed border-gray-300 rounded-2xl items-center justify-end px-4 py-6 ${pressed ? "bg-gray-50" : ""}`}
+                >
+                  <CirclePlus
+                    color={WondrColors["tosca-wondr"]}
+                    size={40}
+                    strokeWidth={2}
+                  />
+                  <VStack size="xs" className="justify-center items-start my-3">
+                    <Text className="font-extrabold text-lg mt-4 text-typography-950 text-center">
+                      Buat pocket
+                    </Text>
+                    <Text className="text-gray-500 text-sm">
+                      Buat tujuan unikmu sendiri dan wujudkan bersama!
+                    </Text>
+                  </VStack>
+                </Box>
+              )}
+            </Pressable>
+          </Box>
+        </ScrollView>
+      )}
 
       <PocketActionSheet
         isOpen={showActionsheet}
