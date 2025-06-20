@@ -1,6 +1,8 @@
+import { router } from "expo-router";
+import { WondrColors } from "../colorUtils";
 import { Image } from "@/components/ui/image";
-import TapCashIcon from "../../assets/images/icon/tapcash-logo.png";
 import PocketIcon from "../../assets/images/icon/pocket.png";
+import TapCashIcon from "../../assets/images/icon/tapcash-logo.png";
 import {
   Send,
   HandCoins,
@@ -8,8 +10,10 @@ import {
   CreditCard,
   Earth,
   LayoutGrid,
+  UserRoundPlus,
+  FileText,
+  Share2,
 } from "lucide-react-native";
-import { router } from "expo-router";
 
 const GoToPocket = async () => {
   router.push("/pocket");
@@ -47,4 +51,18 @@ export const features = [
     onPress: GoToPocket,
   },
   { icon: <LayoutGrid />, label: "Lihat Semua", bg: "#fff", border: true },
+];
+
+export const transactionFeatures = [
+  {
+    icon: <UserRoundPlus />,
+    label: "Simpan Penerima",
+    bg: WondrColors["orange-wondr"],
+  },
+  {
+    icon: <FileText />,
+    label: "Bukti Transaksi",
+    bg: WondrColors["orange-wondr"],
+  },
+  { icon: <Share2 />, label: "Bagikan", bg: WondrColors["orange-wondr"] },
 ];

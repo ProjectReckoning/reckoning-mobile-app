@@ -80,7 +80,7 @@ export default function PinCode() {
                     <Pressable
                       key={colIndex}
                       onPress={() => handlePress(item)}
-                      className="w-[5.7rem] h-[5.7rem] items-center justify-center"
+                      className="w-[5.5rem] h-[5.5rem] items-center justify-center"
                     >
                       <Text className="text-orange-wondr font-bold">
                         Lupa PIN
@@ -93,7 +93,7 @@ export default function PinCode() {
                     <Pressable
                       key={colIndex}
                       onPress={() => handlePress(item)}
-                      className="w-[5.7rem] h-[5.7rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                      className="w-[5.5rem] h-[5.5rem] rounded-full bg-light-gray-wondr items-center justify-center"
                     >
                       <Delete size={28} />
                     </Pressable>
@@ -103,7 +103,7 @@ export default function PinCode() {
                   <Pressable
                     key={colIndex}
                     onPress={() => handlePress(item)}
-                    className="w-[5.7rem] h-[5.7rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                    className="w-[5.5rem] h-[5.5rem] rounded-full bg-light-gray-wondr items-center justify-center"
                   >
                     <Text className="text-2xl font-extrabold text-black">
                       {item}

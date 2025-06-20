@@ -12,7 +12,7 @@ import AppBar from "../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
-import { maskPocketId, formatRupiah } from "../../../../utils/helperFunction";
+import { maskId, formatRupiah } from "../../../../utils/helperFunction";
 import DetailConfirmation from "@/components/feature/transaction/DetailConfirmation";
 
 export default function Confirmation() {
@@ -46,7 +46,7 @@ export default function Confirmation() {
             <Heading size={"lg"}>
               {pocketName ? pocketName : "Nama Pocket"}
             </Heading>
-            <Text size={"md"}>{maskPocketId(pocketId, 3)}</Text>
+            <Text size={"md"}>{maskId(pocketId, 3)}</Text>
           </VStack>
         </HStack>
 
