@@ -44,6 +44,7 @@
     "@gluestack-ui/spinner": "^0.1.15",
     "@gluestack-ui/switch": "^0.1.23",
     "@gluestack-ui/textarea": "^0.1.24",
+    "@gluestack-ui/themed": "^1.1.73",
     "@gluestack-ui/toast": "^1.0.8",
     "@gluestack-ui/tooltip": "^0.1.38",
     "@legendapp/motion": "^2.4.0",
