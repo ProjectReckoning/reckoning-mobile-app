@@ -7,6 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
+import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import AppBar from "../../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
@@ -33,54 +34,64 @@ export default function Topup() {
 
   return (
     <Box className="flex-1 bg-white justify-between px-8 py-5">
-      <VStack space="xs">
-        <AppBar transaction={type.id} />
-
-        {/* Pocket preview */}
-        <HStack
-          space="xl"
-          className="w-full justify-start items-center mt-8 mb-5"
+      <AppBar transaction={type.id} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={50}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
         >
-          <PocketCard
-            mode="icon"
-            pocketName={pocketName}
-            color={pocketColor}
-            icon={pocketIcon}
-            iconSize="8"
-            whiteSpace="mb-5"
-          />
-          <VStack space="xs" className="gap-0">
-            <Heading size={"lg"}>
-              {pocketName ? pocketName : "Nama Pocket"}
-            </Heading>
-            <Text size={"md"}>{maskId(pocketId, 3)}</Text>
+          <VStack space="xs">
+            {/* Pocket preview */}
+            <HStack
+              space="xl"
+              className="w-full justify-start items-center mt-8 mb-5"
+            >
+              <PocketCard
+                mode="icon"
+                pocketName={pocketName}
+                color={pocketColor}
+                icon={pocketIcon}
+                iconSize="8"
+                whiteSpace="mb-5"
+              />
+              <VStack space="xs" className="gap-0">
+                <Heading size={"lg"}>
+                  {pocketName ? pocketName : "Nama Pocket"}
+                </Heading>
+                <Text size={"md"}>{maskId(pocketId, 3)}</Text>
+              </VStack>
+            </HStack>
+
+            <NominalInput
+              amount={amount}
+              setAmount={setAmount}
+              isAmountInvalid={isAmountInvalid}
+              setAmountTouched={setAmountTouched}
+            />
+
+            <SelectNominal />
+
+            <TransactionCard
+              title="Sumber dana"
+              heading={source.type}
+              subheading={source.id}
+              showBalance={true}
+              balance={source.balance}
+            />
           </VStack>
-        </HStack>
-
-        <NominalInput
-          amount={amount}
-          setAmount={setAmount}
-          isAmountInvalid={isAmountInvalid}
-          setAmountTouched={setAmountTouched}
-        />
-
-        <SelectNominal />
-
-        <TransactionCard
-          title="Sumber dana"
-          heading={source.type}
-          subheading={source.id}
-          showBalance={true}
-          balance={source.balance}
-        />
-      </VStack>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <PrimaryButton
         buttonAction={() => {
           router.push("/pocket/transaction/Confirmation");
         }}
         buttonTitle="Lanjut"
-        className={"mb-3"}
+        className={"my-3"}
         disabled={amount === null}
       />
     </Box>

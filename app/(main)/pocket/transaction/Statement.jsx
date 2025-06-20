@@ -105,7 +105,7 @@ export default function Statement() {
           setAmount(null);
           router.push("(main)/pocket/transaction/topup");
         }}
-        className="my-5"
+        className="my-3"
       />
     </Box>
   );
