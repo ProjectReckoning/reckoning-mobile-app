@@ -108,8 +108,9 @@ export function maskBalance(value) {
   return "Rp" + "*".repeat(digits);
 }
 
-export function maskPocketId(id, numDigits) {
-  if (!id) return "";
-  const visible = id.slice(-numDigits);
-  return "*".repeat(id.length - numDigits) + visible;
+export function maskId(id, numDigits = 3) {
+  if (id === undefined || id === null) return "";
+  const idStr = String(id);
+  const visible = idStr.slice(-numDigits);
+  return "*".repeat(Math.max(0, idStr.length - numDigits)) + visible;
 }
