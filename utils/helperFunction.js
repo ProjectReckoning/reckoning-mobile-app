@@ -88,3 +88,28 @@ export function formatDateWithMonthAbbreviation(dateInput) {
 
   return customFormattedString;
 }
+
+export function formatRupiah(value) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(value);
+}
+
+export function formatDigitCurrency(value) {
+  if (!value) return "";
+  const numeric = value.replace(/\D/g, "");
+  return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+export function maskBalance(value) {
+  const digits = value.toString().replace(/\D/g, "").length;
+  return "Rp" + "*".repeat(digits);
+}
+
+export function maskPocketId(id, numDigits) {
+  if (!id) return "";
+  const visible = id.slice(-numDigits);
+  return "*".repeat(id.length - numDigits) + visible;
+}
