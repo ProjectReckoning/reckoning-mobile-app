@@ -1,11 +1,11 @@
 import React from "react";
 import { View } from "react-native";
 import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
 import { Avatar } from "@/components/ui/avatar";
 import * as Progress from "react-native-progress";
 import { WondrColors, COLOR_PALETTE } from "@/utils/colorUtils";
 import { formatCurrency } from "@/utils/helperFunction";
+import AppText from "@/components/common/typography/AppText";
 
 const getConsistentInitials = (name) => {
   if (!name) return "";
@@ -31,36 +31,28 @@ export default function BalanceMemberListCell({
   const progress =
     targetAmount > 0 ? Number(currentAmount) / Number(targetAmount) : 0;
   const percentage = (progress * 100).toFixed(0);
-
   const displayInitials = getConsistentInitials(name);
   const selectedColor = COLOR_PALETTE[index % COLOR_PALETTE.length];
-
   const avatarBgColor = WondrColors["light-gray-wondr"];
   const avatarTextColor = WondrColors["tosca-wondr"];
 
   return (
-    <Box className="flex-row items-center p-4 bg-white rounded-lg">
+    <Box className="flex-row items-center bg-white rounded-lg">
       <Avatar
         size="md"
         style={{ backgroundColor: avatarBgColor, marginRight: 12 }}
         className="items-center justify-center"
       >
-        <Text
-          style={{
-            color: avatarTextColor,
-            fontSize: 18,
-            fontWeight: "bold",
-          }}
-        >
+        <AppText variant="cardTitle" style={{ color: avatarTextColor }}>
           {displayInitials}
-        </Text>
+        </AppText>
       </Avatar>
 
       <View className="flex-1">
         <Box className="flex-row justify-between items-center mb-1">
-          <Text className="text-lg font-bold text-gray-800 flex-shrink pr-2">
+          <AppText variant="cardTitle" className="flex-shrink pr-2">
             {name}
-          </Text>
+          </AppText>
           <Box
             style={{
               backgroundColor: selectedColor,
@@ -71,7 +63,9 @@ export default function BalanceMemberListCell({
               alignItems: "center",
             }}
           >
-            <Text className="text-sm font-bold text-white">{percentage}%</Text>
+            <AppText variant="caption" className="font-bold text-white">
+              {percentage}%
+            </AppText>
           </Box>
         </Box>
 
@@ -86,9 +80,9 @@ export default function BalanceMemberListCell({
           style={{ marginBottom: 4 }}
         />
 
-        <Text className="text-sm text-gray-500">
+        <AppText variant="caption">
           {formatCurrency(currentAmount)} / {formatCurrency(targetAmount)}
-        </Text>
+        </AppText>
       </View>
     </Box>
   );
