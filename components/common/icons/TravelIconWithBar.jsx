@@ -57,7 +57,7 @@ export default function TravelIconWithBar({
         overflow: "hidden", // Crucial to clip content to its rounded shape
         borderRadius: borderRadiusValue,
         borderWidth: 0.5, // Keep its own border
-        borderColor: WondrColors["dark-gray-wondr"], // Keep its own border color
+        borderColor: WondrColors["gray-wondr-border"], // Keep its own border color
         ...outerContainerStyle, // Apply external styles from parent (e.g., negative margins for border overlap)
       }}
     >
