@@ -1,114 +1,73 @@
-// app/pocket/dashboard/history/HistoryContent.jsx
 import React, { useState, useEffect } from "react";
 import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
+import { Spinner } from "@/components/ui/spinner";
 import { SectionList } from "@/components/ui/section-list";
 import { Divider } from "@/components/ui/divider";
-
-import MonthSelectionBar from "@/components/feature/pocketDashboard/history/MonthSelectionBar";
+import { usePocketStore } from "@/stores/pocketStore";
+import AppText from "@/components/common/typography/AppText";
+import MonthSelectionBar from "./MonthSelectionBar";
 import TransactionHistoryTableCell from "@/components/common/tableCells/TransactionHistoryTableCell";
-
-import { MOCK_MONTH_DATA } from "@/utils/mockData/monthMockData"; // This is just Jan-Dec
-import {
-  TRANSACTIONS_GROUPED_FOR_JUNE_2025,
-  TRANSACTIONS_GROUPED_FOR_MAY_2025,
-  // Make sure to import mock data for other months/years as needed
-} from "@/utils/pocketTransactionMockData";
+import { MOCK_MONTH_DATA } from "@/utils/mockData/monthMockData";
 import { formatDateForHeader } from "@/utils/helperFunction";
 import { WondrColors } from "@/utils/colorUtils";
 
 export default function HistoryContent() {
-  // Determine the current month and year for initialization
-  const currentFullDate = new Date("2025-06-16"); // Example: Use actual current date in production
-  const currentMonthValue = currentFullDate.getMonth() + 1; // 1-indexed (e.g., 6 for June)
-  const currentYear = currentFullDate.getFullYear(); // e.g., 2025
+  const transactionHistory = usePocketStore(
+    (state) => state.transactionHistory,
+  );
+  const isHistoryLoading = usePocketStore((state) => state.isHistoryLoading);
+  const historyError = usePocketStore((state) => state.historyError);
+  const fetchTransactionHistory = usePocketStore(
+    (state) => state.fetchTransactionHistory,
+  );
 
-  const [selectedMonthFullValue, setSelectedMonthFullValue] = useState({
-    month: currentMonthValue,
-    year: currentYear,
-    fullValue: `${currentMonthValue}-${currentYear}`, // Unique identifier like "6-2025"
+  // --- FIX: Use a hardcoded date to align with the helper function's context ---
+  const MOCK_CURRENT_DATE = new Date("2025-06-16");
+
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    return {
+      month: MOCK_CURRENT_DATE.getMonth() + 1,
+      year: MOCK_CURRENT_DATE.getFullYear(),
+      fullValue: `${MOCK_CURRENT_DATE.getFullYear()}-${String(
+        MOCK_CURRENT_DATE.getMonth() + 1,
+      ).padStart(2, "0")}`,
+    };
   });
-  const [displayedSections, setDisplayedSections] = useState([]);
   const [rollingMonthsData, setRollingMonthsData] = useState([]);
 
-  // Effect to generate the 12-month rolling data
   useEffect(() => {
     const generateRollingMonths = () => {
-      const allMonths = [...MOCK_MONTH_DATA].sort((a, b) => a.id - b.id); // Ensure Jan-Dec is sorted
+      const allMonths = [...MOCK_MONTH_DATA].sort((a, b) => a.id - b.id);
       const months = [];
-      let displayMonth = currentMonthValue; // Start from current month, 1-indexed
-      let displayYear = currentYear;
-
-      // Populate months going backward from the current month for 12 iterations
+      // Use the same mocked date to generate the month list
+      let date = new Date(MOCK_CURRENT_DATE);
       for (let i = 0; i < 12; i++) {
-        const monthData = allMonths[displayMonth - 1]; // Get 0-indexed month data (e.g., June is index 5)
-        months.push({
-          id: `${monthData.id}_${displayYear}`, // Unique ID combining month ID and year
-          month: monthData.month, // Short month name (e.g., "Jun")
-          value: monthData.value, // 1-indexed month number (e.g., 6)
-          year: displayYear, // Year (e.g., 2025)
-          fullValue: `${monthData.value}-${displayYear}`, // Combined value for selection (e.g., "6-2025")
-        });
-
-        // Move to the previous month
-        displayMonth--;
-        if (displayMonth === 0) {
-          // If month wraps around from January (1) to December (12)
-          displayMonth = 12; // Set to December
-          displayYear--; // Decrement year
+        const year = date.getFullYear();
+        const monthValue = date.getMonth() + 1;
+        const monthData = allMonths[monthValue - 1];
+        if (monthData) {
+          // Add a check to ensure monthData exists
+          months.push({
+            id: `${monthData.id}_${year}`,
+            month: monthData.month,
+            value: monthData.value,
+            year: year,
+            fullValue: `${year}-${String(monthValue).padStart(2, "0")}`,
+          });
         }
+        date.setMonth(date.getMonth() - 1);
       }
-      return months.reverse(); // Reverse to get chronological order (e.g., Jul 2024 -> Jun 2025)
+      return months.reverse();
     };
+    setRollingMonthsData(generateRollingMonths());
+  }, []);
 
-    const generatedMonths = generateRollingMonths();
-    setRollingMonthsData(generatedMonths);
-
-    // Initial data fetch for the current month when component mounts
-    fetchTransactionsForMonth(
-      selectedMonthFullValue.month,
-      selectedMonthFullValue.year,
-    );
-  }, []); // Run only once on component mount to generate the fixed 12-month range
-
-  // Effect to re-fetch transactions when the selected month changes
   useEffect(() => {
-    fetchTransactionsForMonth(
-      selectedMonthFullValue.month,
-      selectedMonthFullValue.year,
-    );
-  }, [selectedMonthFullValue]); // Dependency on selectedMonthFullValue
+    fetchTransactionHistory(selectedMonth.fullValue);
+  }, [selectedMonth, fetchTransactionHistory]);
 
-  // Function to simulate fetching transactions based on month and year
-  const fetchTransactionsForMonth = (monthValue, yearValue) => {
-    let dataFromBackend = [];
-    // This part needs to be expanded significantly if you have more mock data
-    // for various months and years (e.g., May 2024, Dec 2024, etc.)
-    if (monthValue === 6 && yearValue === 2025) {
-      dataFromBackend = TRANSACTIONS_GROUPED_FOR_JUNE_2025;
-    } else if (monthValue === 5 && yearValue === 2025) {
-      dataFromBackend = TRANSACTIONS_GROUPED_FOR_MAY_2025;
-    }
-    // Add more `else if` conditions here for other specific month-year combinations
-    // Example:
-    // else if (monthValue === 12 && yearValue === 2024) {
-    //   dataFromBackend = TRANSACTIONS_GROUPED_FOR_DEC_2024;
-    // }
-    else {
-      dataFromBackend = []; // No data for unhandled months/years
-    }
-
-    const formattedSectionsForSectionList = dataFromBackend.map((group) => ({
-      title: group.date, // 'date' from BE mock becomes 'title' for section header
-      data: group.transactions, // 'transactions' from BE mock becomes 'data' for items
-    }));
-    setDisplayedSections(formattedSectionsForSectionList);
-  };
-
-  // Callback function for MonthSelectionBar to update the selected month
   const handleMonthSelect = (monthItem) => {
-    // monthItem will be the full object: { id, month, value, year, fullValue }
-    setSelectedMonthFullValue({
+    setSelectedMonth({
       month: monthItem.value,
       year: monthItem.year,
       fullValue: monthItem.fullValue,
@@ -117,12 +76,14 @@ export default function HistoryContent() {
 
   const renderSectionHeader = ({ section: { title } }) => (
     <Box className="bg-white px-4 z-10">
-      <Text
-        className="text-base font-bold py-2"
+      <AppText
+        variant="bodyBold"
+        className="py-2"
         style={{ color: WondrColors["dark-gray-wondr"] }}
       >
+        {/* This helper function will now work correctly */}
         {formatDateForHeader(title)}
-      </Text>
+      </AppText>
       <Divider
         style={{ backgroundColor: WondrColors["light-gray-wondr"], height: 1 }}
       />
@@ -131,37 +92,59 @@ export default function HistoryContent() {
 
   const renderItem = ({ item }) => <TransactionHistoryTableCell data={item} />;
 
+  const renderContent = () => {
+    if (isHistoryLoading) {
+      return (
+        <Box className="flex-1 justify-center items-center">
+          <Spinner size="large" />
+        </Box>
+      );
+    }
+
+    if (historyError) {
+      return (
+        <Box className="flex-1 justify-center items-center p-5">
+          <AppText variant="bodyMuted" className="text-center text-red-500">
+            Error: {historyError}
+          </AppText>
+        </Box>
+      );
+    }
+
+    if (transactionHistory.length === 0) {
+      return (
+        <Box className="flex-1 justify-center items-center p-5">
+          <AppText variant="bodyMuted" className="text-center">
+            No transactions for this month.
+          </AppText>
+        </Box>
+      );
+    }
+
+    return (
+      <SectionList
+        sections={transactionHistory.map((item) => ({
+          title: item.date,
+          data: item.transactions,
+        }))}
+        keyExtractor={(item, index) => item.id.toString() + index} // Ensure key is unique
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+        stickySectionHeadersEnabled={true}
+      />
+    );
+  };
+
   return (
     <Box className="flex-1 bg-white pt-2">
       <MonthSelectionBar
-        data={rollingMonthsData} // Pass the newly generated rolling 12 months data
-        selectedMonthValue={selectedMonthFullValue.fullValue} // Pass the combined value for selection
-        onMonthSelect={handleMonthSelect} // Pass the updated handler
+        data={rollingMonthsData}
+        selectedMonthValue={selectedMonth.fullValue}
+        onMonthSelect={handleMonthSelect}
       />
-
-      {displayedSections.length > 0 ? (
-        <SectionList
-          sections={displayedSections}
-          keyExtractor={(item, index) => item.id + index.toString()}
-          renderItem={renderItem}
-          renderSectionHeader={renderSectionHeader}
-          contentContainerStyle={{
-            paddingHorizontal: 0,
-            paddingBottom: 20,
-          }}
-          showsVerticalScrollIndicator={false}
-          stickySectionHeadersEnabled={true}
-        />
-      ) : (
-        <Box className="flex-1 justify-center items-center p-5">
-          <Text
-            className="text-base text-center"
-            style={{ color: WondrColors["dark-gray-wondr"] }}
-          >
-            No transactions for this month.
-          </Text>
-        </Box>
-      )}
+      {renderContent()}
     </Box>
   );
 }

@@ -61,12 +61,10 @@ export function getMonthAbbreviation(dateInput) {
       "Invalid date input provided to getMonthAbbreviation:",
       dateInput,
     );
-    return ""; // Return empty string for invalid dates
+    return "";
   }
 
-  // getMonth() returns 0 for January, 11 for December.
-  // MOCK_MONTH_DATA values are 1-12, so add 1 to the month index.
-  const monthIndex = date.getMonth(); // 0-11
+  const monthIndex = date.getMonth();
   const monthData = MOCK_MONTH_DATA.find(
     (item) => item.value === monthIndex + 1,
   );
@@ -79,22 +77,39 @@ export function formatDateWithMonthAbbreviation(dateInput) {
 
   if (isNaN(date.getTime())) {
     console.error("Invalid date input provided to date formatter:", dateInput);
-    return ""; // Return empty string for invalid dates
+    return "";
   }
 
-  const day = date.getDate(); // Get day number
-  const month = getMonthAbbreviation(date); // Get "Jul"
-  const year = date.getFullYear(); // Get year number
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = getMonthAbbreviation(date);
+  const year = date.getFullYear();
 
   const customFormattedString = `${day} ${month} ${year}`;
 
   return customFormattedString;
 }
 
-// You can add other helper functions here as needed
-/*
-export const calculatePercentage = (current, target) => {
-  if (target === 0) return 0;
-  return (current / target) * 100;
-};
-*/
+export function formatRupiah(value) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(value);
+}
+
+export function formatDigitCurrency(value) {
+  if (!value) return "";
+  const numeric = value.replace(/\D/g, "");
+  return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+export function maskBalance(value) {
+  const digits = value.toString().replace(/\D/g, "").length;
+  return "Rp" + "*".repeat(digits);
+}
+
+export function maskPocketId(id, numDigits) {
+  if (!id) return "";
+  const visible = id.slice(-numDigits);
+  return "*".repeat(id.length - numDigits) + visible;
+}

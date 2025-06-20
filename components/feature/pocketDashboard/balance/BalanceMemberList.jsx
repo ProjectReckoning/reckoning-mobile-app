@@ -1,13 +1,25 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { FlatList, View } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
+import { usePocketStore } from "@/stores/pocketStore";
 import BalanceMemberListCell from "@/components/common/tableCells/BalanceMemberListCell";
-import { WondrColors } from "@/utils/colorUtils";
 
-export default function BalanceMemberList({ members, targetNominal }) {
-  const [sortBy, setSortBy] = useState("none");
+/**
+ * Renders the scrollable list of members for the balance screen.
+ */
+export default function BalanceMemberList() {
+  const members = usePocketStore((state) => state.currentPocket?.members);
+  const targetNominal = usePocketStore(
+    (state) => state.currentPocket?.target_nominal,
+  );
+
+  const memberData = useMemo(() => {
+    if (!Array.isArray(members)) return [];
+    return [...members];
+  }, [members]);
+
+  if (!members) {
+    return null;
+  }
 
   const renderItem = ({ item, index }) => (
     <BalanceMemberListCell
@@ -18,49 +30,16 @@ export default function BalanceMemberList({ members, targetNominal }) {
     />
   );
 
-  return (
-    <Box className="flex-1">
-      <Box className="flex-row justify-between items-center mb-4 px-4 pt-4">
-        <Text className="text-xl font-bold text-gray-800">Target Detail</Text>
-        <Box className="flex-row items-center">
-          <Text className="text-base text-gray-700 mr-2">Sort by</Text>
-          <View
-            style={{
-              borderWidth: 1,
-              borderColor: WondrColors["light-gray-wondr"],
-              borderRadius: 8,
-              overflow: "hidden",
-            }}
-          >
-            <Picker
-              selectedValue={sortBy}
-              style={{ height: 40, width: 120 }}
-              onValueChange={(itemValue) => setSortBy(itemValue)}
-            >
-              <Picker.Item label="None" value="none" />
-              <Picker.Item label="Progress" value="progress" />
-              <Picker.Item label="Name" value="name" />
-            </Picker>
-          </View>
-        </Box>
-      </Box>
+  const ItemSeparator = () => <View style={{ height: 12 }} />;
 
-      <Box
-        className="flex-1 rounded-3xl border border-2"
-        style={{ borderColor: WondrColors["light-gray-wondr"] }}
-      >
-        <FlatList
-          data={members}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            paddingBottom: 20,
-          }}
-        />
-      </Box>
-    </Box>
+  return (
+    <FlatList
+      data={memberData}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id.toString()}
+      ItemSeparatorComponent={ItemSeparator}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
   );
 }
