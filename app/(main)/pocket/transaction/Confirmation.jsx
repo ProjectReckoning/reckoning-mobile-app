@@ -71,7 +71,7 @@ export default function Confirmation() {
 
         <PrimaryButton
           buttonAction={() => {
-            router.push("/pocket/transaction/Confirmation");
+            router.push("/pocket/transaction/PinCode");
           }}
           buttonTitle={`${type.name} sekarang`}
           className={"mb-3"}

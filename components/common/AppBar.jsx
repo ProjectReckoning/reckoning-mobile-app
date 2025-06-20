@@ -9,7 +9,7 @@ const handleBack = () => {
 };
 
 export default function AppBar({
-  title,
+  title = "",
   onBack = handleBack,
   className = "",
   transaction = null,
@@ -25,7 +25,7 @@ export default function AppBar({
       <Heading size="lg" className="font-bold">
         {transaction
           ? `${transaction === "topup" ? (prefix ? `${prefix} Top-Up` : "Top-Up") : transaction === "transfer" ? (prefix ? `${prefix} Transfer` : "Transfer") : prefix ? `${prefix} Withdraw` : "Withdraw"}`
-          : title || "AppBar"}
+          : title}
       </Heading>
       <Box className="w-5 h-5" />
     </Box>
