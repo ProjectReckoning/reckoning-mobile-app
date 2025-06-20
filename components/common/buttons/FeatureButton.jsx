@@ -2,7 +2,7 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
 
-export default function FeatureCard({ icon, label, bg, onPress, border }) {
+export default function FeatureButton({ icon, label, bg, onPress, border }) {
   return (
     <Pressable onPress={onPress} className="items-center">
       <Box

@@ -11,7 +11,7 @@ import { useTransactionStore } from "@/stores/transactionStore";
 import AppBar from "../../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
-import { maskPocketId } from "../../../../../utils/helperFunction";
+import { maskId } from "../../../../../utils/helperFunction";
 import SelectNominal from "@/components/common/buttons/SelectNominal";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
@@ -53,7 +53,7 @@ export default function Topup() {
             <Heading size={"lg"}>
               {pocketName ? pocketName : "Nama Pocket"}
             </Heading>
-            <Text size={"md"}>{maskPocketId(pocketId, 3)}</Text>
+            <Text size={"md"}>{maskId(pocketId, 3)}</Text>
           </VStack>
         </HStack>
 
