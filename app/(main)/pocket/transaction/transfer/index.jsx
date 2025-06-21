@@ -24,51 +24,54 @@ export default function Transfer() {
   const { selectedFriends, setSelectedFriends } = usePocketStore();
 
   return (
-    <Box className="flex-1 bg-white px-8 pt-5">
-      <AppBar title="Transfer" />
+    <Box className="flex-1 bg-white">
+      <Box className="w-full h-72 bg-light-gray-wondr absolute top-0 left-0"></Box>
+      <Box className="flex-1 px-6 pt-5">
+        <AppBar title="Transfer" />
 
-      <Box className="items-center z-10">
-        <HStack
-          space="lg"
-          className="items-start justify-center my-7 px-2 py-5 bg-white border border-gray-wondr-border rounded-2xl"
-        >
-          {transferFeatures.map((feature, i) => (
-            <Box key={i} className="w-1/4 items-center">
-              <FeatureButton {...feature} />
-            </Box>
-          ))}
-        </HStack>
-        <Box className="w-80 h-32 bg-gray-wondr-border rounded-2xl absolute bottom-5 -z-10"></Box>
+        <Box className="items-center z-10">
+          <HStack
+            space="lg"
+            className="items-start justify-center my-7 px-2 py-5 bg-white border border-gray-wondr-border rounded-2xl"
+          >
+            {transferFeatures.map((feature, i) => (
+              <Box key={i} className="w-1/4 items-center">
+                <FeatureButton {...feature} />
+              </Box>
+            ))}
+          </HStack>
+          <Box className="w-80 h-32 bg-gray-wondr-border rounded-2xl absolute bottom-5 -z-10"></Box>
+        </Box>
+
+        <Pressable>
+          <HStack
+            space="lg"
+            className="w-full h-14 bg-white p-3 items-center justify-start border border-dark-gray-wondr-deactive rounded-lg active:bg-gray-50"
+          >
+            <Search size={21} color={WondrColors["dark-gray-wondr-deactive"]} />
+            <Text size="lg" className="font-light">
+              Mau transfer ke siapa hari ini?
+            </Text>
+          </HStack>
+        </Pressable>
+
+        <TabBar
+          tabList={tabList}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          size={16}
+          marginVertical={21}
+        />
+
+        <Heading size="md" className="mb-5">
+          6/200 Penerima
+        </Heading>
+        <FriendList
+          mode="button"
+          selectedFriends={selectedFriends}
+          setSelectedFriends={setSelectedFriends}
+        />
       </Box>
-
-      <Pressable>
-        <HStack
-          space="lg"
-          className="w-full h-14 p-3 items-center justify-start border border-dark-gray-wondr-deactive rounded-lg active:bg-gray-50"
-        >
-          <Search size={21} color={WondrColors["dark-gray-wondr-deactive"]} />
-          <Text size="lg" className="font-light">
-            Mau transfer ke siapa hari ini?
-          </Text>
-        </HStack>
-      </Pressable>
-
-      <TabBar
-        tabList={tabList}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        size={16}
-        marginVertical={21}
-      />
-
-      <Heading size="md" className="mb-5">
-        6/200 Penerima
-      </Heading>
-      <FriendList
-        mode="button"
-        selectedFriends={selectedFriends}
-        setSelectedFriends={setSelectedFriends}
-      />
     </Box>
   );
 }
