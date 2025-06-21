@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import {
   Checkbox,
@@ -29,7 +30,11 @@ const groupFriendsByInitial = (list) => {
   }, {});
 };
 
-export default function FriendList({ selectedFriends, setSelectedFriends }) {
+export default function FriendList({
+  mode = "checkbox",
+  selectedFriends,
+  setSelectedFriends,
+}) {
   const [values, setValues] = useState(selectedFriends || []);
 
   // Group and sort friends
@@ -56,15 +61,53 @@ export default function FriendList({ selectedFriends, setSelectedFriends }) {
               {initial}
             </Heading>
             <Divider className="mb-2" />
-            <CheckboxGroup value={values} onChange={(keys) => setValues(keys)}>
+            {mode === "checkbox" && (
+              <CheckboxGroup
+                value={values}
+                onChange={(keys) => setValues(keys)}
+              >
+                <VStack space="md">
+                  {groupedFriends[initial].map((friend) => (
+                    <Checkbox
+                      key={friend.id}
+                      value={friend.name}
+                      className="flex-row items-center px-0 py-3 rounded-lg bg-white"
+                      defaultIsChecked={false}
+                      isChecked={values.includes(friend.name) ? true : false}
+                    >
+                      <Avatar
+                        size={"md"}
+                        className="bg-[#F2F2F2] items-center justify-center mr-3"
+                      >
+                        <AvatarFallbackText className="text-[#58ABA1]">
+                          {friend.name}
+                        </AvatarFallbackText>
+                      </Avatar>
+                      <Box className="flex-1 flex flex-col">
+                        <CheckboxLabel className="text-lg font-bold">
+                          {friend.name}
+                        </CheckboxLabel>
+                        <Text size="sm" className="text-[#848688]">
+                          {friend.bank} - {friend.id}
+                        </Text>
+                      </Box>
+                      <CheckboxIndicator className="w-6 h-6 rounded-full ml-2">
+                        <CheckboxIcon as={Check} />
+                      </CheckboxIndicator>
+                    </Checkbox>
+                  ))}
+                </VStack>
+              </CheckboxGroup>
+            )}
+            {mode === "button" && (
               <VStack space="md">
                 {groupedFriends[initial].map((friend) => (
-                  <Checkbox
+                  <Pressable
                     key={friend.id}
-                    value={friend.name}
-                    className="flex-row items-center px-0 py-3 rounded-lg bg-white"
-                    defaultIsChecked={false}
-                    isChecked={values.includes(friend.name) ? true : false}
+                    onPress={() => {
+                      setSelectedFriends([friend.name]);
+                    }}
+                    className="flex-row items-center px-0 py-3 bg-white active:active:bg-gray-50"
                   >
                     <Avatar
                       size={"md"}
@@ -75,20 +118,17 @@ export default function FriendList({ selectedFriends, setSelectedFriends }) {
                       </AvatarFallbackText>
                     </Avatar>
                     <Box className="flex-1 flex flex-col">
-                      <CheckboxLabel className="text-lg font-bold">
+                      <Text size="lg" className="font-bold text-black">
                         {friend.name}
-                      </CheckboxLabel>
+                      </Text>
                       <Text size="sm" className="text-[#848688]">
                         {friend.bank} - {friend.id}
                       </Text>
                     </Box>
-                    <CheckboxIndicator className="w-6 h-6 rounded-full ml-2">
-                      <CheckboxIcon as={Check} />
-                    </CheckboxIndicator>
-                  </Checkbox>
+                  </Pressable>
                 ))}
               </VStack>
-            </CheckboxGroup>
+            )}
           </Box>
         ))}
       </ScrollView>

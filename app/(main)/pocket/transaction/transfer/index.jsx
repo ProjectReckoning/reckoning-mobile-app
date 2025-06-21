@@ -61,8 +61,11 @@ export default function Transfer() {
         marginVertical={21}
       />
 
-      <Heading className="mb-5">6/200 Penerima</Heading>
+      <Heading size="md" className="mb-5">
+        6/200 Penerima
+      </Heading>
       <FriendList
+        mode="button"
         selectedFriends={selectedFriends}
         setSelectedFriends={setSelectedFriends}
       />
