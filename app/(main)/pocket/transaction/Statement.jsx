@@ -18,9 +18,6 @@ import StatementDecorator from "@/assets/images/decorators/statementlDecorator.p
 export default function Statement() {
   // Static data for mockup
   const pocketName = "Pergi ke Korea 2026";
-  const pocketColor = "bg-orange-wondr";
-  const pocketIcon = "Airplane";
-  const pocketId = "0238928039";
   const now = new Date();
   const dateTime = now
     .toLocaleDateString("en-GB", {
@@ -37,7 +34,6 @@ export default function Statement() {
   });
   const createdAt = `${dateTime} . ${time} WIB`;
   const refId = "20250625840802948";
-  console.log(dateTime, time, refId);
 
   const { type, amount, source, destination, setAmount } =
     useTransactionStore();
