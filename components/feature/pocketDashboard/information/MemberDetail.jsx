@@ -12,7 +12,7 @@ export default function MemberDetail() {
       </AppText>
       <Pressable>
         <Box className="flex-row gap-2 items-center">
-          <Box className="rounded-xl border border-2 border-light-gray-wondr w-16 h-16 justify-center items-center">
+          <Box className="rounded-xl border-2 border-light-gray-wondr w-16 h-16 justify-center items-center">
             <CirclePlus color={WondrColors["tosca-wondr"]} size={32} />
           </Box>
           {/* By adding flex-1 here, this container will fill the remaining space, allowing text to wrap. */}
