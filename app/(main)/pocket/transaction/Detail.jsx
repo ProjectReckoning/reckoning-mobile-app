@@ -1,40 +1,46 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
-import { Heading } from "@/components/ui/heading";
+import { VStack } from "@/components/ui/vstack";
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
-import { maskId } from "@/utils/helperFunction";
-import AppBar from "../../../../../components/common/AppBar";
-import PocketCard from "@/components/common/cards/PocketCard";
+import AppBar from "../../../../components/common/AppBar";
 import NominalInput from "@/components/common/forms/NominalInput";
-import SelectNominal from "@/components/common/buttons/SelectNominal";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 
-export default function Topup() {
+export default function TransactionDetail() {
   // Static data for mockup
   const pocketName = "Pergi ke Korea 2026";
-  const pocketColor = "bg-orange-wondr";
-  const pocketIcon = "Airplane";
   const pocketId = "0238928039";
 
-  const { type, amount, source, setAmount } = useTransactionStore();
+  const { type, source, destination, amount, setAmount, setSource } =
+    useTransactionStore();
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
+
+  useEffect(() => {
+    setSource({
+      id: pocketId,
+      type: "SHARED POCKET BNI",
+      name: pocketName,
+      balance: 19546250,
+    });
+  }, []);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
   }, [amount, amountTouched]);
 
   return (
-    <Box className="flex-1 bg-white justify-between px-8 py-5">
-      <AppBar transaction={type.id} />
+    <Box className="flex-1 bg-white px-8 py-5">
+      <AppBar transaction={type.id} prefix="Detail" />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={50}
@@ -44,26 +50,24 @@ export default function Topup() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
         >
-          <VStack space="xs">
-            {/* Pocket preview */}
-            <HStack
-              space="xl"
-              className="w-full justify-start items-center mt-8 mb-5"
-            >
-              <PocketCard
-                mode="icon"
-                pocketName={pocketName}
-                color={pocketColor}
-                icon={pocketIcon}
-                iconSize="8"
-                whiteSpace="mb-5"
-              />
-              <VStack space="xs" className="gap-0">
-                <Heading size={"lg"}>
-                  {pocketName ? pocketName : "Nama Pocket"}
-                </Heading>
-                <Text size={"md"}>{maskId(pocketId, 3)}</Text>
-              </VStack>
+          <VStack space="2xl" className="flex-1 mt-8">
+            <HStack space="sm" className="justify-center items-center">
+              <Avatar
+                size={"md"}
+                className="bg-[#F2F2F2] items-center justify-center mr-3"
+              >
+                <AvatarFallbackText className="text-[#58ABA1]">
+                  {destination?.name || ""}
+                </AvatarFallbackText>
+              </Avatar>
+              <Box className="flex-1 flex flex-col">
+                <Text size="lg" className="font-bold text-black">
+                  Sdr {destination?.name || ""}
+                </Text>
+                <Text size="sm" className="text-[#848688]">
+                  {destination?.type?.bank || ""} - {destination?.id || ""}
+                </Text>
+              </Box>
             </HStack>
 
             <NominalInput
@@ -73,8 +77,6 @@ export default function Topup() {
               setAmountTouched={setAmountTouched}
             />
 
-            <SelectNominal />
-
             <TransactionCard
               title="Sumber dana"
               heading={source.type}
@@ -83,17 +85,17 @@ export default function Topup() {
               balance={source.balance}
             />
           </VStack>
+
+          <PrimaryButton
+            buttonAction={() => {
+              router.push("/pocket/transaction/Confirmation");
+            }}
+            buttonTitle="Lanjut"
+            className={"my-3"}
+            disabled={amount === null}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
-
-      <PrimaryButton
-        buttonAction={() => {
-          router.push("/pocket/transaction/Confirmation");
-        }}
-        buttonTitle="Lanjut"
-        className={"my-3"}
-        disabled={amount === null}
-      />
     </Box>
   );
 }

@@ -13,6 +13,7 @@ import {
   CheckboxGroup,
 } from "@/components/ui/checkbox";
 
+import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { Check } from "lucide-react-native";
@@ -34,6 +35,7 @@ export default function FriendList({
   mode = "checkbox",
   selectedFriends,
   setSelectedFriends,
+  setDestination,
 }) {
   const [values, setValues] = useState(selectedFriends || []);
 
@@ -106,6 +108,14 @@ export default function FriendList({
                     key={friend.id}
                     onPress={() => {
                       setSelectedFriends([friend.name]);
+                      if (setDestination) {
+                        setDestination({
+                          id: friend.id,
+                          name: friend.name,
+                          type: { bank: friend.bank },
+                        });
+                      }
+                      router.push("/(main)/pocket/transaction/Detail");
                     }}
                     className="flex-row items-center px-0 py-3 bg-white active:active:bg-gray-50"
                   >

@@ -4,13 +4,14 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react-native";
 import TabBar from "@/components/common/TabBar";
 import { usePocketStore } from "@/stores/pocketStore";
 import FriendList from "@/components/common/FriendList";
 import AppBar from "../../../../../components/common/AppBar";
 import { WondrColors } from "../../../../../utils/colorUtils";
+import { useTransactionStore } from "@/stores/transactionStore";
 import { transferFeatures } from "@/utils/mockData/featureData";
 import FeatureButton from "@/components/common/buttons/FeatureButton";
 
@@ -22,6 +23,11 @@ const tabList = [
 export default function Transfer() {
   const [activeTab, setActiveTab] = useState("tersimpan");
   const { selectedFriends, setSelectedFriends } = usePocketStore();
+  const { setType, setDestination } = useTransactionStore();
+
+  useEffect(() => {
+    setType({ id: "transfer", name: "transfer" });
+  }, [setType]);
 
   return (
     <Box className="flex-1 bg-white">
@@ -70,6 +76,7 @@ export default function Transfer() {
           mode="button"
           selectedFriends={selectedFriends}
           setSelectedFriends={setSelectedFriends}
+          setDestination={setDestination}
         />
       </Box>
     </Box>

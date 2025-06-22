@@ -84,7 +84,7 @@ export default function Statement() {
             <TransactionCard
               title="Penerima"
               heading={pocketName}
-              subheading={`${destination.pocket.type} . ${destination.pocket.id}`}
+              subheading={`${destination.type.pocket} . ${destination.id}`}
             />
             <TransactionCard
               title="Sumber dana"
