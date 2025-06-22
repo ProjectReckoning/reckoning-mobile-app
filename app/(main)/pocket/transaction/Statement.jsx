@@ -83,8 +83,8 @@ export default function Statement() {
           <VStack space="lg" className="w-full">
             <TransactionCard
               title="Penerima"
-              heading={pocketName}
-              subheading={`${destination.type.pocket} . ${destination.id}`}
+              heading={destination.name}
+              subheading={`${destination.type.pocket || destination.type.bank} . ${destination.id}`}
             />
             <TransactionCard
               title="Sumber dana"
@@ -99,7 +99,7 @@ export default function Statement() {
         buttonTitle="Kembali ke beranda"
         buttonAction={() => {
           setAmount(null);
-          router.push("(main)/pocket/transaction/topup");
+          router.replace("(main)/home");
         }}
         className="my-3"
       />

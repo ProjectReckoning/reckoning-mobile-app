@@ -31,7 +31,7 @@ export default function TransactionDetail() {
       name: pocketName,
       balance: 19546250,
     });
-  }, []);
+  }, [setSource]);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);

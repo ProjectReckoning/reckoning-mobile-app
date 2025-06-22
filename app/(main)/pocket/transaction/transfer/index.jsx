@@ -26,7 +26,7 @@ export default function Transfer() {
   const { setType, setDestination } = useTransactionStore();
 
   useEffect(() => {
-    setType({ id: "transfer", name: "transfer" });
+    setType({ id: "transfer", name: "Transfer" });
   }, [setType]);
 
   return (
