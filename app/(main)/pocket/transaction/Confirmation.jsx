@@ -22,33 +22,42 @@ export default function Confirmation() {
   const pocketIcon = "Airplane";
   const pocketId = "0238928039";
 
-  const { type, source, amount } = useTransactionStore();
+  const { type, source, amount, destination } = useTransactionStore();
 
   return (
     <Box className="flex-1 bg-white justify-between px-8 py-5">
       <VStack space="xs">
         <AppBar transaction={type.id} prefix="Konfirmasi" />
 
-        {/* Pocket preview */}
-        <HStack
-          space="xl"
-          className="w-full justify-start items-center mt-8 mb-5"
-        >
-          <PocketCard
-            mode="icon"
-            pocketName={pocketName}
-            color={pocketColor}
-            icon={pocketIcon}
-            iconSize="8"
-            whiteSpace="mb-5"
-          />
-          <VStack space="xs" className="gap-0">
-            <Heading size={"lg"}>
-              {pocketName ? pocketName : "Nama Pocket"}
-            </Heading>
-            <Text size={"md"}>{maskId(pocketId, 3)}</Text>
-          </VStack>
-        </HStack>
+        {destination.type && destination.type.pocket ? (
+          <HStack
+            space="xl"
+            className="w-full justify-start items-center mt-8 mb-5"
+          >
+            <PocketCard
+              mode="icon"
+              pocketName={pocketName}
+              color={pocketColor}
+              icon={pocketIcon}
+              iconSize="8"
+              whiteSpace="mb-5"
+            />
+            <VStack space="xs" className="gap-0">
+              <Heading size={"lg"}>
+                {pocketName ? pocketName : "Nama Pocket"}
+              </Heading>
+              <Text size={"md"}>{maskId(pocketId, 3)}</Text>
+            </VStack>
+          </HStack>
+        ) : (
+          <Box className="mt-8 mb-3">
+            <TransactionCard
+              title="Penerima"
+              heading={destination.name}
+              subheading={`${destination.type.bank} - ${destination.id}`}
+            />
+          </Box>
+        )}
 
         <TransactionCard
           title="Sumber dana"

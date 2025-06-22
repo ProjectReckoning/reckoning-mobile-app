@@ -22,10 +22,9 @@ export const useTransactionStore = create((set) => ({
   setSource: (source) => set({ source }),
 
   destination: {
-    id: null,
-    name: "",
-    bank: "BNI",
-    pocket: { id: "0238928039", name: "", type: "SHARED POCKET BNI" },
+    id: "0238928039",
+    name: "Pergi ke Korea 2026",
+    type: { bank: "BNI", pocket: "SHARED POCKET BNI" },
   },
   setDestination: (destination) => set({ destination }),
 }));

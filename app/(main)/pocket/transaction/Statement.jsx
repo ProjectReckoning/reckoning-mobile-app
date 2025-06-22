@@ -18,9 +18,6 @@ import StatementDecorator from "@/assets/images/decorators/statementlDecorator.p
 export default function Statement() {
   // Static data for mockup
   const pocketName = "Pergi ke Korea 2026";
-  const pocketColor = "bg-orange-wondr";
-  const pocketIcon = "Airplane";
-  const pocketId = "0238928039";
   const now = new Date();
   const dateTime = now
     .toLocaleDateString("en-GB", {
@@ -37,7 +34,6 @@ export default function Statement() {
   });
   const createdAt = `${dateTime} . ${time} WIB`;
   const refId = "20250625840802948";
-  console.log(dateTime, time, refId);
 
   const { type, amount, source, destination, setAmount } =
     useTransactionStore();
@@ -87,8 +83,8 @@ export default function Statement() {
           <VStack space="lg" className="w-full">
             <TransactionCard
               title="Penerima"
-              heading={pocketName}
-              subheading={`${destination.pocket.type} . ${destination.pocket.id}`}
+              heading={destination.name}
+              subheading={`${destination.type.pocket || destination.type.bank} . ${destination.id}`}
             />
             <TransactionCard
               title="Sumber dana"
@@ -103,7 +99,7 @@ export default function Statement() {
         buttonTitle="Kembali ke beranda"
         buttonAction={() => {
           setAmount(null);
-          router.push("(main)/pocket/transaction/topup");
+          router.replace("(main)/home");
         }}
         className="my-3"
       />

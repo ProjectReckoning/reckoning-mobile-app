@@ -63,6 +63,9 @@ export const COLOR_PALETTE = [
   WondrColors["yellow-wondr"],
   WondrColors["red-wondr"],
   WondrColors["green-wondr"],
+  WondrColors["green-select"],
+  WondrColors["gray-wondr-border"],
+  WondrColors["dark-gray-wondr-deactive"],
 ];
 
 // If you want the COLOR_PALETTE itself to be these lighter translucent colors, you would change it like this:
