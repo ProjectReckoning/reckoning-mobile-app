@@ -1,3 +1,4 @@
+// utils/mockData/featureData.js
 import { router } from "expo-router";
 import { WondrColors } from "../colorUtils";
 import { Image } from "@/components/ui/image";
@@ -17,10 +18,6 @@ import {
   UsersRound,
 } from "lucide-react-native";
 
-const GoToPocket = async () => {
-  router.push("/pocket");
-};
-
 export const features = [
   {
     icon: <Send />,
@@ -34,7 +31,7 @@ export const features = [
         size="sm"
         source={TapCashIcon}
         className="aspect-square w-4"
-        alt="logout"
+        alt="TapCash Icon"
       />
     ),
     label: "TapCash",
@@ -71,13 +68,13 @@ export const features = [
         size="2xs"
         source={PocketIcon}
         className="aspect-square w-4"
-        alt="logout"
+        alt="Pocket Icon"
       />
     ),
     label: "Pocket",
     bg: "bg-purple-wondr-translucent",
     bgPressed: "bg-purple-wondr-dark",
-    onPress: GoToPocket,
+    // The onPress property has been correctly removed.
   },
   {
     icon: <LayoutGrid />,

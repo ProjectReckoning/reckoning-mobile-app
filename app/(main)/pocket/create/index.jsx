@@ -1,10 +1,16 @@
+// app/(main)/pocket/create/index.jsx
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
-
 import { useState } from "react";
 import { router } from "expo-router";
 
+// --- NEW: Import our reusable ScreenContainer ---
+import ScreenContainer from "../../../../components/common/ScreenContainer";
+
+// Note: The custom AppBar is no longer needed if you hide the default header
+// and use ScreenContainer, as ScreenContainer provides the top safe area.
+// However, to minimize changes, we will keep it for now.
 import AppBar from "../../../../components/common/AppBar";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { pocketTypes } from "../../../../utils/createPocket/pocketTypeData";
@@ -24,11 +30,13 @@ export default function CreatePocket() {
   };
 
   return (
-    <Box className="flex-1 bg-white justify-stretch">
+    // --- FIX: Use ScreenContainer as the root element ---
+    <ScreenContainer className="bg-white justify-stretch">
       <Box className="w-full h-56 bg-[#C2F0ED] absolute top-0"></Box>
 
-      <Box className="flex-1 flex-col px-6 pt-5 justify-between">
-        <VStack space="4xl" reversed={false}>
+      <Box className="flex-1 flex-col px-6 justify-between">
+        {/* The AppBar is now inside the safe area provided by ScreenContainer */}
+        <VStack space="4xl" reversed={false} className="pt-5">
           <AppBar title="" />
 
           <Heading size="xl" className="text-bold">
@@ -64,6 +72,6 @@ export default function CreatePocket() {
           />
         </Box>
       </Box>
-    </Box>
+    </ScreenContainer>
   );
 }

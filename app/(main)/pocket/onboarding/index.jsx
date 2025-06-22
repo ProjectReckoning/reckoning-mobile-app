@@ -3,33 +3,28 @@ import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
-import { Pressable } from "@/components/ui/pressable";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 
 import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
 
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
 import OnboardingIllustration from "@/assets/images/onboarding.png";
 
 export default function PocketOnboarding() {
-  const handleBack = () => {
-    router.back();
-  };
+  // The back functionality is now handled by the custom AppBar in the root layout.
+  // const handleBack = () => router.back();
 
   const handleNext = () => {
-    router.push("pocket/onboarding/CreatePocketOnboarding");
+    // --- FIX: Use an absolute path for robust navigation ---
+    router.push("/(main)/pocket/onboarding/CreatePocketOnboarding");
   };
 
   return (
-    <Box className="flex-1 bg-white px-6 justify-between">
+    <Box className="flex-1 bg-white px-6 justify-between pt-5">
       <Box className="flex flex-col">
-        <Box className="flex justify-start my-5">
-          <Pressable onPress={handleBack}>
-            <ArrowLeft size={24} />
-          </Pressable>
-        </Box>
+        {/* --- FIX: The manual back button has been removed --- */}
+        {/* It is now automatically provided by the root layout's custom AppBar */}
 
         <Center className="w-full h-16 mt-2">
           <Progress
