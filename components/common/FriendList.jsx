@@ -112,7 +112,12 @@ export default function FriendList({
                         setDestination({
                           id: friend.id,
                           name: friend.name,
-                          type: { bank: friend.bank },
+                          category: {
+                            bank: {
+                              name: friend.bank,
+                              type: "TAPLUS PEGAWAI BNI",
+                            },
+                          },
                         });
                       }
                       router.push("/(main)/pocket/transaction/Detail");

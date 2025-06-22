@@ -15,23 +15,10 @@ import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 
 export default function TransactionDetail() {
-  // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
-  const pocketId = "0238928039";
-
-  const { type, source, destination, amount, setAmount, setSource } =
+  const { type, source, destination, amount, setAmount } =
     useTransactionStore();
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
-
-  useEffect(() => {
-    setSource({
-      id: pocketId,
-      type: "SHARED POCKET BNI",
-      name: pocketName,
-      balance: 19546250,
-    });
-  }, [setSource]);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
@@ -65,7 +52,10 @@ export default function TransactionDetail() {
                   Sdr {destination?.name || ""}
                 </Text>
                 <Text size="sm" className="text-[#848688]">
-                  {destination?.type?.bank || ""} - {destination?.id || ""}
+                  {destination?.category?.bank?.type ||
+                    destination?.category?.pocket?.type ||
+                    ""}{" "}
+                  - {destination?.id || ""}
                 </Text>
               </Box>
             </HStack>
@@ -79,7 +69,9 @@ export default function TransactionDetail() {
 
             <TransactionCard
               title="Sumber dana"
-              heading={source.type}
+              heading={
+                source?.category?.bank?.type || source?.category?.pocket?.type
+              }
               subheading={source.id}
               showBalance={true}
               balance={source.balance}

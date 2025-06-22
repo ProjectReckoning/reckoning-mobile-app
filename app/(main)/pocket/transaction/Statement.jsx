@@ -17,7 +17,6 @@ import StatementDecorator from "@/assets/images/decorators/statementlDecorator.p
 
 export default function Statement() {
   // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
   const now = new Date();
   const dateTime = now
     .toLocaleDateString("en-GB", {
@@ -84,12 +83,12 @@ export default function Statement() {
             <TransactionCard
               title="Penerima"
               heading={destination.name}
-              subheading={`${destination.type.pocket || destination.type.bank} . ${destination.id}`}
+              subheading={`${destination.category?.bank?.type || destination.category?.pocket?.type} . ${destination.id}`}
             />
             <TransactionCard
               title="Sumber dana"
               heading={source.name}
-              subheading={`${source.type} ${maskId(source.id, 3)}`}
+              subheading={`${source.category?.bank?.type || source.category?.pocket?.type} ${maskId(source.id, 3)}`}
             />
           </VStack>
         </VStack>

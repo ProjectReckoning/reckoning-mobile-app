@@ -17,10 +17,8 @@ import DetailConfirmation from "@/components/feature/transaction/DetailConfirmat
 
 export default function Confirmation() {
   // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
   const pocketColor = "bg-orange-wondr";
   const pocketIcon = "Airplane";
-  const pocketId = "0238928039";
 
   const { type, source, amount, destination } = useTransactionStore();
 
@@ -29,14 +27,14 @@ export default function Confirmation() {
       <VStack space="xs">
         <AppBar transaction={type.id} prefix="Konfirmasi" />
 
-        {destination.type && destination.type.pocket ? (
+        {destination.category.pocket && destination.category.pocket.type ? (
           <HStack
             space="xl"
             className="w-full justify-start items-center mt-8 mb-5"
           >
             <PocketCard
               mode="icon"
-              pocketName={pocketName}
+              pocketName={destination.name}
               color={pocketColor}
               icon={pocketIcon}
               iconSize="8"
@@ -44,9 +42,9 @@ export default function Confirmation() {
             />
             <VStack space="xs" className="gap-0">
               <Heading size={"lg"}>
-                {pocketName ? pocketName : "Nama Pocket"}
+                {destination.name ? destination.name : "Nama Pocket"}
               </Heading>
-              <Text size={"md"}>{maskId(pocketId, 3)}</Text>
+              <Text size={"md"}>{maskId(destination.id, 3)}</Text>
             </VStack>
           </HStack>
         ) : (
@@ -54,7 +52,7 @@ export default function Confirmation() {
             <TransactionCard
               title="Penerima"
               heading={destination.name}
-              subheading={`${destination.type.bank} - ${destination.id}`}
+              subheading={`${destination?.category?.bank?.type || destination?.category?.pocket?.type} - ${destination.id}`}
             />
           </Box>
         )}
@@ -62,7 +60,7 @@ export default function Confirmation() {
         <TransactionCard
           title="Sumber dana"
           heading={source.name}
-          subheading={`${source.type} - ${source.id}`}
+          subheading={`${source.category?.bank?.type || source.category?.pocket?.type} - ${source.id}`}
         />
 
         <DetailConfirmation />

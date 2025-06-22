@@ -21,9 +21,27 @@ const tabList = [
 ];
 
 export default function Transfer() {
+  // Static data for mockup
+  const pocketName = "Pergi ke Korea 2026";
+  const pocketId = "0238928039";
+
   const [activeTab, setActiveTab] = useState("tersimpan");
   const { selectedFriends, setSelectedFriends } = usePocketStore();
-  const { setType, setDestination } = useTransactionStore();
+  const { type, setType, setSource, setDestination } = useTransactionStore();
+
+  useEffect(() => {
+    setSource({
+      id: pocketId,
+      name: pocketName,
+      balance: 19546250,
+      category: {
+        pocket: {
+          name: pocketName,
+          type: "SHARED POCKET BNI",
+        },
+      },
+    });
+  }, []);
 
   useEffect(() => {
     setType({ id: "transfer", name: "Transfer" });
@@ -33,7 +51,7 @@ export default function Transfer() {
     <Box className="flex-1 bg-white">
       <Box className="w-full h-72 bg-light-gray-wondr absolute top-0 left-0"></Box>
       <Box className="flex-1 px-6 pt-5">
-        <AppBar title="Transfer" />
+        <AppBar transaction={type.id} />
 
         <Box className="items-center z-10">
           <HStack
