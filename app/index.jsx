@@ -50,7 +50,7 @@ export default function AppEntry() {
   console.log("AppEntry: Redirecting. Token present:", !!token);
   return (
     <Redirect
-      href={token ? "/(main)/pocket/transaction/transfer" : "/(auth)/login"}
+      href={token ? "/(main)/pocket/transaction/withdraw" : "/(auth)/login"}
     />
   );
 }

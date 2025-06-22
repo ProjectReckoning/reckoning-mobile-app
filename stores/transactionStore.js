@@ -14,17 +14,35 @@ export const useTransactionStore = create((set) => ({
     }),
 
   source: {
-    id: 1916837397,
-    name: "AMIRA FERIAL",
-    type: "TAPLUS PEGAWAI BNI",
+    id: null,
+    name: "",
     balance: 19546250,
+    category: {
+      bank: {
+        name: null,
+        type: null,
+      },
+      pocket: {
+        name: null,
+        type: null,
+      },
+    },
   },
   setSource: (source) => set({ source }),
 
   destination: {
-    id: "0238928039",
-    name: "Pergi ke Korea 2026",
-    type: { bank: "BNI", pocket: "SHARED POCKET BNI" },
+    id: null,
+    name: null,
+    category: {
+      bank: {
+        name: null,
+        type: null,
+      },
+      pocket: {
+        name: null,
+        type: null,
+      },
+    },
   },
   setDestination: (destination) => set({ destination }),
 }));

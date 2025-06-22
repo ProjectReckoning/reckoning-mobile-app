@@ -24,9 +24,42 @@ export default function Topup() {
   const pocketIcon = "Airplane";
   const pocketId = "0238928039";
 
-  const { type, amount, source, setAmount } = useTransactionStore();
+  const {
+    type,
+    amount,
+    source,
+    destination,
+    setSource,
+    setAmount,
+    setDestination,
+  } = useTransactionStore();
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
+
+  useEffect(() => {
+    setDestination({
+      id: pocketId,
+      name: pocketName,
+      category: {
+        pocket: {
+          name: pocketName,
+          type: "SHARED POCKET BNI",
+        },
+      },
+    });
+
+    setSource({
+      id: 1916837397,
+      name: "AMIRA FERIAL",
+      balance: 19546250,
+      category: {
+        bank: {
+          name: "BNI",
+          type: "TAPLUS PEGAWAI BNI",
+        },
+      },
+    });
+  }, []);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
@@ -52,7 +85,7 @@ export default function Topup() {
             >
               <PocketCard
                 mode="icon"
-                pocketName={pocketName}
+                pocketName={destination.name}
                 color={pocketColor}
                 icon={pocketIcon}
                 iconSize="8"
@@ -60,9 +93,9 @@ export default function Topup() {
               />
               <VStack space="xs" className="gap-0">
                 <Heading size={"lg"}>
-                  {pocketName ? pocketName : "Nama Pocket"}
+                  {destination.name ? destination.name : "Nama Pocket"}
                 </Heading>
-                <Text size={"md"}>{maskId(pocketId, 3)}</Text>
+                <Text size={"md"}>{maskId(destination.id, 3)}</Text>
               </VStack>
             </HStack>
 
@@ -77,7 +110,7 @@ export default function Topup() {
 
             <TransactionCard
               title="Sumber dana"
-              heading={source.type}
+              heading={source.category.bank.type || source.category.pocket.type}
               subheading={source.id}
               showBalance={true}
               balance={source.balance}
