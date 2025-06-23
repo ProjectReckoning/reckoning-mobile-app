@@ -4,9 +4,9 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { ActivityIndicator, ScrollView } from "react-native";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { CirclePlus } from "lucide-react-native";
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 
 import { usePocketStore } from "@/stores/pocketStore";
 import { WondrColors } from "@/utils/colorUtils";
@@ -22,6 +22,7 @@ const tabList = [
 ];
 
 export default function AllPocket() {
+  const { newPocketId } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("personal");
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
@@ -34,30 +35,23 @@ export default function AllPocket() {
     removePocketFromList,
   } = usePocketStore();
 
-  // --- START: ADD LOGS HERE ---
-  // This block will run every time the component renders.
-  console.log(`--- ALL POCKETS SCREEN RENDERED ---`);
-  console.log(`isAllPocketsLoading: ${isAllPocketsLoading}`);
-  console.log(`allPockets array exists: ${!!allPockets}`);
-  console.log(`Number of pockets: ${allPockets?.length}`);
-  console.log(`-----------------------------------`);
-  // --- END: ADD LOGS HERE ---
+  // This useEffect handles the navigation after a pocket is created
+  useEffect(() => {
+    if (newPocketId) {
+      // It means a pocket was just created. We then push the new dashboard
+      // onto the stack. The history is now clean (`Home` -> `All Pockets` -> `Dashboard`).
+      router.push(`/(main)/pocket/${newPocketId}`);
+    }
+  }, [newPocketId]); // This effect runs only when newPocketId changes
 
-  // Keep this to refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      // --- START: ADD LOGS HERE ---
-      // This will run when the screen comes into focus.
-      console.log(
-        "[AllPockets.jsx] Focus effect: Fetching pockets for display.",
-      );
-      // --- END: ADD LOGS HERE ---
-
       fetchAllPockets();
     }, []),
   );
 
   const filteredPockets = useMemo(() => {
+    // This logic might need adjustment based on your pocket data structure
     return allPockets.filter((pocket) => activeTab === "personal");
   }, [allPockets, activeTab]);
 
@@ -79,7 +73,7 @@ export default function AllPocket() {
   const handleCardPress = (pocketId) => {
     router.push(`/(main)/pocket/${pocketId}`);
   };
-  const GoToCreatePocket = () => router.push("/(main)/pocket/create/index"); // Go to create index
+  const GoToCreatePocket = () => router.push("/(main)/pocket/create");
 
   const renderContent = () => {
     if (isAllPocketsLoading) {
@@ -91,7 +85,8 @@ export default function AllPocket() {
     }
 
     if (filteredPockets.length === 0) {
-      return <EmptyPocket />;
+      // Reverted to match working version
+      return <EmptyPocket createAction={GoToCreatePocket} />;
     }
 
     return (
@@ -103,8 +98,10 @@ export default function AllPocket() {
         <Box className="flex-row flex-wrap justify-between px-2">
           {filteredPockets.map((pocket) => (
             <Pressable
+              // FIX: The key should consistently be pocket_id as per the working version
               key={pocket.pocket_id}
               className="w-[47%] mb-8"
+              // FIX: Use the consistent pocket_id for navigation
               onPress={() => handleCardPress(pocket.pocket_id)}
             >
               {({ pressed }) => (
@@ -112,6 +109,8 @@ export default function AllPocket() {
                   pocketName={pocket.name}
                   pocketType={pocket.type}
                   pocketBalance={Number(pocket.current_balance)}
+                  // FIX: Reverted to a working Tailwind class. The PocketCard component
+                  // likely expects a class name, not a hex code.
                   color={"bg-orange-wondr"}
                   icon={pocket.icon_name}
                   space="mt-5 mb-1"
