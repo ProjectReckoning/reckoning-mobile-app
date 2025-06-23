@@ -9,7 +9,6 @@ import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
-import AppBar from "../../../../components/common/AppBar";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";

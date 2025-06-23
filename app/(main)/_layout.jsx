@@ -1,5 +1,6 @@
 // app/(main)/_layout.jsx
 import { useEffect } from "react";
+import { Pressable } from "react-native";
 import { Stack, router } from "expo-router";
 import useAuthStore from "@/stores/authStore";
 import { ArrowLeft } from "lucide-react-native";
@@ -58,20 +59,16 @@ export default function MainLayout() {
         name="home/notification/[id]/index"
         options={{ title: "Notification Detail" }}
       />
-
-      {/* This screen now correctly inherits the default back button behavior */}
       <Stack.Screen
         name="pocket/all/index"
         options={{
           title: "My Pockets",
         }}
       />
-
       <Stack.Screen
         name="pocket/[id]/index"
         options={{ title: "Pocket Details" }}
       />
-
       <Stack.Screen
         name="pocket/onboarding/index"
         options={{ title: "Get Started" }}
@@ -80,7 +77,6 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
-
       {/* Hide the default header for the create flow wrapper */}
       <Stack.Screen
         name="pocket/create/index"
