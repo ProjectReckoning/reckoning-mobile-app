@@ -7,11 +7,12 @@ import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
+import { friendsList } from "@/utils/mockData/friendsListData";
 import { useTransactionStore } from "@/stores/transactionStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 export default function NewUserConfirmation() {
-  const { newFriend } = usePocketStore();
+  const { newFriend, selectedFriends, setSelectedFriends } = usePocketStore();
   const { type, setDestination } = useTransactionStore();
 
   if (!newFriend) {
@@ -35,6 +36,14 @@ export default function NewUserConfirmation() {
         },
       });
       router.push("/pocket/transaction/Detail");
+    } else {
+      friendsList.push(newFriend);
+
+      if (!selectedFriends.includes(newFriend.name)) {
+        setSelectedFriends([...selectedFriends, newFriend.name]);
+      }
+
+      router.push("/pocket/create/SelectFriend");
     }
   };
 

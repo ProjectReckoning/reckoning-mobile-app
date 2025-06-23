@@ -18,7 +18,7 @@ import { ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { Check } from "lucide-react-native";
 
-import { friendsList } from "../../utils/mockData/friendsListData";
+import { friendsList } from "@/utils/mockData/friendsListData";
 
 // Helper to group friends by first initial
 const groupFriendsByInitial = (list) => {

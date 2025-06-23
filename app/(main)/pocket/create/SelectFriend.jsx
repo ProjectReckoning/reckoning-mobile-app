@@ -20,7 +20,7 @@ export default function FriendsList() {
   const { selectedFriends, setSelectedFriends } = usePocketStore();
 
   const handleBack = () => {
-    router.back();
+    router.push("pocket/create/Details");
   };
 
   return (
