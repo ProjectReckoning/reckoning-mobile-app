@@ -57,11 +57,7 @@ export const usePocketStore = create((set, get) => ({
 
   // --- Actions ---
 
-  /**
-   * Creates a new pocket based on the current store state.
-   */
   createPocket: async () => {
-    console.log("[STORE] createPocket: Fired.");
     set({ isCreating: true, createError: null });
     const {
       pocketName,
@@ -99,60 +95,18 @@ export const usePocketStore = create((set, get) => ({
     }
 
     try {
-      console.log(
-        "[STORE] createPocket: Attempting API call with body:",
-        JSON.stringify(requestBody, null, 2),
-      );
       const response = await api.post("/pocket", requestBody);
-
-      console.log(
-        "[STORE] createPocket: API call successful. Raw response body:",
-        JSON.stringify(response.data, null, 2),
-      );
-
       if (response.data && response.data.ok) {
         set({ isCreating: false });
         get().fetchAllPockets();
-
-        // --- KEY CHANGE: Handle different types of 'data' field ---
-        if (
-          typeof response.data.data === "object" &&
-          response.data.data !== null
-        ) {
-          // Ideal Case: Backend returns the pocket object.
-          console.log(
-            "[STORE] createPocket: Success. Returning pocket object:",
-            response.data.data,
-          );
-          return response.data.data;
-        } else if (typeof response.data.data === "string") {
-          // Partial Success Case: Backend returns a string message.
-          console.warn(
-            "[STORE] createPocket: Partial success. Returning status object.",
-          );
-          return { partialSuccess: true, message: response.data.data };
-        } else {
-          // Unexpected Case
-          console.error(
-            "[STORE] createPocket: 'data' field has unexpected type. Response was:",
-            response.data,
-          );
-          throw new Error(
-            "Pocket created, but response from server was not in the expected format.",
-          );
-        }
+        return response.data.data;
       } else {
-        console.error(
-          "[STORE] createPocket: Condition (response.data.ok) is FALSE or data missing. Response was:",
-          JSON.stringify(response.data, null, 2),
-        );
         throw new Error(
           response.data?.message ||
             "Pocket creation failed, response was not OK.",
         );
       }
     } catch (error) {
-      console.error("[STORE] createPocket: Caught an error.", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -162,9 +116,6 @@ export const usePocketStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Resets all state related to the pocket creation process.
-   */
   resetPocketData: () => {
     set({
       pocketSubject: null,
@@ -181,9 +132,6 @@ export const usePocketStore = create((set, get) => ({
     });
   },
 
-  /**
-   * Fetches the complete list of pockets for the user.
-   */
   fetchAllPockets: async () => {
     set({ isAllPocketsLoading: true, allPocketsError: null });
     try {
@@ -206,9 +154,6 @@ export const usePocketStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Fetches details for a single pocket by its ID.
-   */
   fetchPocketById: async (id) => {
     set({ isLoading: true, error: null });
     try {
@@ -233,9 +178,6 @@ export const usePocketStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Fetches transaction history for the currently selected pocket.
-   */
   fetchTransactionHistory: async (monthString) => {
     const pocketId = get().currentPocket?.id;
     if (!pocketId) return;
@@ -266,11 +208,42 @@ export const usePocketStore = create((set, get) => ({
   },
 
   /**
-   * Optimistically removes a pocket from the local `allPockets` list.
+   * Removes a pocket from the local list (used for optimistic updates).
+   * @param {string | number} pocketId
    */
   removePocketFromList: (pocketId) => {
     set((state) => ({
       allPockets: state.allPockets.filter((p) => p.pocket_id !== pocketId),
     }));
+  },
+
+  /**
+   * --- NEW: Deletes a pocket from the server and removes it from local state. ---
+   * @param {string | number} pocketId - The ID of the pocket to delete.
+   */
+  deletePocket: async (pocketId) => {
+    // We can use the main pocket list's loading and error states for this action.
+    set({ isAllPocketsLoading: true, allPocketsError: null });
+    try {
+      const response = await api.delete(`/pocket/${pocketId}`);
+
+      if (response.data && response.data.ok) {
+        // On successful deletion from the server, remove it from the local list.
+        get().removePocketFromList(pocketId);
+        set({ isAllPocketsLoading: false });
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to delete pocket.");
+      }
+    } catch (error) {
+      console.error("Error deleting pocket:", error);
+      set({
+        allPocketsError:
+          error.message || "An unexpected error occurred while deleting.",
+        isAllPocketsLoading: false,
+      });
+      // Re-throw the error so the component can catch it if needed (e.g., to show a toast).
+      throw error;
+    }
   },
 }));

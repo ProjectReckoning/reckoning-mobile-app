@@ -32,17 +32,16 @@ export default function AllPocket() {
     allPockets,
     isAllPocketsLoading,
     fetchAllPockets,
-    removePocketFromList,
+    // --- KEY CHANGE: Get the new deletePocket action ---
+    deletePocket,
   } = usePocketStore();
 
   // This useEffect handles the navigation after a pocket is created
   useEffect(() => {
     if (newPocketId) {
-      // It means a pocket was just created. We then push the new dashboard
-      // onto the stack. The history is now clean (`Home` -> `All Pockets` -> `Dashboard`).
       router.push(`/(main)/pocket/${newPocketId}`);
     }
-  }, [newPocketId]); // This effect runs only when newPocketId changes
+  }, [newPocketId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -51,7 +50,6 @@ export default function AllPocket() {
   );
 
   const filteredPockets = useMemo(() => {
-    // This logic might need adjustment based on your pocket data structure
     return allPockets.filter((pocket) => activeTab === "personal");
   }, [allPockets, activeTab]);
 
@@ -59,24 +57,43 @@ export default function AllPocket() {
     setSelectedPocket(pocket);
     setShowActionsheet(true);
   };
+
   const handleEdit = () => {
+    if (!selectedPocket) return;
     router.push({
       pathname: "/(main)/pocket/create/Customization",
       params: { pocketId: selectedPocket.pocket_id },
     });
   };
-  const handleDelete = () => {
-    removePocketFromList(selectedPocket.pocket_id);
-    setShowDeleteAlert(false);
-    setSelectedPocket(null);
+
+  // --- KEY CHANGE: handleDelete now calls the API via the store ---
+  const handleDelete = async () => {
+    if (!selectedPocket) return;
+
+    try {
+      // Call the new store action to delete the pocket.
+      // The store will handle the API call and update the local state.
+      await deletePocket(selectedPocket.pocket_id);
+
+      // On success, close the alert and clear the selection.
+      setShowDeleteAlert(false);
+      setSelectedPocket(null);
+    } catch (error) {
+      // Optional: Show an error message to the user if deletion fails.
+      console.error("Failed to delete pocket from component:", error);
+      // You could set an error state here and display it in an alert.
+      setShowDeleteAlert(false);
+    }
   };
+
   const handleCardPress = (pocketId) => {
     router.push(`/(main)/pocket/${pocketId}`);
   };
+
   const GoToCreatePocket = () => router.push("/(main)/pocket/create");
 
   const renderContent = () => {
-    if (isAllPocketsLoading) {
+    if (isAllPocketsLoading && allPockets.length === 0) {
       return (
         <Box className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color={WondrColors["tosca-wondr"]} />
@@ -85,7 +102,6 @@ export default function AllPocket() {
     }
 
     if (filteredPockets.length === 0) {
-      // Reverted to match working version
       return <EmptyPocket createAction={GoToCreatePocket} />;
     }
 
@@ -98,10 +114,8 @@ export default function AllPocket() {
         <Box className="flex-row flex-wrap justify-between px-2">
           {filteredPockets.map((pocket) => (
             <Pressable
-              // FIX: The key should consistently be pocket_id as per the working version
               key={pocket.pocket_id}
               className="w-[47%] mb-8"
-              // FIX: Use the consistent pocket_id for navigation
               onPress={() => handleCardPress(pocket.pocket_id)}
             >
               {({ pressed }) => (
@@ -109,8 +123,6 @@ export default function AllPocket() {
                   pocketName={pocket.name}
                   pocketType={pocket.type}
                   pocketBalance={Number(pocket.current_balance)}
-                  // FIX: Reverted to a working Tailwind class. The PocketCard component
-                  // likely expects a class name, not a hex code.
                   color={"bg-orange-wondr"}
                   icon={pocket.icon_name}
                   space="mt-5 mb-1"
