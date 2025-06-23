@@ -20,7 +20,7 @@ export default function PocketTypeCard({
       <Card
         size="md"
         variant="filled"
-        className={`bg-white border-[1.5px] ${selected ? "border-[#007BE5]" : "border-gray-300"} ${className} overflow-hidden rounded-xl`}
+        className={`bg-white border-[1.5px] ${selected ? "border-green-select" : "border-gray-wondr-border"} ${className} overflow-hidden rounded-xl`}
       >
         <Box className="bg-tosca-wondr w-40 h-9 justify-center pl-5 rounded-br-2xl rounded-tl-xl absolute -left-1 -top-1">
           <Text className="font-semibold text-lg text-black">{subject}</Text>

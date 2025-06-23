@@ -4,11 +4,14 @@ import { Pressable } from "react-native";
 import { Stack, router } from "expo-router";
 import useAuthStore from "@/stores/authStore";
 import { ArrowLeft } from "lucide-react-native";
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function MainLayout() {
   const token = useAuthStore((state) => state.token);
   const type = useTransactionStore((state) => state.type);
+  const { pocketType, goalTitle } = usePocketStore();
 
   useEffect(() => {
     if (!token) {
@@ -77,7 +80,46 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
-      <Stack.Screen name="pocket/create/index" options={{ title: "" }} />
+      <Stack.Screen
+        name="pocket/create/index"
+        options={{
+          title: "",
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectGoal"
+        options={{
+          title: pocketType,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/Details"
+        options={{
+          title: goalTitle,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectFriend"
+        options={{ title: "Pilih Teman" }}
+      />
+      <Stack.Screen
+        name="pocket/create/Customization"
+        options={{
+          title: "Pocket kamu",
+          headerStyle: {
+            backgroundColor: "#F9F9F9",
+          },
+        }}
+      />
       <Stack.Screen
         name="pocket/create/NewUser"
         options={{

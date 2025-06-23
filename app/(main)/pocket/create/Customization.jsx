@@ -6,7 +6,7 @@ import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-import AppBar from "../../../../components/common/AppBar";
+
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
@@ -142,7 +142,6 @@ export default function Customization() {
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
-        <AppBar title="Pocket kamu" className="mb-6" />
         <PocketCard
           mode="type"
           pocketName={pocketName}
