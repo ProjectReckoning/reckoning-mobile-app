@@ -31,15 +31,25 @@ export default function MainLayout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerBackVisible: true,
+        // 1. Hide the default back button globally
+        headerBackVisible: false,
         headerBackTitleVisible: false,
         headerLeftContainerStyle: { paddingLeft: 24 },
-        headerBackImageSource: () => <ArrowLeft size={24} color="black" />,
         contentStyle: { backgroundColor: "white" },
         animation: "slide_from_right",
+        // 2. Provide a custom back button that performs a normal "back" action
+        headerLeft: () => (
+          <Pressable onPress={() => router.back()}>
+            <ArrowLeft size={24} color="black" />
+          </Pressable>
+        ),
       }}
     >
-      <Stack.Screen name="home/index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="home/index"
+        // The home screen should not have a back button
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="home/notification/index"
         options={{ title: "Notifications" }}
@@ -49,8 +59,7 @@ export default function MainLayout() {
         options={{ title: "Notification Detail" }}
       />
 
-      {/* --- KEY CHANGE: Simplified this screen definition --- */}
-      {/* It no longer needs a custom back button because the stack is now correct. */}
+      {/* This screen now correctly inherits the default back button behavior */}
       <Stack.Screen
         name="pocket/all/index"
         options={{
