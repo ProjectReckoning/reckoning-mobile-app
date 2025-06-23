@@ -5,9 +5,10 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useState, useEffect, useCallback } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
+import { usePocketStore } from "@/stores/pocketStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 import TabunganIcon from "@/assets/images/icon/tabunganIcon.svg";
@@ -49,30 +50,49 @@ const savingAccounts = [
 ];
 
 export default function Withdraw() {
-  // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
-  const pocketId = "0238928039";
-
+  const { id } = useLocalSearchParams();
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const { type, setType, setSource, setDestination } = useTransactionStore();
+
+  const { setType, setSource, setDestination, resetTransactionState } =
+    useTransactionStore();
+  const { currentPocket, fetchPocketById } = usePocketStore();
+
+  // --- NEW: Reset the transaction state every time this screen is focused ---
+  useFocusEffect(
+    useCallback(() => {
+      // 1. Reset the state to prevent data pollution
+      resetTransactionState();
+      // 2. Set the type for this specific flow
+      setType({ id: "withdraw", name: "Withdraw" });
+      // 3. Fetch the required pocket data
+      if (id) {
+        fetchPocketById(id);
+      }
+    }, [id]),
+  );
 
   useEffect(() => {
-    setSource({
-      id: pocketId,
-      name: pocketName,
-      balance: 19546250,
-      category: {
-        pocket: {
-          name: pocketName,
-          type: "SHARED POCKET BNI",
+    if (currentPocket) {
+      setSource({
+        id: currentPocket.account_number,
+        name: currentPocket.name,
+        balance: currentPocket.current_balance,
+        category: {
+          pocket: {
+            name: currentPocket.name,
+            type: "SHARED POCKET BNI",
+          },
         },
-      },
-    });
-  }, []);
+      });
+    }
+  }, [currentPocket]);
 
-  useEffect(() => {
-    setType({ id: "withdraw", name: "Withdraw" });
-  }, [setType]);
+  const handleNext = () => {
+    // Navigate to the nested detail screen for the current pocket
+    if (id) {
+      router.push(`/(main)/pocket/${id}/transaction/Detail`);
+    }
+  };
 
   return (
     <Box className="flex-1 bg-white justify-between px-6 pt-3 pb-5">
@@ -112,9 +132,7 @@ export default function Withdraw() {
       </VStack>
 
       <PrimaryButton
-        buttonAction={() => {
-          router.push("/pocket/transaction/Detail");
-        }}
+        buttonAction={handleNext}
         buttonTitle="Lanjut"
         className={"my-3"}
         disabled={selectedIndex === null}

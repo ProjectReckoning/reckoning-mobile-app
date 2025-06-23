@@ -4,12 +4,13 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Search } from "lucide-react-native";
 import TabBar from "@/components/common/TabBar";
 import { usePocketStore } from "@/stores/pocketStore";
 import FriendList from "@/components/common/FriendList";
-import { WondrColors } from "../../../../../utils/colorUtils";
+import { WondrColors } from "@/utils/colorUtils";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { transferFeatures } from "@/utils/mockData/featureData";
 import FeatureButton from "@/components/common/buttons/FeatureButton";
@@ -20,31 +21,55 @@ const tabList = [
 ];
 
 export default function Transfer() {
-  // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
-  const pocketId = "0238928039";
-
+  const { id } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("tersimpan");
-  const { selectedFriends, setSelectedFriends } = usePocketStore();
-  const { setType, setSource, setDestination } = useTransactionStore();
+
+  const {
+    selectedFriends,
+    setSelectedFriends,
+    currentPocket,
+    fetchPocketById,
+  } = usePocketStore();
+  const { setType, setSource, setDestination, resetTransactionState } =
+    useTransactionStore();
+
+  // --- NEW: Reset the transaction state every time this screen is focused ---
+  useFocusEffect(
+    useCallback(() => {
+      // 1. Reset the state to prevent data pollution
+      resetTransactionState();
+      // 2. Set the type for this specific flow
+      setType({ id: "transfer", name: "Transfer" });
+      // 3. Fetch the required pocket data
+      if (id) {
+        fetchPocketById(id);
+      }
+    }, [id]),
+  );
 
   useEffect(() => {
-    setSource({
-      id: pocketId,
-      name: pocketName,
-      balance: 19546250,
-      category: {
-        pocket: {
-          name: pocketName,
-          type: "SHARED POCKET BNI",
+    if (currentPocket) {
+      setSource({
+        id: currentPocket.account_number,
+        name: currentPocket.name,
+        balance: currentPocket.current_balance,
+        category: {
+          pocket: {
+            name: currentPocket.name,
+            type: "SHARED POCKET BNI",
+          },
         },
-      },
-    });
-  }, []);
+      });
+    }
+  }, [currentPocket]);
 
-  useEffect(() => {
-    setType({ id: "transfer", name: "Transfer" });
-  }, [setType]);
+  if (!currentPocket) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex-1 bg-white">

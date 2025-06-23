@@ -46,6 +46,7 @@ export default function MainLayout() {
         ),
       }}
     >
+      {/* ===== Non-Transaction Screens ===== */}
       <Stack.Screen
         name="home/index"
         // The home screen should not have a back button
@@ -82,32 +83,42 @@ export default function MainLayout() {
         name="pocket/create/index"
         options={{ headerShown: false }}
       />
+
+      {/* ===== Transaction Screens (Updated Paths) ===== */}
+      {/* These screens are now correctly nested under the dynamic pocket ID route */}
       <Stack.Screen
-        name="pocket/transaction/topup/index"
+        name="pocket/[id]/transaction/topup/index"
         options={{ title: "Top Up" }}
       />
       <Stack.Screen
-        name="pocket/transaction/transfer/index"
+        name="pocket/[id]/transaction/transfer/index"
         options={{
           title: "Transfer",
           headerStyle: { backgroundColor: "transparent" },
         }}
       />
       <Stack.Screen
-        name="pocket/transaction/withdraw/index"
+        name="pocket/[id]/transaction/withdraw/index"
         options={{ title: "Withdraw" }}
       />
       <Stack.Screen
-        name="pocket/transaction/Detail"
+        name="pocket/[id]/transaction/Detail"
         options={{ title: `Detail ${type.name}` }}
       />
       <Stack.Screen
-        name="pocket/transaction/Confirmation"
+        name="pocket/[id]/transaction/Confirmation"
         options={{ title: `Konfirmasi ${type.name}` }}
       />
-      <Stack.Screen name="pocket/transaction/PinCode" options={{ title: "" }} />
       <Stack.Screen
-        name="pocket/transaction/Statement"
+        name="pocket/[id]/transaction/PinCode"
+        options={{ title: "" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/Statement"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/scheduleTransfer/index"
         options={{ headerShown: false }}
       />
     </Stack>

@@ -3,8 +3,9 @@ import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Input, InputField } from "@/components/ui/input";
 
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
@@ -14,14 +15,29 @@ import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 
 export default function TransactionDetail() {
-  const { type, source, destination, amount, setAmount } =
-    useTransactionStore();
+  const { id } = useLocalSearchParams();
+  const {
+    source,
+    destination,
+    amount,
+    setAmount,
+    // --- NEW: Get description state from store ---
+    description,
+    setDescription,
+  } = useTransactionStore();
+
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
   }, [amount, amountTouched]);
+
+  const handleNext = () => {
+    if (id) {
+      router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+    }
+  };
 
   return (
     <Box className="flex-1 bg-white px-6 pb-5">
@@ -64,6 +80,20 @@ export default function TransactionDetail() {
               setAmountTouched={setAmountTouched}
             />
 
+            {/* --- NEW: Description Input Field --- */}
+            <VStack space="xs">
+              <Text className="font-semibold text-sm text-typography-700">
+                Deskripsi (Opsional)
+              </Text>
+              <Input>
+                <InputField
+                  placeholder="Contoh: Pembayaran ke vendor"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+              </Input>
+            </VStack>
+
             <TransactionCard
               title="Sumber dana"
               heading={
@@ -76,12 +106,10 @@ export default function TransactionDetail() {
           </VStack>
 
           <PrimaryButton
-            buttonAction={() => {
-              router.push("/pocket/transaction/Confirmation");
-            }}
+            buttonAction={handleNext}
             buttonTitle="Lanjut"
             className={"my-5"}
-            disabled={amount === null}
+            disabled={amount === null || amount === 0}
           />
         </ScrollView>
       </KeyboardAvoidingView>

@@ -13,7 +13,8 @@ import {
   CheckboxGroup,
 } from "@/components/ui/checkbox";
 
-import { router } from "expo-router";
+// --- NEW: Import useLocalSearchParams to get the pocket ID from the URL ---
+import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { Check } from "lucide-react-native";
@@ -37,6 +38,8 @@ export default function FriendList({
   setSelectedFriends,
   setDestination,
 }) {
+  // --- NEW: Get the dynamic 'id' from the current route ---
+  const { id } = useLocalSearchParams();
   const [values, setValues] = useState(selectedFriends || []);
 
   // Group and sort friends
@@ -44,7 +47,10 @@ export default function FriendList({
   const initials = Object.keys(groupedFriends).sort();
 
   useEffect(() => {
-    setSelectedFriends(values);
+    // This check prevents an unnecessary update on initial render
+    if (setSelectedFriends) {
+      setSelectedFriends(values);
+    }
   }, [values, setSelectedFriends]);
 
   useEffect(() => {
@@ -107,7 +113,9 @@ export default function FriendList({
                   <Pressable
                     key={friend.id}
                     onPress={() => {
-                      setSelectedFriends([friend.name]);
+                      if (setSelectedFriends) {
+                        setSelectedFriends([friend.name]);
+                      }
                       if (setDestination) {
                         setDestination({
                           id: friend.id,
@@ -120,7 +128,14 @@ export default function FriendList({
                           },
                         });
                       }
-                      router.push("/(main)/pocket/transaction/Detail");
+                      // --- KEY CHANGE: Use the dynamic ID for navigation ---
+                      if (id) {
+                        router.push(`/(main)/pocket/${id}/transaction/Detail`);
+                      } else {
+                        console.error(
+                          "FriendList: Pocket ID is missing, cannot navigate.",
+                        );
+                      }
                     }}
                     className="flex-row items-center px-0 py-3 bg-white active:active:bg-gray-50"
                   >
