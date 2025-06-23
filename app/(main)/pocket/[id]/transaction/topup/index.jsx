@@ -4,9 +4,10 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
-import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useState, useEffect, useCallback } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
+import { usePocketStore } from "@/stores/pocketStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import { maskId } from "@/utils/helperFunction";
@@ -17,52 +18,83 @@ import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 
 export default function Topup() {
-  // Static data for mockup
-  const pocketName = "Pergi ke Korea 2026";
-  const pocketColor = "bg-orange-wondr";
-  const pocketIcon = "Airplane";
-  const pocketId = "0238928039";
-
+  const { id } = useLocalSearchParams();
   const {
-    type,
     amount,
     source,
     destination,
     setSource,
     setAmount,
     setDestination,
+    // --- NEW: Get the reset action ---
+    resetTransactionState,
+    setType,
   } = useTransactionStore();
+  const { currentPocket, fetchPocketById } = usePocketStore();
+
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
 
-  useEffect(() => {
-    setDestination({
-      id: pocketId,
-      name: pocketName,
-      category: {
-        pocket: {
-          name: pocketName,
-          type: "SHARED POCKET BNI",
-        },
-      },
-    });
+  // --- NEW: Reset the transaction state every time this screen is focused ---
+  useFocusEffect(
+    useCallback(() => {
+      // 1. Reset the entire transaction state to its default values
+      resetTransactionState();
+      // 2. Set the type for this specific flow
+      setType({ id: "topup", name: "Top-Up" });
+      // 3. Fetch the required pocket data
+      if (id) {
+        fetchPocketById(id);
+      }
+    }, [id]), // This effect re-runs if the pocket ID changes
+  );
 
-    setSource({
-      id: 1916837397,
-      name: "AMIRA FERIAL",
-      balance: 19546250,
-      category: {
-        bank: {
-          name: "BNI",
-          type: "TAPLUS PEGAWAI BNI",
+  useEffect(() => {
+    // This effect runs after the pocket data has been fetched
+    if (currentPocket) {
+      setDestination({
+        id: currentPocket.account_number,
+        name: currentPocket.name,
+        category: {
+          pocket: {
+            name: currentPocket.name,
+            type: "SHARED POCKET BNI",
+          },
         },
-      },
-    });
-  }, []);
+      });
+      // Set a default source for the Top Up flow
+      setSource({
+        id: 1916837397,
+        name: "AMIRA FERIAL",
+        balance: 19546250,
+        category: {
+          bank: {
+            name: "BNI",
+            type: "TAPLUS PEGAWAI BNI",
+          },
+        },
+      });
+    }
+  }, [currentPocket]);
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
   }, [amount, amountTouched]);
+
+  if (!currentPocket || !source.id) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </Box>
+    );
+  }
+
+  const handleNext = () => {
+    // Navigate to the nested confirmation screen for the current pocket
+    if (id) {
+      router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+    }
+  };
 
   return (
     <Box className="flex-1 bg-white justify-between px-6 pb-5">
@@ -76,7 +108,6 @@ export default function Topup() {
           contentContainerStyle={{ flexGrow: 1 }}
         >
           <VStack space="xs">
-            {/* Pocket preview */}
             <HStack
               space="xl"
               className="w-full justify-start items-center mt-3 mb-5"
@@ -84,15 +115,13 @@ export default function Topup() {
               <PocketCard
                 mode="icon"
                 pocketName={destination.name}
-                color={pocketColor}
-                icon={pocketIcon}
+                color={currentPocket.color_hex}
+                icon={currentPocket.icon_name}
                 iconSize="8"
                 whiteSpace="mb-5"
               />
               <VStack space="xs" className="gap-0">
-                <Heading size={"lg"}>
-                  {destination.name ? destination.name : "Nama Pocket"}
-                </Heading>
+                <Heading size={"lg"}>{destination.name}</Heading>
                 <Text size={"md"}>{maskId(destination.id, 3)}</Text>
               </VStack>
             </HStack>
@@ -108,7 +137,7 @@ export default function Topup() {
 
             <TransactionCard
               title="Sumber dana"
-              heading={source.category.bank.type || source.category.pocket.type}
+              heading={source.category.bank.type}
               subheading={source.id}
               showBalance={true}
               balance={source.balance}
@@ -118,12 +147,10 @@ export default function Topup() {
       </KeyboardAvoidingView>
 
       <PrimaryButton
-        buttonAction={() => {
-          router.push("/pocket/transaction/Confirmation");
-        }}
+        buttonAction={handleNext}
         buttonTitle="Lanjut"
         className={"my-3"}
-        disabled={amount === null}
+        disabled={amount === null || amount === 0}
       />
     </Box>
   );

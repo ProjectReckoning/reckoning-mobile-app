@@ -1,3 +1,4 @@
+// app/(main)/pocket/[id]/transaction/Statement.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -11,31 +12,54 @@ import { useTransactionStore } from "@/stores/transactionStore";
 import { transactionFeatures } from "@/utils/mockData/featureData";
 import FeatureButton from "@/components/common/buttons/FeatureButton";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { formatRupiah, maskId } from "../../../../utils/helperFunction";
+import { formatRupiah, maskId } from "@/utils/helperFunction";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 import StatementDecorator from "@/assets/images/decorators/statementlDecorator.png";
 
 export default function Statement() {
-  // Static data for mockup
-  const now = new Date();
-  const dateTime = now
-    .toLocaleDateString("en-GB", {
+  // --- NEW: Get state and actions from the store ---
+  const {
+    type,
+    source,
+    destination,
+    transactionResult, // The result from the API call
+    setAmount, // To reset the amount on finish
+  } = useTransactionStore();
+
+  const handleFinish = () => {
+    // Reset the amount and go back to the home screen.
+    setAmount(null);
+    router.replace("(main)/home");
+  };
+
+  // --- NEW: Display a loading or error state if the transaction is not complete ---
+  if (!transactionResult) {
+    return (
+      <Box className="flex-1 justify-center items-center p-8">
+        <Heading>Error</Heading>
+        <Text className="text-center mt-2">
+          Transaction details not found. Please try again.
+        </Text>
+        <PrimaryButton
+          buttonTitle="Kembali ke beranda"
+          buttonAction={handleFinish}
+          className="my-5 w-full"
+        />
+      </Box>
+    );
+  }
+
+  // Format the date from the API response
+  const createdAt = new Date(transactionResult.createdAt).toLocaleDateString(
+    "en-GB",
+    {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    })
-    .replace(/ /g, " ");
-  const time = now.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-  const createdAt = `${dateTime} . ${time} WIB`;
-  const refId = "20250625840802948";
-
-  const { type, amount, source, destination, setAmount } =
-    useTransactionStore();
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
 
   return (
     <Box className="w-full flex-1 flex-col bg-white justify-between items-center px-6 py-5 mt-10 mb-3">
@@ -54,18 +78,19 @@ export default function Statement() {
             className="w-fit h-40"
             resizeMode="contain"
           />
-
-          {/* Content */}
           <VStack space="lg" className="items-center mt-3">
             <Heading size="md" className="text-black font-semibold">
               {type.name} Berhasil
             </Heading>
+            {/* Use amount from the transaction result */}
             <Heading size="4xl" className="font-black text-black">
-              {formatRupiah(amount)}
+              {formatRupiah(transactionResult.amount)}
             </Heading>
             <VStack space="xs" className="items-center">
+              {/* Use date from the transaction result */}
               <Text>{createdAt}</Text>
-              <Text>{`RefID: ${refId}`}</Text>
+              {/* Use ID from the transaction result */}
+              <Text>{`RefID: ${transactionResult.id}`}</Text>
             </VStack>
           </VStack>
         </VStack>
@@ -96,10 +121,7 @@ export default function Statement() {
 
       <PrimaryButton
         buttonTitle="Kembali ke beranda"
-        buttonAction={() => {
-          setAmount(null);
-          router.replace("(main)/home");
-        }}
+        buttonAction={handleFinish}
         className="my-3"
       />
     </Box>
