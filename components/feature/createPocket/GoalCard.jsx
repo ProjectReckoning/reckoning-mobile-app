@@ -23,7 +23,7 @@ export default function GoalCard({
       <Card
         size="md"
         variant="filled"
-        className={`w-full h-fit min-h-48 justify-end bg-white border-[1.5px] ${selected ? "border-[#007BE5]" : "border-gray-300"} overflow-hidden rounded-xl ${isCustom ? "border-dashed" : ""} ${className}`}
+        className={`w-full h-fit min-h-48 justify-end bg-white border-[1.5px] ${selected ? "border-green-select" : "border-gray-wondr-border"} overflow-hidden rounded-xl ${isCustom ? "border-dashed" : ""} ${className}`}
       >
         {isCustom ? (
           <Box className="flex-1 items-center justify-center">

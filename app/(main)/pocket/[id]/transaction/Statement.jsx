@@ -8,6 +8,7 @@ import { Heading } from "@/components/ui/heading";
 
 import { router } from "expo-router";
 import { ScrollView } from "react-native";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { transactionFeatures } from "@/utils/mockData/featureData";
 import FeatureButton from "@/components/common/buttons/FeatureButton";
@@ -23,12 +24,14 @@ export default function Statement() {
     source,
     destination,
     transactionResult, // The result from the API call
-    setAmount, // To reset the amount on finish
+    resetTransactionData,
   } = useTransactionStore();
+  const { resetTransactionState } = usePocketStore();
 
   const handleFinish = () => {
     // Reset the amount and go back to the home screen.
-    setAmount(null);
+    resetTransactionData();
+    resetTransactionState();
     router.replace("(main)/home");
   };
 
