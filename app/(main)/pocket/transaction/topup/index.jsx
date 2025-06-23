@@ -10,7 +10,6 @@ import { useTransactionStore } from "@/stores/transactionStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import { maskId } from "@/utils/helperFunction";
-import AppBar from "../../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import SelectNominal from "@/components/common/buttons/SelectNominal";
@@ -66,8 +65,7 @@ export default function Topup() {
   }, [amount, amountTouched]);
 
   return (
-    <Box className="flex-1 bg-white justify-between px-8 py-5">
-      <AppBar transaction={type.id} />
+    <Box className="flex-1 bg-white justify-between px-6 pb-5">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={50}
@@ -81,7 +79,7 @@ export default function Topup() {
             {/* Pocket preview */}
             <HStack
               space="xl"
-              className="w-full justify-start items-center mt-8 mb-5"
+              className="w-full justify-start items-center mt-3 mb-5"
             >
               <PocketCard
                 mode="icon"

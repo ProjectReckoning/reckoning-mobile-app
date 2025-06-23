@@ -25,9 +25,7 @@ export default function TransactionDetail() {
   }, [amount, amountTouched]);
 
   return (
-    <Box className="flex-1 bg-white px-8 py-5">
-      <AppBar transaction={type.id} prefix="Detail" />
-
+    <Box className="flex-1 bg-white px-6 pb-5">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={50}
@@ -37,7 +35,7 @@ export default function TransactionDetail() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
         >
-          <VStack space="2xl" className="flex-1 mt-8">
+          <VStack space="2xl" className="flex-1 mt-5">
             <HStack space="sm" className="justify-center items-center">
               <Avatar
                 size={"md"}
@@ -52,7 +50,7 @@ export default function TransactionDetail() {
                   Sdr {destination?.name || ""}
                 </Text>
                 <Text size="sm" className="text-[#848688]">
-                  {destination?.category?.bank?.type ||
+                  {destination?.category?.bank?.name ||
                     destination?.category?.pocket?.type ||
                     ""}{" "}
                   - {destination?.id || ""}
@@ -83,7 +81,7 @@ export default function TransactionDetail() {
               router.push("/pocket/transaction/Confirmation");
             }}
             buttonTitle="Lanjut"
-            className={"my-3"}
+            className={"my-5"}
             disabled={amount === null}
           />
         </ScrollView>

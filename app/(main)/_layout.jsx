@@ -1,11 +1,13 @@
 // app/(main)/_layout.jsx
-import { Stack, router } from "expo-router";
 import { useEffect } from "react";
+import { Stack, router } from "expo-router";
 import useAuthStore from "@/stores/authStore";
 import { ArrowLeft } from "lucide-react-native";
+import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function MainLayout() {
   const token = useAuthStore((state) => state.token);
+  const type = useTransactionStore((state) => state.type);
 
   useEffect(() => {
     if (!token) {
@@ -67,6 +69,34 @@ export default function MainLayout() {
       />
       <Stack.Screen
         name="pocket/create/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/topup/index"
+        options={{ title: "Top Up" }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/transfer/index"
+        options={{
+          title: "Transfer",
+          headerStyle: { backgroundColor: "transparent" },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/withdraw/index"
+        options={{ title: "Withdraw" }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/Detail"
+        options={{ title: `Detail ${type.name}` }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/Confirmation"
+        options={{ title: `Konfirmasi ${type.name}` }}
+      />
+      <Stack.Screen name="pocket/transaction/PinCode" options={{ title: "" }} />
+      <Stack.Screen
+        name="pocket/transaction/Statement"
         options={{ headerShown: false }}
       />
     </Stack>

@@ -9,7 +9,6 @@ import { Search } from "lucide-react-native";
 import TabBar from "@/components/common/TabBar";
 import { usePocketStore } from "@/stores/pocketStore";
 import FriendList from "@/components/common/FriendList";
-import AppBar from "../../../../../components/common/AppBar";
 import { WondrColors } from "../../../../../utils/colorUtils";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { transferFeatures } from "@/utils/mockData/featureData";
@@ -27,7 +26,7 @@ export default function Transfer() {
 
   const [activeTab, setActiveTab] = useState("tersimpan");
   const { selectedFriends, setSelectedFriends } = usePocketStore();
-  const { type, setType, setSource, setDestination } = useTransactionStore();
+  const { setType, setSource, setDestination } = useTransactionStore();
 
   useEffect(() => {
     setSource({
@@ -49,14 +48,12 @@ export default function Transfer() {
 
   return (
     <Box className="flex-1 bg-white">
-      <Box className="w-full h-72 bg-light-gray-wondr absolute top-0 left-0"></Box>
-      <Box className="flex-1 px-6 pt-5">
-        <AppBar transaction={type.id} />
-
+      <Box className="w-full h-56 bg-light-gray-wondr absolute top-0 left-0"></Box>
+      <Box className="flex-1 px-6">
         <Box className="items-center z-10">
           <HStack
             space="lg"
-            className="items-start justify-center my-7 px-2 py-5 bg-white border border-gray-wondr-border rounded-2xl"
+            className="items-start justify-center mt-4 mb-7 px-2 py-5 bg-white border border-gray-wondr-border rounded-2xl"
           >
             {transferFeatures.map((feature, i) => (
               <Box key={i} className="w-1/4 items-center">
@@ -64,7 +61,7 @@ export default function Transfer() {
               </Box>
             ))}
           </HStack>
-          <Box className="w-80 h-32 bg-gray-wondr-border rounded-2xl absolute bottom-5 -z-10"></Box>
+          <Box className="w-3/4 h-32 bg-gray-wondr-border rounded-2xl absolute bottom-5 -z-10"></Box>
         </Box>
 
         <Pressable>

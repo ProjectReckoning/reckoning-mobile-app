@@ -23,15 +23,10 @@ export default function Confirmation() {
   const { type, source, amount, destination } = useTransactionStore();
 
   return (
-    <Box className="flex-1 bg-white justify-between px-8 py-5">
-      <VStack space="xs">
-        <AppBar transaction={type.id} prefix="Konfirmasi" />
-
+    <Box className="flex-1 bg-white justify-between px-6 py-5">
+      <VStack space="xs" className="justify-start">
         {destination.category.pocket && destination.category.pocket.type ? (
-          <HStack
-            space="xl"
-            className="w-full justify-start items-center mt-8 mb-5"
-          >
+          <HStack space="xl" className="w-full justify-start items-center mb-5">
             <PocketCard
               mode="icon"
               pocketName={destination.name}
@@ -48,7 +43,7 @@ export default function Confirmation() {
             </VStack>
           </HStack>
         ) : (
-          <Box className="mt-8 mb-3">
+          <Box className="mb-3">
             <TransactionCard
               title="Penerima"
               heading={destination.name}
