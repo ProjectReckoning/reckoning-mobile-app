@@ -174,6 +174,14 @@ export default function MainLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="pocket/[id]/transaction/Receipt"
+        options={{
+          title: "",
+          headerStyle: { backgroundColor: "transparent" },
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
         name="pocket/[id]/scheduleTransfer/index"
         options={{ headerShown: false }}
       />

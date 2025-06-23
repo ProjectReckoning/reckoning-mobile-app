@@ -16,6 +16,7 @@ import {
   FileText,
   Share2,
   UsersRound,
+  Download,
 } from "lucide-react-native";
 
 export const features = [
@@ -95,6 +96,22 @@ export const transactionFeatures = [
   {
     icon: <FileText />,
     label: "Bukti Transaksi",
+    bg: "bg-orange-wondr",
+    bgPressed: "bg-orange-wondr-dark",
+    onPress: () => router.push("pocket/[id]/transaction/Receipt"),
+  },
+  {
+    icon: <Share2 />,
+    label: "Bagikan",
+    bg: "bg-orange-wondr",
+    bgPressed: "bg-orange-wondr-dark",
+  },
+];
+
+export const receiptFeatures = [
+  {
+    icon: <Download />,
+    label: "Download",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
   },
