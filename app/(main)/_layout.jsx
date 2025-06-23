@@ -77,10 +77,24 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
-      {/* Hide the default header for the create flow wrapper */}
+      <Stack.Screen name="pocket/create/index" options={{ title: "" }} />
       <Stack.Screen
-        name="pocket/create/index"
-        options={{ headerShown: false }}
+        name="pocket/create/NewUser"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Transfer ke penerima baru"
+              : "Tambah teman baru",
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/NewUserConfirmation"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Konfirmasi penerima baru"
+              : "Konfirmasi teman baru",
+        }}
       />
       <Stack.Screen
         name="pocket/transaction/topup/index"
