@@ -42,8 +42,6 @@ export default function PinCode() {
   return (
     <Box className="flex-1 flex-col bg-white justify-between px-6 py-5">
       <VStack space="2xl">
-        <AppBar />
-
         <VStack space="2xl" className="mt-3">
           {/* Heading */}
           <VStack space="xs" className="items-center justify-center">

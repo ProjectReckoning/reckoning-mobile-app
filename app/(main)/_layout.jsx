@@ -1,12 +1,14 @@
 // app/(main)/_layout.jsx
-import { Stack, router } from "expo-router";
 import { useEffect } from "react";
+import { Pressable } from "react-native";
+import { Stack, router } from "expo-router";
 import useAuthStore from "@/stores/authStore";
 import { ArrowLeft } from "lucide-react-native";
-import { Pressable } from "react-native";
+import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function MainLayout() {
   const token = useAuthStore((state) => state.token);
+  const type = useTransactionStore((state) => state.type);
 
   useEffect(() => {
     if (!token) {
@@ -57,20 +59,16 @@ export default function MainLayout() {
         name="home/notification/[id]/index"
         options={{ title: "Notification Detail" }}
       />
-
-      {/* This screen now correctly inherits the default back button behavior */}
       <Stack.Screen
         name="pocket/all/index"
         options={{
           title: "My Pockets",
         }}
       />
-
       <Stack.Screen
         name="pocket/[id]/index"
         options={{ title: "Pocket Details" }}
       />
-
       <Stack.Screen
         name="pocket/onboarding/index"
         options={{ title: "Get Started" }}
@@ -79,10 +77,37 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
-
       {/* Hide the default header for the create flow wrapper */}
       <Stack.Screen
         name="pocket/create/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/topup/index"
+        options={{ title: "Top Up" }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/transfer/index"
+        options={{
+          title: "Transfer",
+          headerStyle: { backgroundColor: "transparent" },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/withdraw/index"
+        options={{ title: "Withdraw" }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/Detail"
+        options={{ title: `Detail ${type.name}` }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/Confirmation"
+        options={{ title: `Konfirmasi ${type.name}` }}
+      />
+      <Stack.Screen name="pocket/transaction/PinCode" options={{ title: "" }} />
+      <Stack.Screen
+        name="pocket/transaction/Statement"
         options={{ headerShown: false }}
       />
     </Stack>

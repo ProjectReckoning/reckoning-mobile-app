@@ -7,7 +7,6 @@ import { Pressable } from "@/components/ui/pressable";
 
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import AppBar from "../../../../../components/common/AppBar";
 import { useTransactionStore } from "@/stores/transactionStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
@@ -76,10 +75,8 @@ export default function Withdraw() {
   }, [setType]);
 
   return (
-    <Box className="flex-1 bg-white justify-between px-8 py-5">
+    <Box className="flex-1 bg-white justify-between px-6 pt-3 pb-5">
       <VStack space="xl">
-        <AppBar transaction={type.id} />
-
         <HStack space="lg" className="my-2">
           <TabunganIcon width={24} height={24} />
           <Heading size="md">Tabungan</Heading>
