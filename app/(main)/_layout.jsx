@@ -21,7 +21,6 @@ export default function MainLayout() {
 
   return (
     <Stack
-      // --- FINAL HEADER CONFIGURATION ---
       screenOptions={{
         headerShown: true,
         headerStyle: {
@@ -32,14 +31,10 @@ export default function MainLayout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        // Let Expo Router handle the back button logic, we just change the icon
-        headerBackVisible: true, // Make sure the back button is fundamentally visible
-        headerBackTitleVisible: false, // Hide the text like "Back"
-        headerLeftContainerStyle: { paddingLeft: 24 }, // Add padding to match your design
-        headerBackImageSource: () => (
-          // This is a robust way to set a custom back icon
-          <ArrowLeft size={24} color="black" />
-        ),
+        headerBackVisible: true,
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: { paddingLeft: 24 },
+        headerBackImageSource: () => <ArrowLeft size={24} color="black" />,
         contentStyle: { backgroundColor: "white" },
         animation: "slide_from_right",
       }}
@@ -54,11 +49,20 @@ export default function MainLayout() {
         options={{ title: "Notification Detail" }}
       />
 
-      <Stack.Screen name="pocket/all/index" options={{ title: "My Pockets" }} />
+      {/* --- KEY CHANGE: Simplified this screen definition --- */}
+      {/* It no longer needs a custom back button because the stack is now correct. */}
+      <Stack.Screen
+        name="pocket/all/index"
+        options={{
+          title: "My Pockets",
+        }}
+      />
+
       <Stack.Screen
         name="pocket/[id]/index"
         options={{ title: "Pocket Details" }}
       />
+
       <Stack.Screen
         name="pocket/onboarding/index"
         options={{ title: "Get Started" }}
@@ -67,6 +71,8 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
+
+      {/* Hide the default header for the create flow wrapper */}
       <Stack.Screen
         name="pocket/create/index"
         options={{ headerShown: false }}
