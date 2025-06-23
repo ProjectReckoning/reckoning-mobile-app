@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/avatar";
 
 import { router } from "expo-router";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
-import { usePocketStore } from "../../../../stores/pocketStore";
-import { savingGoals } from "../../../../utils/createPocket/goalData";
+import { savingGoals } from "@/utils/createPocket/goalData";
 import { UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
-import AppBar from "../../../../components/common/AppBar";
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-import FormPocketDetail from "../../../../components/feature/createPocket/FormPocketDetail";
+import { WondrColors } from "@/utils/colorUtils";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import FormPocketDetail from "@/components/feature/createPocket/FormPocketDetail";
 
 export default function Details() {
   const {
@@ -122,7 +122,9 @@ export default function Details() {
 
   return (
     <Box className="flex-1 bg-white">
-      <Box className={`w-full h-56 ${selectedGoal.color}`}>
+      <Box
+        className={`w-full h-44 bg-[${WondrColors["tosca-wondr-light-translucent"]}]`}
+      >
         <Box
           className={`w-44 absolute right-[0.1rem] -bottom-[0.1rem] ${selectedGoal.decoratorClassName}`}
         >
@@ -133,15 +135,12 @@ export default function Details() {
             resizeMode="contain"
           />
         </Box>
-        <Box className="flex-1 flex-col px-6 pt-5 justify-between">
-          <VStack space="4xl" reversed={false}>
-            <AppBar title={selectedGoal.title} />
-            <VStack space="xs" reversed={false}>
-              <Heading size="xl" className="text-bold w-56">
-                {selectedGoal.title2}
-              </Heading>
-              <Text className="w-56 text-lg">{selectedGoal.subtitle2}</Text>
-            </VStack>
+        <Box className="flex-1 flex-col px-6 pt-8 justify-between">
+          <VStack space="xs" reversed={false}>
+            <Heading size="xl" className="text-bold w-56">
+              {selectedGoal.title2}
+            </Heading>
+            <Text className="w-56 text-lg">{selectedGoal.subtitle2}</Text>
           </VStack>
         </Box>
       </Box>

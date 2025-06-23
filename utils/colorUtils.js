@@ -13,7 +13,7 @@ export const WondrColors = {
   "tosca-wondr": "#3FD8D4",
   "tosca-wondr-dark": "#2EACAA",
   "tosca-wondr-translucent": "#3FD8D4CC", // 80% opacity
-  "tosca-wondr-light-translucent": "#D9F7F6", // 30% opacity
+  "tosca-wondr-light-translucent": "#C3F0EC", // 30% opacity
 
   "lime-wondr": "#D9F634",
   "lime-wondr-dark": "#B5D040",

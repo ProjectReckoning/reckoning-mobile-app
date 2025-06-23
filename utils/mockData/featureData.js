@@ -115,6 +115,7 @@ export const transferFeatures = [
     border: true,
     className: "border-light-gray-wondr",
     textClassName: "text-xs",
+    onPress: () => router.push("/pocket/create/NewUser"),
   },
   {
     icon: <VAIcon width={28} height={28} fill={"#fff"} />,

@@ -4,11 +4,14 @@ import { Pressable } from "react-native";
 import { Stack, router } from "expo-router";
 import useAuthStore from "@/stores/authStore";
 import { ArrowLeft } from "lucide-react-native";
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function MainLayout() {
   const token = useAuthStore((state) => state.token);
   const type = useTransactionStore((state) => state.type);
+  const { pocketType, goalTitle } = usePocketStore();
 
   useEffect(() => {
     if (!token) {
@@ -78,10 +81,63 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
-      {/* Hide the default header for the create flow wrapper */}
       <Stack.Screen
         name="pocket/create/index"
-        options={{ headerShown: false }}
+        options={{
+          title: "",
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectGoal"
+        options={{
+          title: pocketType,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/Details"
+        options={{
+          title: goalTitle,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectFriend"
+        options={{ title: "Pilih Teman" }}
+      />
+      <Stack.Screen
+        name="pocket/create/Customization"
+        options={{
+          title: "Pocket kamu",
+          headerStyle: {
+            backgroundColor: "#F9F9F9",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/NewUser"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Transfer ke penerima baru"
+              : "Tambah teman baru",
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/NewUserConfirmation"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Konfirmasi penerima baru"
+              : "Konfirmasi teman baru",
+        }}
       />
 
       {/* ===== Transaction Screens (Updated Paths) ===== */}

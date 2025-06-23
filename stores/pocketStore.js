@@ -40,6 +40,9 @@ export const usePocketStore = create((set, get) => ({
   isCreating: false,
   createError: null,
 
+  newFriend: null,
+  setNewFriend: (friend) => set({ newFriend: friend }),
+
   // --- State for Single Pocket Display ---
   currentPocket: null,
   isLoading: false,
@@ -140,6 +143,7 @@ export const usePocketStore = create((set, get) => ({
       pocketIcon: "Pocket",
       isCreating: false,
       createError: null,
+      newFriend: null,
     });
   },
 
