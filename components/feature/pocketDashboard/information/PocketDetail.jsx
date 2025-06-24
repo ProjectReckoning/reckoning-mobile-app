@@ -8,7 +8,8 @@ import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
 import TravelIconWithBar from "@/components/common/icons/TravelIconWithBar";
 import { WondrColors } from "@/utils/colorUtils";
-import { formatToLocalizedDate } from "@/utils/helperFunction"; // Assuming you have this helper
+import { formatToLocalizedDate } from "@/utils/helperFunction";
+import PocketCard from "@/components/common/cards/PocketCard";
 
 export default function PocketDetail() {
   // Get data directly from the Zustand store
@@ -26,9 +27,6 @@ export default function PocketDetail() {
   const maxHStackHeight = figmaTotalComponentHeight * scaleFactor;
 
   // Use a placeholder icon if the one from the API isn't mapped yet
-  const IconComponent = () => (
-    <Box className="w-16 h-16 bg-orange-wondr items-center justify-center rounded-l-2xl" />
-  );
 
   const creationDate = currentPocket.members.find(
     (m) => m.id === currentPocket.owner_user_id,
@@ -51,17 +49,13 @@ export default function PocketDetail() {
           maxHeight: maxHStackHeight,
         }}
       >
-        <TravelIconWithBar
-          IconComponent={IconComponent}
-          iconSize={64}
-          iconColor="white"
-          mainBgColorKey="orange-wondr"
-          outerBgColorKey="orange-wondr-light-translucent"
-          outerContainerStyle={{
-            marginLeft: -1,
-            marginTop: -1,
-            marginBottom: -1,
-          }}
+        <PocketCard
+          mode="icon"
+          color="bg-orange-wondr"
+          icon="Airplane"
+          iconSize="10"
+          whiteSpace="mb-5"
+          cardWidth="w-fit"
         />
         <VStack
           className="ml-4 justify-center flex-1"

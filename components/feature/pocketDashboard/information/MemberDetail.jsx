@@ -3,6 +3,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { CirclePlus } from "lucide-react-native";
 import { WondrColors } from "@/utils/colorUtils";
 import AppText from "@/components/common/typography/AppText";
+import { router } from "expo-router";
 
 export default function MemberDetail() {
   return (
@@ -10,7 +11,12 @@ export default function MemberDetail() {
       <AppText variant="pageTitle" className="mb-2">
         Member Detail
       </AppText>
-      <Pressable>
+      <Pressable
+        onPress={() => {
+          router.push("pocket/create/SelectFriend");
+        }}
+        className="flex flex-row gap-5 items-center mb-6 active:bg-gray-100 rounded-xl"
+      >
         <Box className="flex-row gap-2 items-center">
           <Box className="rounded-xl border-2 border-light-gray-wondr w-16 h-16 justify-center items-center">
             <CirclePlus color={WondrColors["tosca-wondr"]} size={32} />
