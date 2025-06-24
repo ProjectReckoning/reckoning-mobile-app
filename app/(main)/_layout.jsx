@@ -186,6 +186,10 @@ export default function MainLayout() {
         name="pocket/[id]/scheduleTransfer/index"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="pocket/transaction/setTarget/index"
+        options={{ title: "Change Target" }}
+      />
     </Stack>
   );
 }

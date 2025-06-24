@@ -20,7 +20,7 @@ export default function autoBudgeting() {
   };
 
   const handleNext = () => {
-    router.push("pocket/transaction/autoBudgeting/SetAutoBudgeting");
+    router.push("pocket/transaction/autoBudgeting");
   };
 
   return (
