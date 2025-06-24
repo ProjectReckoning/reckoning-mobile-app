@@ -1,10 +1,11 @@
+// stores/transactionStore.js
 import { create } from "zustand";
 import api from "@/lib/api";
 
 const initialState = {
   type: { id: "topup", name: "Top-Up" },
   amount: null,
-  description: "", // <-- NEW: Add description to initial state
+  description: "",
   source: {
     id: null,
     name: "",
@@ -52,7 +53,7 @@ export const useTransactionStore = create((set, get) => ({
     }),
   setSource: (source) => set({ source }),
   setDestination: (destination) => set({ destination }),
-  setDescription: (description) => set({ description }), // <-- NEW: Add setter for description
+  setDescription: (description) => set({ description }),
 
   resetTransactionState: () => {
     set(initialState);
@@ -122,7 +123,6 @@ export const useTransactionStore = create((set, get) => ({
     }
   },
 
-  // --- NEW: Action to execute the Transfer transaction ---
   executeTransfer: async (pocketId) => {
     console.log(
       `[STORE] executeTransfer: Initiated for pocket ID: ${pocketId}`,
@@ -138,8 +138,8 @@ export const useTransactionStore = create((set, get) => ({
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
-      destination: destination.name, // The API requires a string for the destination
-      description: description || `Transfer to ${destination.name}`, // Use description from state or a default
+      destination: destination.name,
+      description: description || `Transfer to ${destination.name}`,
     };
 
     try {
@@ -163,7 +163,6 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error(response.data.message || "Transfer failed.");
       }
     } catch (error) {
-      console.error("[STORE] executeTransfer: Error Caught:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
