@@ -11,8 +11,18 @@ const colorClassToHex = {
   "bg-pink-wondr": "#FF69B4",
 };
 
+// Helper map to convert HEX codes back to Tailwind classes
+const hexToColorClass = {
+  "#FF7A00": "bg-orange-wondr",
+  "#FFC700": "bg-yellow-wondr",
+  "#A8E05F": "bg-lime-wondr",
+  "#58ABA1": "bg-tosca-wondr",
+  "#8A2BE2": "bg-purple-wondr",
+  "#FF69B4": "bg-pink-wondr",
+};
+
 export const usePocketStore = create((set, get) => ({
-  // --- State for Pocket Creation ---
+  // --- State for Pocket Creation & Editing ---
   pocketSubject: null,
   setPocketSubject: (subject) => set({ pocketSubject: subject }),
   pocketType: null,
@@ -39,7 +49,8 @@ export const usePocketStore = create((set, get) => ({
   setPocketIcon: (icon) => set({ pocketIcon: icon }),
   isCreating: false,
   createError: null,
-
+  isUpdating: false,
+  updateError: null,
   newFriend: null,
   setNewFriend: (friend) => set({ newFriend: friend }),
 
@@ -130,6 +141,59 @@ export const usePocketStore = create((set, get) => ({
     }
   },
 
+  updatePocket: async (pocketId) => {
+    console.log(`--- [STORE] updatePocket: Initiated for ID: ${pocketId} ---`);
+    set({ isUpdating: true, updateError: null });
+
+    const { pocketName, pocketType, pocketIcon, pocketColor } = get();
+
+    const requestBody = {
+      name: pocketName,
+      type: pocketType === "Spending" ? "spending" : "saving",
+      icon_name: pocketIcon,
+      color_hex: colorClassToHex[pocketColor] || "#FF7A00",
+    };
+
+    try {
+      console.log(
+        `[STORE] updatePocket(${pocketId}): Request Body:`,
+        JSON.stringify(requestBody, null, 2),
+      );
+      const response = await api.patch(`/pocket/${pocketId}`, requestBody);
+      console.log(
+        `[STORE] updatePocket(${pocketId}): Response Received:`,
+        JSON.stringify(response.data, null, 2),
+      );
+
+      if (response.data && response.data.ok) {
+        set({ isUpdating: false });
+        get().fetchAllPockets();
+        return response.data.data;
+      } else {
+        throw new Error(response.data?.message || "Pocket update failed.");
+      }
+    } catch (error) {
+      console.error(`[STORE] updatePocket(${pocketId}): Error Caught:`, error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      set({ updateError: errorMessage, isUpdating: false });
+      throw error;
+    }
+  },
+
+  setPocketForEditing: (pocket) => {
+    if (!pocket) return;
+    set({
+      pocketName: pocket.name,
+      pocketType: pocket.type,
+      pocketIcon: pocket.icon_name,
+      pocketColor:
+        hexToColorClass[pocket.color_hex.toUpperCase()] || "bg-orange-wondr",
+    });
+  },
+
   resetPocketData: () => {
     set({
       pocketSubject: null,
@@ -143,6 +207,8 @@ export const usePocketStore = create((set, get) => ({
       pocketIcon: "Pocket",
       isCreating: false,
       createError: null,
+      isUpdating: false,
+      updateError: null,
       newFriend: null,
     });
   },

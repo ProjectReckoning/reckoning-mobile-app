@@ -1,3 +1,4 @@
+// components/feature/home/AccountCard.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -11,7 +12,23 @@ import { Animated, View } from "react-native";
 
 import AccountCardItem from "./AccountCardItem";
 
-export default function AccountCard() {
+// Helper function to format the balance
+const formatCurrency = (value) => {
+  if (typeof value !== "number") {
+    return "Rp...";
+  }
+  // Using Intl.NumberFormat for robust, locale-aware currency formatting
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+    .format(value)
+    .replace(/\s/g, ""); // remove any space like in 'Rp 1.000'
+};
+
+export default function AccountCard({ user }) {
   const CARD_COUNT = 3; // Portfolio + 2 AccountCardItem
 
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -30,6 +47,9 @@ export default function AccountCard() {
       },
     },
   );
+
+  // Format the balance from the user object
+  const userBalance = formatCurrency(user?.balance);
 
   return (
     <Box className="flex flex-column">
@@ -77,13 +97,15 @@ export default function AccountCard() {
             </Text>
           </Pressable>
 
+          {/* Main account card - now with dynamic balance */}
           <AccountCardItem
             tipeTabungan="TAPLUS PEGAWAI BNI"
             noRekening="1916837397"
-            saldo="Rp19.546.250"
+            saldo={userBalance}
             primary={true}
           />
 
+          {/* Mocked secondary account card */}
           <AccountCardItem
             tipeTabungan="TAPLUS MUDA"
             noRekening="1916512345"

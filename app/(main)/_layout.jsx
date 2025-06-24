@@ -8,7 +8,15 @@ import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 
+// --- ADDED: 1. Import the push notification hook ---
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+
 export default function MainLayout() {
+  // --- ADDED: 2. Call the hook to initialize push notifications ---
+  // This will register for notifications, get the token, and set up listeners
+  // as soon as the user enters the main, authenticated part of the app.
+  const { expoPushToken } = usePushNotifications();
+
   const token = useAuthStore((state) => state.token);
   const type = useTransactionStore((state) => state.type);
   const { pocketType, goalTitle } = usePocketStore();
@@ -18,6 +26,14 @@ export default function MainLayout() {
       router.replace("/(auth)/login");
     }
   }, [token]);
+
+  // --- ADDED: Optional block for debugging ---
+  // You can uncomment this to see the push token in your console.
+  useEffect(() => {
+    if (expoPushToken) {
+      console.log("Push Token obtained in MainLayout:", expoPushToken);
+    }
+  }, [expoPushToken]);
 
   if (!token) {
     return null;
