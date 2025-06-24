@@ -11,11 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.takua.bnipocket",
+      "buildNumber": "1",
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": false,
         "UIBackgroundModes": [
-          "fetch",
-          "remote-notification",
           "fetch",
           "remote-notification"
         ],
