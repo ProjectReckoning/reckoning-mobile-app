@@ -31,7 +31,9 @@ export default function PocketIconSelector({
               key={iconKey}
               className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-green-select" : ""}`}
             >
-              {IconComponent && <IconComponent width="40%" height="40%" />}
+              {IconComponent && (
+                <IconComponent width="40%" height="40%" color="#848688" />
+              )}
             </Pressable>
           );
         })}
