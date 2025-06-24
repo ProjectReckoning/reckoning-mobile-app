@@ -14,9 +14,13 @@ import {
 import { router } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
-import { savingGoals, businessGoals } from "@/utils/createPocket/goalData";
 import { UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import {
+  savingGoals,
+  spendingDetails,
+  businessGoals,
+} from "@/utils/createPocket/goalData";
 
 import { WondrColors } from "@/utils/colorUtils";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -43,7 +47,12 @@ export default function Details() {
   const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
 
-  const goals = pocketType === "Business Fund" ? businessGoals : savingGoals;
+  const goals =
+    pocketType === "Business Fund"
+      ? businessGoals
+      : pocketType === "Saving"
+        ? savingGoals
+        : spendingDetails;
   const selectedGoal =
     goals.find((goal) => goal.title === goalTitle) || goals[0];
 
@@ -157,6 +166,7 @@ export default function Details() {
                 pocketName={pocketName}
                 setPocketName={setPocketName}
                 isNameInvalid={isNameInvalid}
+                pocketType={pocketType}
                 pocketBalanceTarget={pocketBalanceTarget}
                 setPocketBalanceTarget={(value) => {
                   setBalanceTouched(true); // Mark as touched on first change

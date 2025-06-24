@@ -119,6 +119,27 @@ export const savingGoals = [
   },
 ];
 
+export const spendingDetails = [
+  {
+    isCustom: true,
+    title: "Custom Goal",
+    title2: "Kelola dana kalian",
+    subtitle: "Buat tujuan unikmu sendiri dan wujudkan bersama!",
+    subtitle2: "Atur keuanganmu dan capai tujuanmu!",
+    decorator: (
+      <CustomGoalDecorator
+        width={190}
+        height="100%"
+        style={{
+          position: "absolute",
+          bottom: 5,
+          right: -5,
+        }}
+      />
+    ),
+  },
+];
+
 export const businessGoals = [
   {
     title: "Bisnis Makanan",
