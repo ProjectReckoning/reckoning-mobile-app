@@ -1,6 +1,5 @@
-// app/_layout.js
+// app/_layout.jsx
 import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
@@ -8,10 +7,18 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { ThemeProvider, DefaultTheme } from "@react-navigation/native";
 import "@/global.css";
 
+// --- Imports for Global Error Modal ---
+import ErrorModal from "@/components/common/ErrorModal";
+import useErrorStore from "@/stores/errorStore";
+import ErrorImage from "@/assets/images/ErrorImage.png";
+
 export { ErrorBoundary } from "expo-router";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const { visible, status, message, hideError } = useErrorStore();
+
+  console.log(`[RootLayout] Rendering. Error modal visibility is: ${visible}`);
 
   return (
     <SafeAreaProvider>
@@ -22,8 +29,19 @@ export default function RootLayout() {
             <Stack.Screen name="(main)" options={{ headerShown: false }} />
           </Stack>
         </ThemeProvider>
+
+        {/* --- FIX: The ErrorModal is now MOVED INSIDE the GluestackUIProvider --- */}
+        <ErrorModal
+          isOpen={visible}
+          onClose={hideError}
+          title={status || "Something Went Wrong"}
+          subtitle={message || "An unexpected error has occurred."}
+          imageSource={ErrorImage}
+        />
       </GluestackUIProvider>
       <StatusBar style="dark" />
+
+      {/* --- The ErrorModal was previously here, which was incorrect --- */}
     </SafeAreaProvider>
   );
 }

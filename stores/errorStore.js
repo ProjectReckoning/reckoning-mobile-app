@@ -6,7 +6,10 @@ const useErrorStore = create((set) => ({
   status: null,
   message: null,
 
-  showError: ({ status, message }) => set({ visible: true, status, message }),
+  showError: ({ status, message }) => {
+    console.log("[errorStore] showError CALLED. Setting visible to true."); // <-- ADD THIS LINE
+    set({ visible: true, status, message });
+  },
 
   hideError: () => set({ visible: false, status: null, message: null }),
 }));

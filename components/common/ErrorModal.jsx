@@ -2,7 +2,7 @@ import React from "react";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Image } from "@/components/ui/image";
-import { Box } from "@/components/ui/box"; // <-- Tambahkan import Box
+import { Box } from "@/components/ui/box";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -19,10 +19,11 @@ export default function ErrorModal({
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose} zIndex={999}>
       <ActionsheetBackdrop />
-      <ActionsheetContent zIndex={999}>
+      <ActionsheetContent>
         <VStack
           w="$full"
-          style={{ paddingBottom: 30, paddingSide: 20, gap: 7 }}
+          // The ONLY change is here: "paddingSide" is corrected to "paddingHorizontal"
+          style={{ paddingBottom: 30, paddingHorizontal: 20, gap: 7 }}
         >
           <Box w="$full" alignItems="center">
             <Image
@@ -37,12 +38,11 @@ export default function ErrorModal({
             size="xl"
             fontWeight="$extrabold"
             textAlign="center"
-            className="text-black font-bold  "
+            className="text-black font-bold"
           >
             {title}
           </Text>
 
-          {/* Subjudul/Deskripsi Error */}
           <Text size="sm" textAlign="center">
             {subtitle}
           </Text>

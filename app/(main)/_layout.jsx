@@ -7,16 +7,10 @@ import { ArrowLeft } from "lucide-react-native";
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
-
-// --- ADDED: 1. Import the push notification hook ---
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export default function MainLayout() {
-  // --- ADDED: 2. Call the hook to initialize push notifications ---
-  // This will register for notifications, get the token, and set up listeners
-  // as soon as the user enters the main, authenticated part of the app.
-  const { expoPushToken } = usePushNotifications();
-
+  const { registerForPushNotificationsAsync } = usePushNotifications();
   const token = useAuthStore((state) => state.token);
   const type = useTransactionStore((state) => state.type);
   const { pocketType, goalTitle } = usePocketStore();
@@ -24,16 +18,14 @@ export default function MainLayout() {
   useEffect(() => {
     if (!token) {
       router.replace("/(auth)/login");
+    } else {
+      // Call the registration function once the user is confirmed to be logged in.
+      console.log(
+        "User is authenticated, attempting to register for push notifications...",
+      );
+      registerForPushNotificationsAsync();
     }
   }, [token]);
-
-  // --- ADDED: Optional block for debugging ---
-  // You can uncomment this to see the push token in your console.
-  useEffect(() => {
-    if (expoPushToken) {
-      console.log("Push Token obtained in MainLayout:", expoPushToken);
-    }
-  }, [expoPushToken]);
 
   if (!token) {
     return null;
@@ -51,13 +43,11 @@ export default function MainLayout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        // 1. Hide the default back button globally
         headerBackVisible: false,
         headerBackTitleVisible: false,
         headerLeftContainerStyle: { paddingLeft: 24 },
         contentStyle: { backgroundColor: "white" },
         animation: "slide_from_right",
-        // 2. Provide a custom back button that performs a normal "back" action
         headerLeft: () => (
           <Pressable onPress={() => router.back()}>
             <ArrowLeft size={24} color="black" />
@@ -66,11 +56,7 @@ export default function MainLayout() {
       }}
     >
       {/* ===== Non-Transaction Screens ===== */}
-      <Stack.Screen
-        name="home/index"
-        // The home screen should not have a back button
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="home/index" options={{ headerShown: false }} />
       <Stack.Screen
         name="home/notification/index"
         options={{ title: "Notifications" }}
@@ -157,7 +143,6 @@ export default function MainLayout() {
       />
 
       {/* ===== Transaction Screens (Updated Paths) ===== */}
-      {/* These screens are now correctly nested under the dynamic pocket ID route */}
       <Stack.Screen
         name="pocket/[id]/transaction/topup/index"
         options={{ title: "Top Up" }}

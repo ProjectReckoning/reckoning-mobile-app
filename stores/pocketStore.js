@@ -1,7 +1,7 @@
+// stores/pocketStore.js
 import { create } from "zustand";
 import api from "@/lib/api";
 
-// Helper map to convert Tailwind color classes to HEX codes
 const colorClassToHex = {
   "bg-orange-wondr": "#FF7A00",
   "bg-yellow-wondr": "#FFC700",
@@ -11,7 +11,6 @@ const colorClassToHex = {
   "bg-pink-wondr": "#FF69B4",
 };
 
-// Helper map to convert HEX codes back to Tailwind classes
 const hexToColorClass = {
   "#FF7A00": "bg-orange-wondr",
   "#FFC700": "bg-yellow-wondr",
@@ -22,7 +21,7 @@ const hexToColorClass = {
 };
 
 export const usePocketStore = create((set, get) => ({
-  // --- State for Pocket Creation & Editing ---
+  // --- State ---
   pocketSubject: null,
   setPocketSubject: (subject) => set({ pocketSubject: subject }),
   pocketType: null,
@@ -53,18 +52,12 @@ export const usePocketStore = create((set, get) => ({
   updateError: null,
   newFriend: null,
   setNewFriend: (friend) => set({ newFriend: friend }),
-
-  // --- State for Single Pocket Display ---
   currentPocket: null,
   isLoading: false,
   error: null,
-
-  // --- State for Transaction History ---
   transactionHistory: [],
   isHistoryLoading: false,
   historyError: null,
-
-  // --- State for All Pockets List ---
   allPockets: [],
   isAllPocketsLoading: false,
   allPocketsError: null,
@@ -110,16 +103,7 @@ export const usePocketStore = create((set, get) => ({
     }
 
     try {
-      console.log(
-        "[STORE] createPocket: Request Body:",
-        JSON.stringify(requestBody, null, 2),
-      );
       const response = await api.post("/pocket", requestBody);
-      console.log(
-        "[STORE] createPocket: Response Received:",
-        JSON.stringify(response.data, null, 2),
-      );
-
       if (response.data && response.data.ok) {
         set({ isCreating: false });
         get().fetchAllPockets();
@@ -131,7 +115,6 @@ export const usePocketStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      console.error("[STORE] createPocket: Error Caught:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -155,16 +138,7 @@ export const usePocketStore = create((set, get) => ({
     };
 
     try {
-      console.log(
-        `[STORE] updatePocket(${pocketId}): Request Body:`,
-        JSON.stringify(requestBody, null, 2),
-      );
       const response = await api.patch(`/pocket/${pocketId}`, requestBody);
-      console.log(
-        `[STORE] updatePocket(${pocketId}): Response Received:`,
-        JSON.stringify(response.data, null, 2),
-      );
-
       if (response.data && response.data.ok) {
         set({ isUpdating: false });
         get().fetchAllPockets();
@@ -173,7 +147,6 @@ export const usePocketStore = create((set, get) => ({
         throw new Error(response.data?.message || "Pocket update failed.");
       }
     } catch (error) {
-      console.error(`[STORE] updatePocket(${pocketId}): Error Caught:`, error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -217,11 +190,7 @@ export const usePocketStore = create((set, get) => ({
     console.log("--- [STORE] fetchAllPockets: Initiated ---");
     set({ isAllPocketsLoading: true, allPocketsError: null });
     try {
-      const response = await api.get("/pocket");
-      console.log(
-        "[STORE] fetchAllPockets: Response Received:",
-        JSON.stringify(response.data, null, 2),
-      );
+      const response = await api.get("/pocket"); // Intentionally incorrect path for testing
       if (response.data && response.data.ok) {
         set({
           allPockets: response.data.data || [],
@@ -231,12 +200,12 @@ export const usePocketStore = create((set, get) => ({
         throw new Error(response.data.message || "Failed to fetch pockets.");
       }
     } catch (error) {
-      console.error("[STORE] fetchAllPockets: Error Caught:", error);
       set({
         allPocketsError: error.message || "An unexpected error occurred.",
         isAllPocketsLoading: false,
         allPockets: [],
       });
+      throw error; // <-- RE-THROW THE ERROR
     }
   },
 
@@ -245,10 +214,6 @@ export const usePocketStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get(`/pocket/${id}`);
-      console.log(
-        `[STORE] fetchPocketById(${id}): Response Received:`,
-        JSON.stringify(response.data, null, 2),
-      );
       if (response.data && response.data.ok) {
         set({
           currentPocket: response.data.data,
@@ -260,30 +225,22 @@ export const usePocketStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      console.error(`[STORE] fetchPocketById(${id}): Error Caught:`, error);
       set({
         error: error.message || "An unexpected error occurred.",
         isLoading: false,
         currentPocket: null,
       });
+      throw error; // <-- RE-THROW THE ERROR
     }
   },
 
   fetchTransactionHistory: async (monthString) => {
     const pocketId = get().currentPocket?.id;
-    console.log(
-      `--- [STORE] fetchTransactionHistory: Initiated for Pocket ID: ${pocketId}, Month: ${monthString} ---`,
-    );
     if (!pocketId) return;
-
     set({ isHistoryLoading: true, historyError: null });
     try {
       const response = await api.get(
         `/pocket/${pocketId}/history?month=${monthString}`,
-      );
-      console.log(
-        `[STORE] fetchTransactionHistory(${pocketId}): Response Received:`,
-        JSON.stringify(response.data, null, 2),
       );
       if (response.data && response.data.ok) {
         set({
@@ -296,15 +253,12 @@ export const usePocketStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      console.error(
-        `[STORE] fetchTransactionHistory(${pocketId}): Error Caught:`,
-        error,
-      );
       set({
         historyError: error.message || "An unexpected error occurred.",
         isHistoryLoading: false,
         transactionHistory: [],
       });
+      throw error; // <-- RE-THROW THE ERROR
     }
   },
 
@@ -319,11 +273,6 @@ export const usePocketStore = create((set, get) => ({
     set({ isAllPocketsLoading: true, allPocketsError: null });
     try {
       const response = await api.delete(`/pocket/${pocketId}`);
-      console.log(
-        `[STORE] deletePocket(${pocketId}): Response Received:`,
-        JSON.stringify(response.data, null, 2),
-      );
-
       if (response.data && response.data.ok) {
         get().removePocketFromList(pocketId);
         set({ isAllPocketsLoading: false });
@@ -332,13 +281,12 @@ export const usePocketStore = create((set, get) => ({
         throw new Error(response.data.message || "Failed to delete pocket.");
       }
     } catch (error) {
-      console.error(`[STORE] deletePocket(${pocketId}): Error Caught:`, error);
       set({
         allPocketsError:
           error.message || "An unexpected error occurred while deleting.",
         isAllPocketsLoading: false,
       });
-      throw error;
+      throw error; // <-- RE-THROW THE ERROR
     }
   },
 }));
