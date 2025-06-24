@@ -86,7 +86,10 @@
     "zustand": "^5.0.5",
     "expo-sharing": "~13.1.5",
     "expo-file-system": "~18.1.10",
-    "react-native-view-shot": "4.0.3"
+    "react-native-view-shot": "4.0.3",
+    "expo-notifications": "~0.31.3",
+    "expo-device": "~7.1.4",
+    "expo-dev-client": "~5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
