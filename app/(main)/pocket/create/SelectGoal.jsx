@@ -1,6 +1,5 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 
@@ -10,35 +9,39 @@ import { ScrollView } from "react-native";
 
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
-import { savingGoals } from "@/utils/createPocket/goalData";
+import { savingGoals, businessGoals } from "@/utils/createPocket/goalData";
 import GoalCard from "@/components/feature/createPocket/GoalCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import GoalDecorator from "@/assets/images/decorators/goal-decorator.png";
+import GoalDecorator from "@/assets/images/decorators/goalDecorator.svg";
 
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const { setGoalTitle } = usePocketStore();
+  const { pocketType, setGoalTitle } = usePocketStore();
 
   const GoToDetails = () => {
     router.push("pocket/create/Details");
   };
 
+  const goals = pocketType === "Business Fund" ? businessGoals : savingGoals;
+
   return (
     <Box className="flex-1 bg-white justify-stretch">
       <Box
-        className={`w-full h-48 bg-[${WondrColors["tosca-wondr-light-translucent"]}] absolute top-0`}
-      ></Box>
+        className={`w-full h-40 bg-[${WondrColors["tosca-wondr-light-translucent"]}] absolute top-0`}
+      />
 
-      <Box className="w-52 absolute right-0 -top-6">
-        <Image
-          source={GoalDecorator}
-          alt="pocket-type-decorator"
-          className="w-full h-64"
-          resizeMode="contain"
-        />
-      </Box>
+      <GoalDecorator
+        width={200}
+        height="100%"
+        style={{
+          position: "absolute",
+          top: -345,
+          right: 0,
+          zIndex: 1,
+        }}
+      />
 
-      <Box className="flex-1 flex-col px-6 py-8 justify-between">
+      <Box className="flex-1 flex-col px-6 py-8 justify-between z-10">
         <VStack space="4xl" reversed={false}>
           <VStack space="xs" reversed={false}>
             <Heading size="xl" className="text-bold">
@@ -58,7 +61,7 @@ export default function SelectGoal() {
             style={{ marginRight: -10 }}
           >
             <Box className="flex flex-row flex-wrap justify-between">
-              {savingGoals.map((goalProps, i) => (
+              {goals.map((goalProps, i) => (
                 <Box key={i} className="w-[48%] mb-5">
                   <GoalCard
                     {...goalProps}

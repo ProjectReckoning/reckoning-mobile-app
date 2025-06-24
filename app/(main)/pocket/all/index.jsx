@@ -160,7 +160,7 @@ export default function AllPocket() {
   };
 
   return (
-    <Box className="w-full flex-1 flex-col px-6 pt-5 bg-white">
+    <Box className="w-full flex-1 flex-col px-6 bg-white">
       <TabBar
         tabList={tabList}
         activeTab={activeTab}

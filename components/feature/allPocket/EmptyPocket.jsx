@@ -34,7 +34,7 @@ export default function EmptyPocket() {
       <PrimaryButton
         buttonAction={GoToCreatePocket}
         buttonTitle="Buat Pocket"
-        className="mb-8"
+        className="mb-10"
       />
     </Box>
   );

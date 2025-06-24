@@ -14,7 +14,7 @@ import {
 import { router } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
-import { savingGoals } from "@/utils/createPocket/goalData";
+import { savingGoals, businessGoals } from "@/utils/createPocket/goalData";
 import { UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
@@ -26,6 +26,7 @@ export default function Details() {
   const {
     pocketName,
     setPocketName,
+    pocketType,
     pocketBalanceTarget,
     setPocketBalanceTarget,
     targetDuration,
@@ -42,8 +43,9 @@ export default function Details() {
   const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
 
+  const goals = pocketType === "Business Fund" ? businessGoals : savingGoals;
   const selectedGoal =
-    savingGoals.find((goal) => goal.title === goalTitle) || savingGoals[0];
+    goals.find((goal) => goal.title === goalTitle) || goals[0];
 
   const extraAvatars = selectedFriends.slice(5);
   const remainingCount = extraAvatars.length;
@@ -125,16 +127,7 @@ export default function Details() {
       <Box
         className={`w-full h-44 bg-[${WondrColors["tosca-wondr-light-translucent"]}]`}
       >
-        <Box
-          className={`w-44 absolute right-[0.1rem] -bottom-[0.1rem] ${selectedGoal.decoratorClassName}`}
-        >
-          <Image
-            source={selectedGoal.decorator}
-            alt="pocket-type-decorator"
-            className="w-full h-48"
-            resizeMode="contain"
-          />
-        </Box>
+        {selectedGoal.decorator}
         <Box className="flex-1 flex-col px-6 pt-8 justify-between">
           <VStack space="xs" reversed={false}>
             <Heading size="xl" className="text-bold w-56">
