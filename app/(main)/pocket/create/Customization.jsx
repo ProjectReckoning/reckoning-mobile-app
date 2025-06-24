@@ -1,23 +1,20 @@
 import { Box } from "@/components/ui/box";
-import { VStack } from "@/components/ui/vstack";
 import { useState, useEffect } from "react";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { VStack } from "@/components/ui/vstack";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
+import { CommonActions } from "@react-navigation/native";
 import PocketCard from "@/components/common/cards/PocketCard";
+import { personalIcons } from "@/utils/pocketCustomization/personalPocketIconUtils";
+import { businessIcons } from "@/utils/pocketCustomization/businessPocketIconUtils";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
-import { CommonActions } from "@react-navigation/native";
-import {
-  iconKeys,
-  iconMap,
-  iconWhiteMap,
-} from "../../../../utils/pocketCustomization/personalPocketIconUtils";
 
 const colors = [
   "bg-orange-wondr",
@@ -47,7 +44,6 @@ export default function Customization() {
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [alertMessages, setAlertMessages] = useState([]);
-  const PocketWhite = iconWhiteMap.Pocket;
 
   const {
     pocketName,
@@ -63,12 +59,10 @@ export default function Customization() {
     resetPocketData,
   } = usePocketStore();
 
+  const isBusiness = pocketType === "Business Fund";
   const selectedColor =
     selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
   const selectedSolid = colorMap[selectedColor]?.solid;
-  const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
-
-  const isBusiness = pocketType === "Business Fund";
 
   const handleCreatePocket = async () => {
     // Validation remains the same
@@ -149,11 +143,10 @@ export default function Customization() {
           pocketName={pocketName}
           pocketType={pocketType}
           color={selectedSolid}
-          icon={SelectedIconWhite}
+          icon={pocketIcon}
           iconSize="16"
           space="my-7"
           cardWidth="min-w-48"
-          isBusiness={isBusiness}
         />
       </Box>
 
@@ -182,11 +175,11 @@ export default function Customization() {
                 setPocketColor={setPocketColor}
               />
               <PocketIconSelector
-                iconKeys={iconKeys}
-                iconMap={iconMap}
+                icons={isBusiness ? businessIcons : personalIcons}
                 selectedIconIndex={selectedIconIndex}
                 setSelectedIconIndex={setSelectedIconIndex}
                 setPocketIcon={setPocketIcon}
+                isBusiness={isBusiness}
               />
             </VStack>
           </ScrollView>
