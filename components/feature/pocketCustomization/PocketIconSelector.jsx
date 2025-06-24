@@ -1,3 +1,4 @@
+// components/feature/pocketCustomization/PocketIconSelector.jsx
 import { Text } from "@/components/ui/text";
 import { Icon } from "@/components/ui/icon";
 import { VStack } from "@/components/ui/vstack";
@@ -7,9 +8,8 @@ import { Pressable } from "@/components/ui/pressable";
 export default function PocketIconSelector({
   iconKeys,
   iconMap,
-  selectedIconIndex,
+  selectedIndex,
   setSelectedIconIndex,
-  setPocketIcon,
 }) {
   return (
     <VStack space="xl">
@@ -18,11 +18,10 @@ export default function PocketIconSelector({
         {iconKeys.map((iconKey, index) => (
           <Pressable
             onPress={() => {
-              setPocketIcon(iconKey);
-              setSelectedIconIndex(selectedIconIndex === index ? null : index);
+              setSelectedIconIndex(index);
             }}
             key={iconKey}
-            className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+            className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIndex === index ? "border-2 border-[#007BE5]" : ""}`}
           >
             <Icon as={iconMap[iconKey]} size="sm" />
           </Pressable>

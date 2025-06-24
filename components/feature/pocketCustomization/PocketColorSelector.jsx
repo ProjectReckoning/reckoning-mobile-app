@@ -1,3 +1,4 @@
+// components/feature/pocketCustomization/PocketColorSelector.jsx
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -5,9 +6,8 @@ import { Pressable } from "@/components/ui/pressable";
 
 export default function PocketColorSelector({
   colors,
-  selectedColorIndex,
+  selectedIndex,
   setSelectedColorIndex,
-  setPocketColor,
 }) {
   return (
     <VStack space="xl">
@@ -16,13 +16,10 @@ export default function PocketColorSelector({
         {colors.map((color, index) => (
           <Pressable
             onPress={() => {
-              setPocketColor(color);
-              setSelectedColorIndex(
-                selectedColorIndex === index ? null : index,
-              );
+              setSelectedColorIndex(index);
             }}
             key={index}
-            className={`w-8 h-8 rounded-full ${color} ${selectedColorIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+            className={`w-8 h-8 rounded-full ${color} ${selectedIndex === index ? "border-2 border-[#007BE5]" : ""}`}
           ></Pressable>
         ))}
       </HStack>

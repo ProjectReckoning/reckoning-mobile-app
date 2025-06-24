@@ -1,11 +1,16 @@
+// app/(main)/pocket/create/Customization.jsx
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
-import { useState, useEffect } from "react";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { usePocketStore } from "../../../../stores/pocketStore";
-import { allPocket } from "../../../../utils/mockData/mockPocketDb";
+import { useState, useEffect, useCallback } from "react";
+import {
+  router,
+  useLocalSearchParams,
+  useNavigation,
+  useFocusEffect,
+} from "expo-router";
+import { usePocketStore } from "@/stores/pocketStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
@@ -17,7 +22,7 @@ import {
   iconKeys,
   iconMap,
   iconWhiteMap,
-} from "../../../../utils/pocketCustomization/personalPocketIconUtils";
+} from "@/utils/pocketCustomization/personalPocketIconUtils";
 
 const colors = [
   "bg-orange-wondr",
@@ -42,13 +47,14 @@ export default function Customization() {
   const navigation = useNavigation();
   const isEditMode = !!pocketId;
 
-  const [selectedColorIndex, setSelectedColorIndex] = useState(null);
-  const [selectedIconIndex, setSelectedIconIndex] = useState(null);
-  const [isNameInvalid, setNameIsInvalid] = useState(false);
+  // --- Local State for UI ---
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [alertMessages, setAlertMessages] = useState([]);
-  const PocketWhite = iconWhiteMap.Pocket;
+  const [isNameInvalid, setNameIsInvalid] = useState(false);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+  const [selectedIconIndex, setSelectedIconIndex] = useState(0);
 
+  // --- Zustand Store State and Actions ---
   const {
     pocketName,
     pocketType,
@@ -57,19 +63,58 @@ export default function Customization() {
     setPocketName,
     setPocketColor,
     setPocketIcon,
-    setPocketType,
     createPocket,
     isCreating,
+    updatePocket,
+    isUpdating,
+    setPocketForEditing,
+    allPockets,
     resetPocketData,
   } = usePocketStore();
 
-  const selectedColor =
-    selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
-  const selectedSolid = colorMap[selectedColor]?.solid;
-  const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
+  // --- Effects ---
+
+  // On screen focus, set up for edit mode or reset
+  useFocusEffect(
+    useCallback(() => {
+      if (isEditMode) {
+        const pocketToEdit = allPockets.find((p) => p.pocket_id == pocketId);
+        if (pocketToEdit) {
+          setPocketForEditing(pocketToEdit);
+        }
+      }
+      return () => {
+        resetPocketData();
+      };
+    }, [pocketId, isEditMode, allPockets]),
+  );
+
+  // When store data changes (in edit mode), update local index state
+  useEffect(() => {
+    const colorIndex = colors.indexOf(pocketColor);
+    setSelectedColorIndex(colorIndex >= 0 ? colorIndex : 0);
+
+    const iconIndex = iconKeys.indexOf(pocketIcon);
+    setSelectedIconIndex(iconIndex >= 0 ? iconIndex : 0);
+  }, [pocketColor, pocketIcon]);
+
+  // When local index changes, update the Zustand store
+  useEffect(() => {
+    setPocketColor(colors[selectedColorIndex]);
+  }, [selectedColorIndex]);
+
+  useEffect(() => {
+    setPocketIcon(iconKeys[selectedIconIndex]);
+  }, [selectedIconIndex]);
+
+  // Validate pocket name
+  useEffect(() => {
+    setNameIsInvalid(pocketName.length > 20 || pocketName.trim().length === 0);
+  }, [pocketName]);
+
+  // --- Handlers ---
 
   const handleCreatePocket = async () => {
-    // Validation remains the same
     if (!pocketName || pocketName.trim().length === 0 || isNameInvalid) {
       setAlertMessages([
         "Pocket name is invalid. It must be between 1 and 20 characters.",
@@ -94,11 +139,9 @@ export default function Customization() {
 
       if (newPocketId) {
         resetPocketData();
-        // --- KEY CHANGE: Reset the entire navigation stack ---
-        // This creates a fresh history, making back navigation work correctly.
         navigation.dispatch(
           CommonActions.reset({
-            index: 2, // The final active screen is at index 2
+            index: 2,
             routes: [
               { name: "home/index" },
               { name: "pocket/all/index" },
@@ -107,7 +150,6 @@ export default function Customization() {
           }),
         );
       } else {
-        // Fallback if ID is somehow missing
         resetPocketData();
         router.replace("/(main)/pocket/all");
       }
@@ -118,26 +160,26 @@ export default function Customization() {
     }
   };
 
-  const handleSaveChanges = () => {
-    router.back();
+  const handleSaveChanges = async () => {
+    if (isNameInvalid) {
+      setAlertMessages(["Pocket name is invalid."]);
+      setShowAlertDialog(true);
+      return;
+    }
+    try {
+      await updatePocket(pocketId);
+      resetPocketData();
+      router.back();
+    } catch (error) {
+      const latestError = usePocketStore.getState().updateError;
+      setAlertMessages([latestError || "Failed to save changes."]);
+      setShowAlertDialog(true);
+    }
   };
 
-  useEffect(() => {
-    setNameIsInvalid(pocketName.length > 20 || pocketName.trim().length === 0);
-  }, [pocketName]);
-
-  useEffect(() => {
-    if (pocketId) {
-      const pocket = allPocket.find((p) => p.id === Number(pocketId));
-      if (pocket) {
-        setPocketName(pocket.name);
-        setPocketType(pocket.type);
-        setPocketColor(pocket.color);
-        setPocketIcon(pocket.icon);
-      }
-    }
-    return () => {};
-  }, [pocketId, setPocketName, setPocketType, setPocketColor, setPocketIcon]);
+  const PocketWhite = iconWhiteMap.Pocket;
+  const selectedSolid = colorMap[pocketColor]?.solid;
+  const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 
   return (
     <Box className="flex-1 bg-white justify-between">
@@ -165,25 +207,21 @@ export default function Customization() {
             contentContainerStyle={{ flexGrow: 1 }}
           >
             <VStack space="2xl" className="w-full px-3">
-              {(pocketType === "Spending" || isEditMode) && (
-                <PocketNameInput
-                  pocketName={pocketName}
-                  setPocketName={setPocketName}
-                  isNameInvalid={isNameInvalid}
-                />
-              )}
+              <PocketNameInput
+                pocketName={pocketName}
+                setPocketName={setPocketName}
+                isNameInvalid={isNameInvalid}
+              />
               <PocketColorSelector
                 colors={colors}
-                selectedColorIndex={selectedColorIndex}
+                selectedIndex={selectedColorIndex}
                 setSelectedColorIndex={setSelectedColorIndex}
-                setPocketColor={setPocketColor}
               />
               <PocketIconSelector
                 iconKeys={iconKeys}
                 iconMap={iconMap}
-                selectedIconIndex={selectedIconIndex}
+                selectedIndex={selectedIconIndex}
                 setSelectedIconIndex={setSelectedIconIndex}
-                setPocketIcon={setPocketIcon}
               />
             </VStack>
           </ScrollView>
@@ -193,9 +231,9 @@ export default function Customization() {
           <>
             <PrimaryButton
               buttonAction={handleSaveChanges}
-              buttonTitle="Simpan"
+              buttonTitle={isUpdating ? "Menyimpan..." : "Simpan"}
               className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
-              disabled={isNameInvalid || isCreating}
+              disabled={isNameInvalid || isUpdating}
             />
             <PrimaryButton
               buttonAction={() => router.back()}
