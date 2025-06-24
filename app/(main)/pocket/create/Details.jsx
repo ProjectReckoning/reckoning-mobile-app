@@ -82,21 +82,26 @@ export default function Details() {
     const nameInvalid =
       !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
 
-    // Balance: required, integer, min 10000
-    const balanceInvalid =
-      typeof pocketBalanceTarget !== "number" ||
-      isNaN(pocketBalanceTarget) ||
-      pocketBalanceTarget < 10000 ||
-      !Number.isInteger(pocketBalanceTarget);
-
-    // Duration: required, both start and end date
-    const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
-
     setNameIsInvalid(nameInvalid);
-    setBalanceIsInvalid(balanceInvalid);
-    setDateIsInvalid(dateInvalid);
 
-    return !nameInvalid && !balanceInvalid && !dateInvalid;
+    if (pocketType === "Saving") {
+      // Balance: required, integer, min 10000
+      const balanceInvalid =
+        typeof pocketBalanceTarget !== "number" ||
+        isNaN(pocketBalanceTarget) ||
+        pocketBalanceTarget < 10000 ||
+        !Number.isInteger(pocketBalanceTarget);
+
+      // Duration: required, both start and end date
+      const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+
+      setBalanceIsInvalid(balanceInvalid);
+      setDateIsInvalid(dateInvalid);
+
+      return !nameInvalid && !balanceInvalid && !dateInvalid;
+    }
+
+    return !nameInvalid;
   };
 
   const handleSubmit = () => {
@@ -232,12 +237,16 @@ export default function Details() {
               buttonTitle="Lanjut"
               className="mt-5 mb-8"
               disabled={
-                isNameInvalid ||
-                isBalanceInvalid ||
-                isDateInvalid ||
-                pocketBalanceTarget === null ||
-                targetDuration.startDate === null ||
-                targetDuration.endDate === null
+                pocketType === "Saving"
+                  ? isNameInvalid ||
+                    isBalanceInvalid ||
+                    isDateInvalid ||
+                    pocketName.length === 0 ||
+                    pocketName.length > 20 ||
+                    pocketBalanceTarget === null ||
+                    targetDuration.startDate === null ||
+                    targetDuration.endDate === null
+                  : pocketName.length === 0 || pocketName.length > 20
               }
             />
           </Box>
