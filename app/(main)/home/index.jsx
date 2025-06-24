@@ -5,19 +5,17 @@ import { Image } from "@/components/ui/image";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router"; // Import useFocusEffect
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
 import TabBar from "../../../components/common/TabBar";
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
-import { useState } from "react";
+import { useState, useCallback } from "react"; // Import useCallback
 import useAuthStore from "@/stores/authStore";
 import AccountCard from "@/components/feature/home/AccountCard";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
-
-// --- NEW: Import our reusable ScreenContainer ---
 import ScreenContainer from "@/components/common/ScreenContainer";
 
 const tabList = [
@@ -28,7 +26,14 @@ const tabList = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
-  const removeToken = useAuthStore((state) => state.removeToken);
+  const { user, removeToken, fetchUser } = useAuthStore();
+
+  // Fetch user data every time the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchUser();
+    }, []),
+  );
 
   const handleLogout = async () => {
     console.log("Logout button pressed. Attempting to clear token...");
@@ -37,11 +42,17 @@ export default function Home() {
     router.replace("/(auth)/login");
   };
 
+  // Helper to get first name and initials
+  const firstName = user?.name?.split(" ")[0] || "";
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("") || "";
+
   return (
-    // --- FIX: Use ScreenContainer as the root element ---
     <ScreenContainer className="bg-white">
       {/* Header */}
-      {/* The `pt-3` is removed from here as ScreenContainer handles all top spacing */}
       <Box className="flex flex-column pb-3 px-6 bg-[#F9F9F9]">
         {/* Row 1: wondr icon and logout */}
         <Box className="flex flex-row items-center justify-between">
@@ -75,10 +86,12 @@ export default function Home() {
               className="bg-[#00DDD8] items-center justify-center"
             >
               <AvatarFallbackText className="text-[#0F0F19]">
-                Amira Ferial
+                {initials}
               </AvatarFallbackText>
             </Avatar>
-            <Text className="text-xl font-bold text-gray-800">Hi, Mira!</Text>
+            <Text className="text-xl font-bold text-gray-800">
+              Hi, {firstName}!
+            </Text>
           </Box>
 
           <Box className="flex flex-row items-center justify-center gap-4">
@@ -120,7 +133,7 @@ export default function Home() {
       </Box>
 
       <ScrollView className="flex-1 px-6">
-        <AccountCard />
+        <AccountCard user={user} />
         <SelectedFeature />
       </ScrollView>
     </ScreenContainer>
