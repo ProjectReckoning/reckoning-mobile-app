@@ -1,23 +1,24 @@
+// app/(main)/home/index.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-
 import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
 import TabBar from "../../../components/common/TabBar";
-
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
-
 import { useState } from "react";
-import useAuthStore from "@/stores/authStore"; // Import your auth store
+import useAuthStore from "@/stores/authStore";
 import AccountCard from "@/components/feature/home/AccountCard";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
+
+// --- NEW: Import our reusable ScreenContainer ---
+import ScreenContainer from "@/components/common/ScreenContainer";
 
 const tabList = [
   { key: "insight", label: "Insight" },
@@ -27,20 +28,21 @@ const tabList = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
-  // Get the removeToken function from your auth store
   const removeToken = useAuthStore((state) => state.removeToken);
 
   const handleLogout = async () => {
     console.log("Logout button pressed. Attempting to clear token...");
-    await removeToken(); // Call the function to clear token from SecureStore and Zustand state
+    await removeToken();
     console.log("Token cleared. Redirecting to login screen.");
-    router.replace("/(auth)/login"); // Redirect to the login page after successful logout
+    router.replace("/(auth)/login");
   };
 
   return (
-    <Box className="flex-1 bg-white">
+    // --- FIX: Use ScreenContainer as the root element ---
+    <ScreenContainer className="bg-white">
       {/* Header */}
-      <Box className="flex flex-column pt-3 pb-3 px-6 bg-[#F9F9F9]">
+      {/* The `pt-3` is removed from here as ScreenContainer handles all top spacing */}
+      <Box className="flex flex-column pb-3 px-6 bg-[#F9F9F9]">
         {/* Row 1: wondr icon and logout */}
         <Box className="flex flex-row items-center justify-between">
           <Image
@@ -53,7 +55,7 @@ export default function Home() {
           <Button
             size="xs"
             className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center"
-            onPress={handleLogout} // Attach the handleLogout function here
+            onPress={handleLogout}
           >
             <Image
               size="2xs"
@@ -121,6 +123,6 @@ export default function Home() {
         <AccountCard />
         <SelectedFeature />
       </ScrollView>
-    </Box>
+    </ScreenContainer>
   );
 }

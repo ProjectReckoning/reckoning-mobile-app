@@ -1,24 +1,18 @@
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
-
 import { useState, useEffect } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { usePocketStore } from "../../../../stores/pocketStore";
 import { allPocket } from "../../../../utils/mockData/mockPocketDb";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
 
-import AppBar from "../../../../components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
-import {
-  resetPocketData,
-  pocketValidation,
-} from "../../../../utils/pocketCustomization/pocketValidation";
-
+import { CommonActions } from "@react-navigation/native";
 import {
   iconKeys,
   iconMap,
@@ -35,34 +29,17 @@ const colors = [
 ];
 
 const colorMap = {
-  "bg-orange-wondr": {
-    solid: "bg-orange-wondr",
-    translucent: "bg-orange-wondr-light-translucent",
-  },
-  "bg-yellow-wondr": {
-    solid: "bg-yellow-wondr",
-    translucent: "bg-yellow-wondr-light-translucent",
-  },
-  "bg-lime-wondr": {
-    solid: "bg-lime-wondr",
-    translucent: "bg-lime-wondr-light-translucent",
-  },
-  "bg-tosca-wondr": {
-    solid: "bg-tosca-wondr",
-    translucent: "bg-tosca-wondr-light-translucent",
-  },
-  "bg-purple-wondr": {
-    solid: "bg-purple-wondr",
-    translucent: "bg-purple-wondr-light-translucent",
-  },
-  "bg-pink-wondr": {
-    solid: "bg-pink-wondr",
-    translucent: "bg-pink-wondr-light-translucent",
-  },
+  "bg-orange-wondr": { solid: "bg-orange-wondr" },
+  "bg-yellow-wondr": { solid: "bg-yellow-wondr" },
+  "bg-lime-wondr": { solid: "bg-lime-wondr" },
+  "bg-tosca-wondr": { solid: "bg-tosca-wondr" },
+  "bg-purple-wondr": { solid: "bg-purple-wondr" },
+  "bg-pink-wondr": { solid: "bg-pink-wondr" },
 };
 
 export default function Customization() {
   const { pocketId } = useLocalSearchParams();
+  const navigation = useNavigation();
   const isEditMode = !!pocketId;
 
   const [selectedColorIndex, setSelectedColorIndex] = useState(null);
@@ -77,20 +54,13 @@ export default function Customization() {
     pocketType,
     pocketColor,
     pocketIcon,
-    goalTitle,
-    pocketBalanceTarget,
-    targetDuration,
-    selectedFriends,
-    pocketSubject,
-    setPocketSubject,
     setPocketName,
-    setPocketBalanceTarget,
-    setTargetDuration,
-    setGoalTitle,
-    setPocketType,
-    setSelectedFriends,
     setPocketColor,
     setPocketIcon,
+    setPocketType,
+    createPocket,
+    isCreating,
+    resetPocketData,
   } = usePocketStore();
 
   const selectedColor =
@@ -98,56 +68,62 @@ export default function Customization() {
   const selectedSolid = colorMap[selectedColor]?.solid;
   const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 
-  const storeSetters = {
-    setPocketName,
-    setPocketColor,
-    setPocketIcon,
-    setPocketBalanceTarget,
-    setTargetDuration,
-    setPocketType,
-    setGoalTitle,
-    setSelectedFriends,
-    setPocketSubject,
-    setAlertMessages,
-    setShowAlertDialog,
-    setNameIsInvalid,
-    setSelectedColorIndex,
-    setSelectedIconIndex,
+  const handleCreatePocket = async () => {
+    // Validation remains the same
+    if (!pocketName || pocketName.trim().length === 0 || isNameInvalid) {
+      setAlertMessages([
+        "Pocket name is invalid. It must be between 1 and 20 characters.",
+      ]);
+      setShowAlertDialog(true);
+      return;
+    }
+    if (!pocketColor) {
+      setAlertMessages(["Please select a pocket color."]);
+      setShowAlertDialog(true);
+      return;
+    }
+    if (!pocketIcon) {
+      setAlertMessages(["Please select a pocket icon."]);
+      setShowAlertDialog(true);
+      return;
+    }
+
+    try {
+      const pocketData = await createPocket();
+      const newPocketId = pocketData?.id;
+
+      if (newPocketId) {
+        resetPocketData();
+        // --- KEY CHANGE: Reset the entire navigation stack ---
+        // This creates a fresh history, making back navigation work correctly.
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 2, // The final active screen is at index 2
+            routes: [
+              { name: "home/index" },
+              { name: "pocket/all/index" },
+              { name: "pocket/[id]/index", params: { id: newPocketId } },
+            ],
+          }),
+        );
+      } else {
+        // Fallback if ID is somehow missing
+        resetPocketData();
+        router.replace("/(main)/pocket/all");
+      }
+    } catch (error) {
+      const latestError = usePocketStore.getState().createError;
+      setAlertMessages([latestError || "An unknown error occurred."]);
+      setShowAlertDialog(true);
+    }
   };
 
-  const resetData = () => resetPocketData(storeSetters);
-
-  const handlePocketValidation = () =>
-    pocketValidation({
-      pocketName,
-      pocketType,
-      pocketColor,
-      pocketIcon,
-      goalTitle,
-      pocketBalanceTarget,
-      targetDuration,
-      setNameIsInvalid,
-      setAlertMessages,
-      setShowAlertDialog,
-      pocketSubject,
-      selectedFriends,
-      allPocket,
-      resetData,
-      GoToNext,
-      isEditMode,
-      pocketId,
-    });
-
-  const GoToNext = () => {
-    router.push("/(main)/pocket/all");
+  const handleSaveChanges = () => {
+    router.back();
   };
 
   useEffect(() => {
-    if (pocketName.length > 20 || pocketName.length === null) {
-      setNameIsInvalid(true);
-    } else {
-      setNameIsInvalid(false);
-    }
+    setNameIsInvalid(pocketName.length > 20 || pocketName.trim().length === 0);
   }, [pocketName]);
 
   useEffect(() => {
@@ -160,13 +136,12 @@ export default function Customization() {
         setPocketIcon(pocket.icon);
       }
     }
-  }, [pocketId]);
+    return () => {};
+  }, [pocketId, setPocketName, setPocketType, setPocketColor, setPocketIcon]);
 
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
-        <AppBar title="Pocket kamu" className="mb-6" />
-
         <PocketCard
           mode="type"
           pocketName={pocketName}
@@ -213,37 +188,33 @@ export default function Customization() {
             </VStack>
           </ScrollView>
         </KeyboardAvoidingView>
+
         {isEditMode ? (
           <>
             <PrimaryButton
-              buttonAction={handlePocketValidation}
+              buttonAction={handleSaveChanges}
               buttonTitle="Simpan"
               className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
-              disabled={isNameInvalid || pocketName.length === 0}
+              disabled={isNameInvalid || isCreating}
             />
             <PrimaryButton
-              buttonAction={() => {
-                router.back();
-              }}
+              buttonAction={() => router.back()}
               buttonTitle="Batal"
               className="bg-white border border-gray-wondr active:bg-light-gray-wondr"
             />
           </>
         ) : (
           <PrimaryButton
-            buttonAction={handlePocketValidation}
-            buttonTitle="Buat Pocket"
+            buttonAction={handleCreatePocket}
+            buttonTitle={isCreating ? "Membuat Pocket..." : "Buat Pocket"}
             className="mt-3 mb-12"
-            disabled={isNameInvalid || pocketName.length === 0}
+            disabled={isNameInvalid || isCreating}
           />
         )}
 
         <PocketErrorAlert
           isOpen={showAlertDialog}
           onClose={() => setShowAlertDialog(false)}
-          Add
-          commentMore
-          actions
           messages={alertMessages}
         />
       </Box>

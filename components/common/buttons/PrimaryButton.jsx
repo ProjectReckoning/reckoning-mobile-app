@@ -8,7 +8,7 @@ export default function PrimaryButton({
   buttonActiveColor = "active:bg-tosca-wondr-dark",
   disabled = false,
   className,
-  textClassName = "",
+  textClassName = "text-black text-lg text-center font-bold",
 }) {
   return (
     <>

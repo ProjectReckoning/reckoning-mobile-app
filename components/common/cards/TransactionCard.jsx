@@ -19,17 +19,19 @@ export default function TransactionCard({
 
   return (
     <VStack space="lg">
-      <HStack className="justify-between items-center">
-        <Text className="text-sm text-black font-light">{title}</Text>
-        {showBalance && (
-          <Pressable
-            onPress={() => setIsShowBalance(!isShowBalance)}
-            className="mr-2"
-          >
-            {isShowBalance ? <EyeOff size={16} /> : <Eye size={16} />}
-          </Pressable>
-        )}
-      </HStack>
+      {title && (
+        <HStack className="justify-between items-center">
+          <Text className="text-sm text-black font-light">{title}</Text>
+          {showBalance && (
+            <Pressable
+              onPress={() => setIsShowBalance(!isShowBalance)}
+              className="mr-2"
+            >
+              {isShowBalance ? <EyeOff size={16} /> : <Eye size={16} />}
+            </Pressable>
+          )}
+        </HStack>
+      )}
       <VStack space="xs" className="border border-[#C3C3C3] rounded-xl p-4">
         <Heading size={"sm"} className="font-normal">
           {heading}

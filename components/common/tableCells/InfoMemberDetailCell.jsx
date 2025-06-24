@@ -42,7 +42,7 @@ export default function InfoMemberDetailCell({ member, index = 0 }) {
 
   return (
     <Box
-      className="flex-row rounded-2xl p-2 border border-2 items-center"
+      className="flex-row rounded-2xl p-2 border-2 items-center"
       style={{ borderColor: WondrColors["light-gray-wondr"] }}
     >
       <Avatar

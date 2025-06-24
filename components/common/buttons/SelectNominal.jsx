@@ -14,7 +14,7 @@ export default function SelectNominal() {
   const setAmount = useTransactionStore((state) => state.setAmount);
 
   useEffect(() => {
-    if (amount === null) {
+    if (amount === null || !nominalList.includes(amount)) {
       setSelectedIndex(null);
     } else if (nominalList.includes(amount)) {
       setSelectedIndex(nominalList.indexOf(amount));

@@ -8,16 +8,16 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { ScrollView } from "react-native";
 
-import AppBar from "../../../../components/common/AppBar";
-import { usePocketStore } from "../../../../stores/pocketStore";
-import { savingGoals } from "../../../../utils/createPocket/goalData";
-import GoalCard from "../../../../components/feature/createPocket/GoalCard";
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-import GoalDecorator from "../../../../assets/images/decorators/goal-decorator.png";
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
+import { savingGoals } from "@/utils/createPocket/goalData";
+import GoalCard from "@/components/feature/createPocket/GoalCard";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import GoalDecorator from "@/assets/images/decorators/goal-decorator.png";
 
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const { pocketType, setGoalTitle } = usePocketStore();
+  const { setGoalTitle } = usePocketStore();
 
   const GoToDetails = () => {
     router.push("pocket/create/Details");
@@ -25,9 +25,11 @@ export default function SelectGoal() {
 
   return (
     <Box className="flex-1 bg-white justify-stretch">
-      <Box className="w-full h-56 bg-[#C2F0ED] absolute top-0"></Box>
+      <Box
+        className={`w-full h-48 bg-[${WondrColors["tosca-wondr-light-translucent"]}] absolute top-0`}
+      ></Box>
 
-      <Box className="w-52 absolute right-0 top-2">
+      <Box className="w-52 absolute right-0 -top-6">
         <Image
           source={GoalDecorator}
           alt="pocket-type-decorator"
@@ -36,10 +38,8 @@ export default function SelectGoal() {
         />
       </Box>
 
-      <Box className="flex-1 flex-col px-6 pt-5 justify-between">
+      <Box className="flex-1 flex-col px-6 py-8 justify-between">
         <VStack space="4xl" reversed={false}>
-          <AppBar title={pocketType} className="bg-[#C2F0ED]" />
-
           <VStack space="xs" reversed={false}>
             <Heading size="xl" className="text-bold">
               Choose your goal!
@@ -78,7 +78,7 @@ export default function SelectGoal() {
             buttonAction={GoToDetails}
             buttonTitle="Lanjut"
             disabled={selectedIndex === null}
-            className="mt-3 mb-8"
+            className="mt-3"
           />
         </Box>
       </Box>

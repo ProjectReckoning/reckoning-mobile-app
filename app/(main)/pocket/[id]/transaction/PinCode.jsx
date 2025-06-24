@@ -4,11 +4,12 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
+import { ActivityIndicator } from "react-native";
 
 import { useState } from "react";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { useTransactionStore } from "@/stores/transactionStore";
 import { Delete } from "lucide-react-native";
-import AppBar from "../../../../components/common/AppBar";
 
 const PIN_LENGTH = 6;
 
@@ -20,32 +21,63 @@ const keypad = [
 ];
 
 export default function PinCode() {
+  const { id } = useLocalSearchParams();
   const [pin, setPin] = useState("");
 
-  const handlePress = (val) => {
+  const {
+    type,
+    isProcessing,
+    transactionError,
+    executeTopUp,
+    executeWithdraw,
+    // --- NEW: Get the transfer action from the store ---
+    executeTransfer,
+  } = useTransactionStore();
+
+  const handlePress = async (val) => {
+    if (isProcessing) return;
+
+    let newPin = pin;
     if (typeof val === "number" && pin.length < PIN_LENGTH) {
-      const newPin = pin + val;
+      newPin = pin + val;
       setPin(newPin);
-      if (newPin.length === PIN_LENGTH) {
-        setTimeout(() => {
-          setPin("");
-          router.push("/(main)/pocket/transaction/Statement");
-        }, 150);
-      }
     } else if (val === "backspace" && pin.length > 0) {
-      setPin(pin.slice(0, -1));
+      newPin = pin.slice(0, -1);
+      setPin(newPin);
     } else if (val === "Lupa PIN") {
       console.log("Lupa PIN pressed");
+      return;
+    }
+
+    if (newPin.length === PIN_LENGTH) {
+      try {
+        // --- KEY CHANGE: Check the transaction type and call the correct action ---
+        if (type.id === "topup") {
+          await executeTopUp(id);
+        } else if (type.id === "withdraw") {
+          await executeWithdraw(id);
+        } else if (type.id === "transfer") {
+          await executeTransfer(id);
+        } else {
+          console.warn(`Transaction type "${type.name}" not yet implemented.`);
+        }
+
+        // On success, navigate to the statement screen
+        router.push(`/(main)/pocket/${id}/transaction/Statement`);
+      } catch (error) {
+        console.error(`PIN Screen: ${type.name} failed.`, error);
+        alert(
+          `Transaction Failed: ${transactionError || "An unknown error occurred."}`,
+        );
+        setPin("");
+      }
     }
   };
 
   return (
     <Box className="flex-1 flex-col bg-white justify-between px-6 py-5">
       <VStack space="2xl">
-        <AppBar />
-
         <VStack space="2xl" className="mt-3">
-          {/* Heading */}
           <VStack space="xs" className="items-center justify-center">
             <Heading size="xl" className="font-bold">
               Masukan PIN wondr
@@ -58,19 +90,21 @@ export default function PinCode() {
       </VStack>
 
       <VStack space="2xl">
-        {/* PIN Circles */}
         <HStack className="gap-3 justify-center my-10">
-          {[...Array(PIN_LENGTH)].map((_, i) => (
-            <Box
-              key={i}
-              className={`w-5 h-5 rounded-full ${
-                pin[i] ? "bg-tosca-wondr" : "border-2 border-black"
-              } items-center justify-center mx-1`}
-            />
-          ))}
+          {isProcessing ? (
+            <ActivityIndicator size="large" color="#58ABA1" />
+          ) : (
+            [...Array(PIN_LENGTH)].map((_, i) => (
+              <Box
+                key={i}
+                className={`w-5 h-5 rounded-full ${
+                  pin[i] ? "bg-tosca-wondr" : "border-2 border-black"
+                } items-center justify-center mx-1`}
+              />
+            ))
+          )}
         </HStack>
 
-        {/* Keypad */}
         <VStack className="flex justify-between items-center gap-8 mb-16">
           {keypad.map((row, rowIndex) => (
             <HStack key={rowIndex} className="gap-8">
@@ -80,7 +114,8 @@ export default function PinCode() {
                     <Pressable
                       key={colIndex}
                       onPress={() => handlePress(item)}
-                      className="w-[5.7rem] h-[5.7rem] items-center justify-center"
+                      className="w-[5.5rem] h-[5.5rem] items-center justify-center"
+                      disabled={isProcessing}
                     >
                       <Text className="text-orange-wondr font-bold">
                         Lupa PIN
@@ -93,7 +128,8 @@ export default function PinCode() {
                     <Pressable
                       key={colIndex}
                       onPress={() => handlePress(item)}
-                      className="w-[5.7rem] h-[5.7rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                      className="w-[5.5rem] h-[5.5rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                      disabled={isProcessing}
                     >
                       <Delete size={28} />
                     </Pressable>
@@ -103,7 +139,8 @@ export default function PinCode() {
                   <Pressable
                     key={colIndex}
                     onPress={() => handlePress(item)}
-                    className="w-[5.7rem] h-[5.7rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                    className="w-[5.5rem] h-[5.5rem] rounded-full bg-light-gray-wondr items-center justify-center"
+                    disabled={isProcessing}
                   >
                     <Text className="text-2xl font-extrabold text-black">
                       {item}

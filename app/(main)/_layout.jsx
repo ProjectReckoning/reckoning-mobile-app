@@ -1,46 +1,190 @@
 // app/(main)/_layout.jsx
-import { Stack, Redirect, router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import useAuthStore from "@/stores/authStore";
 import { useEffect } from "react";
+import { Pressable } from "react-native";
+import { Stack, router } from "expo-router";
+import useAuthStore from "@/stores/authStore";
+import { ArrowLeft } from "lucide-react-native";
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
+import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function MainLayout() {
   const token = useAuthStore((state) => state.token);
-  const user = useAuthStore((state) => state.user);
+  const type = useTransactionStore((state) => state.type);
+  const { pocketType, goalTitle } = usePocketStore();
 
   useEffect(() => {
-    console.log(
-      "MainLayout: Checking token. Current token:",
-      token ? "present" : "null",
-    );
     if (!token) {
-      console.log("MainLayout: No token found, redirecting to login.");
       router.replace("/(auth)/login");
     }
   }, [token]);
 
-  // If no token, return null or a minimal loading indicator until redirection happens
   if (!token) {
-    console.log("MainLayout: Token is null, returning null for rendering.");
     return null;
   }
 
-  console.log("MainLayout: Token is present, rendering main Stack.");
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
+    <Stack
+      screenOptions={{
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: "white",
+        },
+        headerShadowVisible: false,
+        headerTitleAlign: "center",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+        // 1. Hide the default back button globally
+        headerBackVisible: false,
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: { paddingLeft: 24 },
+        contentStyle: { backgroundColor: "white" },
+        animation: "slide_from_right",
+        // 2. Provide a custom back button that performs a normal "back" action
+        headerLeft: () => (
+          <Pressable onPress={() => router.back()}>
+            <ArrowLeft size={24} color="black" />
+          </Pressable>
+        ),
+      }}
+    >
+      {/* ===== Non-Transaction Screens ===== */}
+      <Stack.Screen
+        name="home/index"
+        // The home screen should not have a back button
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="home/notification/index"
+        options={{ title: "Notifications" }}
+      />
+      <Stack.Screen
+        name="home/notification/[id]/index"
+        options={{ title: "Notification Detail" }}
+      />
+      <Stack.Screen
+        name="pocket/all/index"
+        options={{
+          title: "My Pockets",
         }}
-      >
-        <Stack.Screen
-          name="home"
-          options={{
-            headerShown: false,
-          }}
-        />
-        {/* Add other main screens here as needed */}
-      </Stack>
-    </SafeAreaView>
+      />
+      <Stack.Screen
+        name="pocket/[id]/index"
+        options={{ title: "Pocket Details" }}
+      />
+      <Stack.Screen
+        name="pocket/onboarding/index"
+        options={{ title: "Get Started" }}
+      />
+      <Stack.Screen
+        name="pocket/onboarding/CreatePocketOnboarding"
+        options={{ title: "Create Pocket" }}
+      />
+      <Stack.Screen
+        name="pocket/create/index"
+        options={{
+          title: "",
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectGoal"
+        options={{
+          title: pocketType,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/Details"
+        options={{
+          title: goalTitle,
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/SelectFriend"
+        options={{ title: "Pilih Teman" }}
+      />
+      <Stack.Screen
+        name="pocket/create/Customization"
+        options={{
+          title: "Pocket kamu",
+          headerStyle: {
+            backgroundColor: "#F9F9F9",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/NewUser"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Transfer ke penerima baru"
+              : "Tambah teman baru",
+        }}
+      />
+      <Stack.Screen
+        name="pocket/create/NewUserConfirmation"
+        options={{
+          title:
+            type?.id === "transfer"
+              ? "Konfirmasi penerima baru"
+              : "Konfirmasi teman baru",
+        }}
+      />
+
+      {/* ===== Transaction Screens (Updated Paths) ===== */}
+      {/* These screens are now correctly nested under the dynamic pocket ID route */}
+      <Stack.Screen
+        name="pocket/[id]/transaction/topup/index"
+        options={{ title: "Top Up" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/transfer/index"
+        options={{
+          title: "Transfer",
+          headerStyle: { backgroundColor: "transparent" },
+        }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/withdraw/index"
+        options={{ title: "Withdraw" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/Detail"
+        options={{ title: `Detail ${type.name}` }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/Confirmation"
+        options={{ title: `Konfirmasi ${type.name}` }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/PinCode"
+        options={{ title: "" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/Statement"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/Receipt"
+        options={{
+          title: "",
+          headerStyle: { backgroundColor: "transparent" },
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/scheduleTransfer/index"
+        options={{ headerShown: false }}
+      />
+    </Stack>
   );
 }

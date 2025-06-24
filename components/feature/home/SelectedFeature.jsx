@@ -1,29 +1,69 @@
+// components/feature/home/SelectedFeature.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
+import { HStack } from "@/components/ui/hstack";
 import { Link, LinkText } from "@/components/ui/link";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
+import { usePocketStore } from "@/stores/pocketStore";
 
 import FeatureButton from "../../common/buttons/FeatureButton";
 import { features } from "../../../utils/mockData/featureData";
 
 export default function SelectedFeature() {
+  const { allPockets, fetchAllPockets } = usePocketStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log(
+        "[SelectedFeature.jsx] Focus effect: Fetching pockets for check.",
+      );
+      fetchAllPockets();
+    }, []),
+  );
+
+  const handlePocketPress = () => {
+    const hasPocket = allPockets && allPockets.length > 0;
+
+    // --- THIS IS THE LOG FOR THE HOME SCREEN ---
+    const destination = hasPocket
+      ? "/(main)/pocket/all"
+      : "/(main)/pocket/onboarding";
+    console.log(`--- HOME SCREEN ACTION ---`);
+    console.log(
+      `Button pressed. Checking for pockets. Pockets found: ${hasPocket}`,
+    );
+    console.log(`Navigating to: ${destination}`);
+    console.log(`--------------------------`);
+
+    router.push(destination);
+  };
+
   return (
     <Box className="flex flex-col gap-1 my-5">
-      {/* Title */}
       <Box className="flex flex-row my-5 justify-between items-end">
         <Text className="font-extrabold text-xl">Fitur pilihan kamu</Text>
         <Link href="">
-          <LinkText className="text-sm text-[#FF7F00] font-bold">Atur</LinkText>
+          <LinkText className="text-sm text-orange-wondr font-bold">
+            Atur
+          </LinkText>
         </Link>
       </Box>
-
-      {/* Feature Grid */}
-      <Box className="flex flex-row flex-wrap justify-between">
-        {features.map((featureProps, i) => (
-          <Box key={i} className="w-1/4 mb-6 items-center">
-            <FeatureButton {...featureProps} />
-          </Box>
-        ))}
-      </Box>
+      <HStack className="flex flex-wrap justify-between">
+        {features.map((featureProps, i) => {
+          const isPocketButton = featureProps.label === "Pocket";
+          return (
+            <Box key={i} className="w-1/4 mb-6 items-center">
+              <FeatureButton
+                {...featureProps}
+                onPress={
+                  isPocketButton ? handlePocketPress : featureProps.onPress
+                }
+              />
+            </Box>
+          );
+        })}
+      </HStack>
     </Box>
   );
 }
