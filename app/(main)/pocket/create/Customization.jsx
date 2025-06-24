@@ -68,6 +68,8 @@ export default function Customization() {
   const selectedSolid = colorMap[selectedColor]?.solid;
   const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
 
+  const isBusiness = pocketType === "Business Fund";
+
   const handleCreatePocket = async () => {
     // Validation remains the same
     if (!pocketName || pocketName.trim().length === 0 || isNameInvalid) {
@@ -151,6 +153,7 @@ export default function Customization() {
           iconSize="16"
           space="my-7"
           cardWidth="min-w-48"
+          isBusiness={isBusiness}
         />
       </Box>
 
@@ -165,7 +168,7 @@ export default function Customization() {
             contentContainerStyle={{ flexGrow: 1 }}
           >
             <VStack space="2xl" className="w-full px-3">
-              {(pocketType === "Spending" || isEditMode) && (
+              {isEditMode && (
                 <PocketNameInput
                   pocketName={pocketName}
                   setPocketName={setPocketName}

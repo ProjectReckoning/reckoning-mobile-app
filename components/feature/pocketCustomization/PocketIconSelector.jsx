@@ -22,7 +22,7 @@ export default function PocketIconSelector({
               setSelectedIconIndex(selectedIconIndex === index ? null : index);
             }}
             key={iconKey}
-            className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+            className={`w-12 h-12 rounded-full bg-[#F2F2F2] items-center justify-center ${selectedIconIndex === index ? "border-2 border-green-select" : ""}`}
           >
             <Icon as={iconMap[iconKey]} size="sm" />
           </Pressable>

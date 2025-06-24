@@ -13,9 +13,9 @@ const PocketWhite = iconWhiteMap.Pocket;
 export default function PocketCard({
   mode = "balance", // mode can be "icon", "type", or "balance"
   pocketName,
-  pocketType = "Saving",
+  pocketType,
   pocketBalance = 0,
-  color = "bg-orange-wondr",
+  color,
   icon = PocketWhite,
   iconSize = "16",
   space = "my-7",
@@ -23,7 +23,9 @@ export default function PocketCard({
   cardWidth = "w-fit",
   editButton = false,
   onEdit = () => {},
+  isBusiness = false,
 }) {
+  // const isBusiness = pocketType === "Business Fund";
   const IconComponent =
     typeof icon === "string"
       ? iconWhiteMap[icon] || PocketWhite
@@ -41,11 +43,11 @@ export default function PocketCard({
       className={`h-fit bg-white border border-gray-300 rounded-2xl p-0 ${cardWidth}`}
     >
       <Box
-        className={`w-fit h-fit rounded-t-2xl p-4 ${whiteSpace} ${color}-light-translucent ${mode === "icon" && "p-3"}`}
+        className={`w-fit h-fit rounded-t-2xl p-4 ${whiteSpace} ${color ? color : pocketType === "Business Fund" ? "bg-purple-wondr" : "bg-orange-wondr"}-light-translucent ${mode === "icon" && "p-3"}`}
       >
         <HStack className="justify-between items-start">
           <Box
-            className={`w-${iconSize} h-${iconSize} ${color} rounded-full items-center justify-center ${mode === "icon" && "mb-0 mr-4"}`}
+            className={`w-${iconSize} h-${iconSize} ${color ? color : pocketType === "Business Fund" ? "bg-purple-wondr" : "bg-orange-wondr"} rounded-full items-center justify-center ${mode === "icon" && "mb-0 mr-4"}`}
           >
             <Icon as={IconComponent} className="w-1/2 h-1/2" />
           </Box>
