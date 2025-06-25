@@ -1,16 +1,16 @@
 import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import pocketTypeDecorator from "../../../assets/images/decorators/pocket-type.png";
+import SavingDecorator from "@/assets/images/decorators/savingDecorator.svg";
 
 export default function PocketTypeCard({
   type,
   subject,
   content,
+  source,
   className,
   selected = false,
   onPress,
@@ -25,13 +25,8 @@ export default function PocketTypeCard({
         <Box className="bg-tosca-wondr w-40 h-9 justify-center pl-5 rounded-br-2xl rounded-tl-xl absolute -left-1 -top-1">
           <Text className="font-semibold text-lg text-black">{subject}</Text>
         </Box>
-        <Box className="w-24 absolute -right-4">
-          <Image
-            source={pocketTypeDecorator}
-            alt="pocket-type-decorator"
-            className="w-full h-16"
-            resizeMode="contain"
-          />
+        <Box className="w-24 absolute -right-7">
+          {source ? source : <SavingDecorator width={60} height={60} />}
         </Box>
         <Heading size="md" className="mt-7 mb-1">
           {type}

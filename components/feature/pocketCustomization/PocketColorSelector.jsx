@@ -19,7 +19,7 @@ export default function PocketColorSelector({
               setSelectedColorIndex(index);
             }}
             key={index}
-            className={`w-8 h-8 rounded-full ${color} ${selectedIndex === index ? "border-2 border-[#007BE5]" : ""}`}
+            className={`w-8 h-8 rounded-full ${color} ${selectedIndex === index ? "border-2 border-green-select" : ""}`}
           ></Pressable>
         ))}
       </HStack>

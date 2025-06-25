@@ -11,7 +11,6 @@ import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import PocketTypeCard from "@/components/feature/createPocket/PocketTypeCard";
 
 import { id, registerTranslation } from "react-native-paper-dates";
-
 registerTranslation("id", id);
 
 export default function CreatePocket() {
@@ -20,7 +19,7 @@ export default function CreatePocket() {
 
   const GoToNext = () => {
     if (pocketType === "Spending") {
-      router.push("pocket/create/Customization");
+      router.push("pocket/create/Details");
     } else if (pocketType === "Saving" || pocketType === "Business Fund") {
       router.push("pocket/create/SelectGoal");
     }
@@ -31,7 +30,6 @@ export default function CreatePocket() {
       <Box className="w-full h-48 bg-[#C3F0EC] absolute top-0"></Box>
 
       <Box className="flex-1 flex-col px-6 pt-8 justify-between">
-        {/* The AppBar is now inside the safe area provided by ScreenContainer */}
         <VStack space="4xl" reversed={false} className="">
           <Heading size="xl" className="text-bold">
             Pilih tipe pocket kamu!

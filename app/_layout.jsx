@@ -1,10 +1,10 @@
 // app/_layout.jsx
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import { ThemeProvider, DefaultTheme } from "@react-navigation/native";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "@/global.css";
 
 // --- Imports for Global Error Modal ---
@@ -24,10 +24,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <GluestackUIProvider mode={colorScheme === "dark" ? "light" : "light"}>
         <ThemeProvider value={DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(main)" options={{ headerShown: false }} />
-          </Stack>
+          <SafeAreaView style={{ flex: 1 }}>
+            <Stack>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(main)" options={{ headerShown: false }} />
+            </Stack>
+          </SafeAreaView>
         </ThemeProvider>
 
         {/* --- FIX: The ErrorModal is now MOVED INSIDE the GluestackUIProvider --- */}

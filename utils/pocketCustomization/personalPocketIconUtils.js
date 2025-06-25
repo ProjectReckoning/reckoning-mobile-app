@@ -1,41 +1,24 @@
-import {
-  Pocket,
-  PocketWhite,
-  Laptop,
-  LaptopWhite,
-  Diamond,
-  DiamondWhite,
-  Airplane,
-  AirplaneWhite,
-  Moonstar,
-  MoonstarWhite,
-  Group,
-  GroupWhite,
-} from "../../assets/Icons/PocketIcon";
+import Pocket from "@/assets/images/icon/pocket/pocket.svg";
+import Laptop from "@/assets/images/icon/pocket/laptop.svg";
+import Diamond from "@/assets/images/icon/pocket/diamond.svg";
+import Airplane from "@/assets/images/icon/pocket/airplane.svg";
+import Moonstar from "@/assets/images/icon/pocket/moonstar.svg";
+import Group from "@/assets/images/icon/pocket/group.svg";
 
-export const iconKeys = [
-  "Pocket",
-  "Laptop",
-  "Diamond",
-  "Airplane",
-  "Moonstar",
-  "Group",
+export const personalIcons = [
+  "pocket",
+  "laptop",
+  "diamond",
+  "airplane",
+  "moonstar",
+  "group",
 ];
 
-export const iconMap = {
-  Pocket,
-  Laptop,
-  Diamond,
-  Airplane,
-  Moonstar,
-  Group,
-};
-
-export const iconWhiteMap = {
-  Pocket: PocketWhite,
-  Laptop: LaptopWhite,
-  Diamond: DiamondWhite,
-  Airplane: AirplaneWhite,
-  Moonstar: MoonstarWhite,
-  Group: GroupWhite,
+export const personalIconMap = {
+  pocket: Pocket,
+  laptop: Laptop,
+  diamond: Diamond,
+  airplane: Airplane,
+  moonstar: Moonstar,
+  group: Group,
 };
