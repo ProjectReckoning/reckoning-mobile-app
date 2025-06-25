@@ -14,7 +14,7 @@ import { usePocketStore } from "@/stores/pocketStore";
 import PocketCard from "@/components/common/cards/PocketCard";
 import EmptyPocket from "@/components/feature/allPocket/EmptyPocket";
 import PocketActionSheet from "@/components/feature/allPocket/PocketActionSheet";
-import DeletePocketAlert from "@/components/feature/allPocket/DeletePocketAlert";
+import DeleteLeavePocketAlert from "@/components/feature/allPocket/DeleteLeavePocketAlert";
 
 const tabList = [
   { key: "personal", label: "Personal" },
@@ -26,7 +26,7 @@ export default function AllPocket() {
   const [activeTab, setActiveTab] = useState("personal");
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
 
   const { allPockets, isAllPocketsLoading, fetchAllPockets, deletePocket } =
     usePocketStore();
@@ -76,15 +76,17 @@ export default function AllPocket() {
       await deletePocket(selectedPocket.pocket_id);
 
       // On success, close the alert and clear the selection.
-      setShowDeleteAlert(false);
+      setShowDeleteLeaveAlert(false);
       setSelectedPocket(null);
     } catch (error) {
       // Optional: Show an error message to the user if deletion fails.
       console.error("Failed to delete pocket from component:", error);
       // You could set an error state here and display it in an alert.
-      setShowDeleteAlert(false);
+      setShowDeleteLeaveAlert(false);
     }
   };
+
+  const handleLeave = () => {};
 
   const handleCardPress = (pocketId) => {
     router.push(`/(main)/pocket/${pocketId}`);
@@ -173,23 +175,26 @@ export default function AllPocket() {
         isOpen={showActionsheet}
         onClose={() => setShowActionsheet(false)}
         onEdit={handleEdit}
-        onDelete={() => {
+        onDeleteLeave={() => {
           setShowActionsheet(false);
-          setShowDeleteAlert(true);
+          setShowDeleteLeaveAlert(true);
         }}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}
         color={selectedPocket?.color}
         icon={selectedPocket?.icon_name}
+        userRole={selectedPocket?.user_role}
       />
-      <DeletePocketAlert
-        isOpen={showDeleteAlert}
-        onClose={() => setShowDeleteAlert(false)}
+      <DeleteLeavePocketAlert
+        isOpen={showDeleteLeaveAlert}
+        onClose={() => setShowDeleteLeaveAlert(false)}
         onDelete={handleDelete}
+        onLeave={handleLeave}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}
         color={selectedPocket?.color}
         icon={selectedPocket?.icon_name}
+        userRole={selectedPocket?.user_role}
       />
     </Box>
   );

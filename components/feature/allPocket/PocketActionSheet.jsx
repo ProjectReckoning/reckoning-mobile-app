@@ -18,11 +18,12 @@ export default function PocketActionSheet({
   isOpen,
   onClose,
   onEdit,
-  onDelete,
+  onDeleteLeave,
   pocketName,
   pocketType,
   icon,
   color,
+  userRole = "owner",
 }) {
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -65,10 +66,10 @@ export default function PocketActionSheet({
         {/* Delete */}
         <PrimaryButton
           buttonAction={() => {
-            onDelete();
+            onDeleteLeave();
             onClose();
           }}
-          buttonTitle="Hapus pocket"
+          buttonTitle={`${userRole === "owner" ? "Hapus pocket" : "Keluar dari pocket"}`}
           className="bg-white border-2 border-red-wondr mb-4 active:bg-red-wondr"
           textClassName="text-red-wondr"
           textPressed="text-white"
