@@ -65,7 +65,7 @@ export default function Statement() {
   );
 
   return (
-    <Box className="w-full flex-1 flex-col bg-white justify-between items-center px-6 py-5 mt-10 mb-3">
+    <Box className="w-full flex-1 flex-col bg-white justify-between items-center px-6 py-5 mb-3">
       <ScrollView
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{
