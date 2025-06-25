@@ -14,9 +14,13 @@ import {
 import { router } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
-import { savingGoals } from "@/utils/createPocket/goalData";
 import { UserPlus, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import {
+  savingGoals,
+  spendingDetails,
+  businessGoals,
+} from "@/utils/createPocket/goalData";
 
 import { WondrColors } from "@/utils/colorUtils";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -26,6 +30,7 @@ export default function Details() {
   const {
     pocketName,
     setPocketName,
+    pocketType,
     pocketBalanceTarget,
     setPocketBalanceTarget,
     targetDuration,
@@ -42,8 +47,14 @@ export default function Details() {
   const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
 
+  const goals =
+    pocketType === "Business Fund"
+      ? businessGoals
+      : pocketType === "Saving"
+        ? savingGoals
+        : spendingDetails;
   const selectedGoal =
-    savingGoals.find((goal) => goal.title === goalTitle) || savingGoals[0];
+    goals.find((goal) => goal.title === goalTitle) || goals[0];
 
   const extraAvatars = selectedFriends.slice(5);
   const remainingCount = extraAvatars.length;
@@ -71,21 +82,26 @@ export default function Details() {
     const nameInvalid =
       !nameTrimmed || nameTrimmed.length === 0 || nameTrimmed.length > 20;
 
-    // Balance: required, integer, min 10000
-    const balanceInvalid =
-      typeof pocketBalanceTarget !== "number" ||
-      isNaN(pocketBalanceTarget) ||
-      pocketBalanceTarget < 10000 ||
-      !Number.isInteger(pocketBalanceTarget);
-
-    // Duration: required, both start and end date
-    const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
-
     setNameIsInvalid(nameInvalid);
-    setBalanceIsInvalid(balanceInvalid);
-    setDateIsInvalid(dateInvalid);
 
-    return !nameInvalid && !balanceInvalid && !dateInvalid;
+    if (pocketType === "Saving") {
+      // Balance: required, integer, min 10000
+      const balanceInvalid =
+        typeof pocketBalanceTarget !== "number" ||
+        isNaN(pocketBalanceTarget) ||
+        pocketBalanceTarget < 10000 ||
+        !Number.isInteger(pocketBalanceTarget);
+
+      // Duration: required, both start and end date
+      const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+
+      setBalanceIsInvalid(balanceInvalid);
+      setDateIsInvalid(dateInvalid);
+
+      return !nameInvalid && !balanceInvalid && !dateInvalid;
+    }
+
+    return !nameInvalid;
   };
 
   const handleSubmit = () => {
@@ -125,16 +141,7 @@ export default function Details() {
       <Box
         className={`w-full h-44 bg-[${WondrColors["tosca-wondr-light-translucent"]}]`}
       >
-        <Box
-          className={`w-44 absolute right-[0.1rem] -bottom-[0.1rem] ${selectedGoal.decoratorClassName}`}
-        >
-          <Image
-            source={selectedGoal.decorator}
-            alt="pocket-type-decorator"
-            className="w-full h-48"
-            resizeMode="contain"
-          />
-        </Box>
+        {selectedGoal.decorator}
         <Box className="flex-1 flex-col px-6 pt-8 justify-between">
           <VStack space="xs" reversed={false}>
             <Heading size="xl" className="text-bold w-56">
@@ -164,6 +171,7 @@ export default function Details() {
                 pocketName={pocketName}
                 setPocketName={setPocketName}
                 isNameInvalid={isNameInvalid}
+                pocketType={pocketType}
                 pocketBalanceTarget={pocketBalanceTarget}
                 setPocketBalanceTarget={(value) => {
                   setBalanceTouched(true); // Mark as touched on first change
@@ -229,12 +237,16 @@ export default function Details() {
               buttonTitle="Lanjut"
               className="mt-5 mb-8"
               disabled={
-                isNameInvalid ||
-                isBalanceInvalid ||
-                isDateInvalid ||
-                pocketBalanceTarget === null ||
-                targetDuration.startDate === null ||
-                targetDuration.endDate === null
+                pocketType === "Saving"
+                  ? isNameInvalid ||
+                    isBalanceInvalid ||
+                    isDateInvalid ||
+                    pocketName.length === 0 ||
+                    pocketName.length > 20 ||
+                    pocketBalanceTarget === null ||
+                    targetDuration.startDate === null ||
+                    targetDuration.endDate === null
+                  : pocketName.length === 0 || pocketName.length > 20
               }
             />
           </Box>
