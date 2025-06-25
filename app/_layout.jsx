@@ -41,7 +41,7 @@ export default function RootLayout() {
           imageSource={ErrorImage}
         />
       </GluestackUIProvider>
-      <StatusBar style="dark" />
+      <StatusBar translucent backgroundColor="transparent" style="dark" />
 
       {/* --- The ErrorModal was previously here, which was incorrect --- */}
     </SafeAreaProvider>
