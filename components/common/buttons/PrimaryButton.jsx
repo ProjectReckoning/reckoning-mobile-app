@@ -8,7 +8,8 @@ export default function PrimaryButton({
   buttonActiveColor = "active:bg-tosca-wondr-dark",
   disabled = false,
   className,
-  textClassName = "text-black text-lg text-center font-bold",
+  textClassName = "",
+  textPressed = "",
 }) {
   return (
     <>
@@ -17,7 +18,13 @@ export default function PrimaryButton({
         onPress={buttonAction}
         disabled={disabled}
       >
-        <Text className={`${textClassName}`}>{buttonTitle}</Text>
+        {({ pressed }) => (
+          <Text
+            className={`text-black text-lg text-center font-bold ${textClassName} ${pressed ? textPressed : ""}`}
+          >
+            {buttonTitle}
+          </Text>
+        )}
       </Pressable>
     </>
   );

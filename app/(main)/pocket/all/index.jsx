@@ -5,12 +5,12 @@ import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { ActivityIndicator, ScrollView } from "react-native";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { CirclePlus } from "lucide-react-native";
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
-import { usePocketStore } from "@/stores/pocketStore";
-import { WondrColors } from "@/utils/colorUtils";
 import TabBar from "@/components/common/TabBar";
+import { CirclePlus } from "lucide-react-native";
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
 import PocketCard from "@/components/common/cards/PocketCard";
 import EmptyPocket from "@/components/feature/allPocket/EmptyPocket";
 import PocketActionSheet from "@/components/feature/allPocket/PocketActionSheet";
@@ -28,13 +28,8 @@ export default function AllPocket() {
   const [selectedPocket, setSelectedPocket] = useState(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
-  const {
-    allPockets,
-    isAllPocketsLoading,
-    fetchAllPockets,
-    // --- KEY CHANGE: Get the new deletePocket action ---
-    deletePocket,
-  } = usePocketStore();
+  const { allPockets, isAllPocketsLoading, fetchAllPockets, deletePocket } =
+    usePocketStore();
 
   // This useEffect handles the navigation after a pocket is created
   useEffect(() => {
@@ -50,7 +45,12 @@ export default function AllPocket() {
   );
 
   const filteredPockets = useMemo(() => {
-    return allPockets.filter((pocket) => activeTab === "personal");
+    if (activeTab === "personal") {
+      return allPockets.filter(
+        (pocket) => pocket.type === "Saving" || pocket.type === "Spending",
+      );
+    }
+    return allPockets.filter((pocket) => pocket.type === "Business");
   }, [allPockets, activeTab]);
 
   const handleEditButton = (pocket) => {
@@ -123,7 +123,7 @@ export default function AllPocket() {
                   pocketName={pocket.name}
                   pocketType={pocket.type}
                   pocketBalance={Number(pocket.current_balance)}
-                  color={"bg-orange-wondr"}
+                  color={pocket.color}
                   icon={pocket.icon_name}
                   space="mt-5 mb-1"
                   cardWidth={`${pressed ? "bg-gray-50" : ""}`}
@@ -166,6 +166,7 @@ export default function AllPocket() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         size={16}
+        marginVertical={28}
       />
       {renderContent()}
       <PocketActionSheet
@@ -178,7 +179,7 @@ export default function AllPocket() {
         }}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}
-        color={selectedPocket?.color_hex}
+        color={selectedPocket?.color}
         icon={selectedPocket?.icon_name}
       />
       <DeletePocketAlert
@@ -187,7 +188,7 @@ export default function AllPocket() {
         onDelete={handleDelete}
         pocketName={selectedPocket?.name}
         pocketType={selectedPocket?.type}
-        color={selectedPocket?.color_hex}
+        color={selectedPocket?.color}
         icon={selectedPocket?.icon_name}
       />
     </Box>
