@@ -168,11 +168,7 @@ export const usePocketStore = create((set, get) => ({
       pocketName: pocket.name,
       pocketType: pocket.type,
       pocketIcon: pocket.icon_name,
-      pocketColor:
-        hexToColorClass[pocket.color_hex.toUpperCase()] ||
-        pocket.type === "Business Fund"
-          ? "bg-purple-wondr"
-          : "bg-orange-wondr",
+      pocketColor: pocket.color,
     });
   },
 

@@ -75,13 +75,15 @@ export default function Customization() {
   useFocusEffect(
     useCallback(() => {
       if (isEditMode) {
-        const pocketToEdit = allPockets.find((p) => p.pocket_id === pocketId);
+        const pocketToEdit = allPockets.find((p) => p.pocket_id == pocketId);
         if (pocketToEdit) {
           setPocketForEditing(pocketToEdit);
         }
       }
       return () => {
-        resetPocketData();
+        if (isEditMode) {
+          resetPocketData();
+        }
       };
     }, [pocketId, isEditMode, allPockets]),
   );
@@ -89,13 +91,25 @@ export default function Customization() {
   // When store data changes (in edit mode), update local index state
   useEffect(() => {
     const colorIndex = colors.indexOf(pocketColor);
-    setSelectedColorIndex(colorIndex >= 0 ? colorIndex : 0);
-
     const iconArray =
       pocketType === "Business Fund" ? businessIcons : personalIcons;
     const iconIndex = iconArray.indexOf(pocketIcon);
-    setSelectedIconIndex(iconIndex >= 0 ? iconIndex : 0);
-  }, [pocketColor, pocketIcon]);
+
+    if (
+      (colorIndex !== selectedColorIndex && colorIndex >= 0) ||
+      (iconIndex !== selectedIconIndex && iconIndex >= 0)
+    ) {
+      setTimeout(() => {
+        if (colorIndex !== selectedColorIndex && colorIndex >= 0) {
+          setSelectedColorIndex(colorIndex);
+        }
+        if (iconIndex !== selectedIconIndex && iconIndex >= 0) {
+          setSelectedIconIndex(iconIndex);
+        }
+      }, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pocketColor, pocketIcon, pocketType]);
 
   // When local index changes, update the Zustand store
   useEffect(() => {
