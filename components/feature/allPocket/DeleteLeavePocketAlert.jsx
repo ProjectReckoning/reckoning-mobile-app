@@ -19,10 +19,12 @@ export default function DeletePocketAlert({
   isOpen,
   onClose,
   onDelete,
+  onLeave,
   pocketName,
   pocketType,
   icon,
   color,
+  userRole = "owner",
 }) {
   return (
     <AlertDialog isOpen={isOpen} onClose={onClose} size="md">
@@ -64,10 +66,14 @@ export default function DeletePocketAlert({
           {/* Delete */}
           <PrimaryButton
             buttonAction={() => {
-              onDelete();
+              if (userRole === "owner") {
+                onDelete();
+              } else {
+                onLeave();
+              }
               onClose();
             }}
-            buttonTitle="Hapus pocket"
+            buttonTitle={`${userRole === "owner" ? "Hapus pocket" : "Keluar dari pocket"}`}
             className="w-full bg-red-wondr mb-1 text-white active:bg-red-wondr-dark"
             textClassName="text-white"
           />
