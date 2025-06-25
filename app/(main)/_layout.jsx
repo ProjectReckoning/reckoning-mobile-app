@@ -104,7 +104,7 @@ export default function MainLayout() {
       <Stack.Screen
         name="pocket/create/Details"
         options={{
-          title: goalTitle,
+          title: pocketType === "Spending" ? "Pocket Spending" : goalTitle,
           headerStyle: {
             backgroundColor: WondrColors["tosca-wondr-light-translucent"],
           },

@@ -1,22 +1,20 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { Icon } from "@/components/ui/icon";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { EllipsisVertical } from "lucide-react-native";
-import { iconWhiteMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
-
-const PocketWhite = iconWhiteMap.Pocket;
+import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
+import { businessIconMap } from "@/utils/pocketCustomization/businessPocketIconUtils";
 
 export default function PocketCard({
   mode = "balance", // mode can be "icon", "type", or "balance"
   pocketName,
-  pocketType = "Saving",
+  pocketType,
   pocketBalance = 0,
-  color = "bg-orange-wondr",
-  icon = PocketWhite,
+  color,
+  icon = "pocket",
   iconSize = "16",
   space = "my-7",
   whiteSpace = "mb-10",
@@ -26,8 +24,10 @@ export default function PocketCard({
 }) {
   const IconComponent =
     typeof icon === "string"
-      ? iconWhiteMap[icon] || PocketWhite
-      : icon || PocketWhite;
+      ? pocketType === "Business Fund"
+        ? businessIconMap[icon.toLowerCase()] || businessIconMap.pocket
+        : personalIconMap[icon.toLowerCase()] || personalIconMap.pocket
+      : personalIconMap.pocket;
 
   const formatRupiah = (value) =>
     new Intl.NumberFormat("id-ID", {
@@ -36,18 +36,24 @@ export default function PocketCard({
       minimumFractionDigits: 0,
     }).format(value);
 
+  const baseColor =
+    color ||
+    (pocketType === "Business Fund" ? "bg-purple-wondr" : "bg-orange-wondr");
+
+  const lightColor = `${baseColor}-light-translucent`;
+
   return (
     <Box
       className={`h-fit bg-white border border-gray-300 rounded-2xl p-0 ${cardWidth}`}
     >
       <Box
-        className={`w-fit h-fit rounded-t-2xl p-4 ${whiteSpace} ${color}-light-translucent ${mode === "icon" && "p-3"}`}
+        className={`w-fit h-fit rounded-t-2xl p-4 ${whiteSpace} ${lightColor} ${mode === "icon" && "p-3"}`}
       >
         <HStack className="justify-between items-start">
           <Box
-            className={`w-${iconSize} h-${iconSize} ${color} rounded-full items-center justify-center ${mode === "icon" && "mb-0 mr-4"}`}
+            className={`w-${iconSize} h-${iconSize} ${baseColor} rounded-full items-center justify-center ${mode === "icon" && "mb-0 mr-4"}`}
           >
-            <Icon as={IconComponent} className="w-1/2 h-1/2" />
+            <IconComponent width="50%" height="50%" color="#fff" />
           </Box>
           {editButton && (
             <Pressable onPress={onEdit} className="mt-2 -mr-2">

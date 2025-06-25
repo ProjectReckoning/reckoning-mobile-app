@@ -5,18 +5,18 @@ import { Image } from "@/components/ui/image";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-import { router, useFocusEffect } from "expo-router"; // Import useFocusEffect
+
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
+import { useState, useCallback } from "react";
+import useAuthStore from "@/stores/authStore";
+import { router, useFocusEffect } from "expo-router";
 import TabBar from "../../../components/common/TabBar";
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
-import { useState, useCallback } from "react"; // Import useCallback
-import useAuthStore from "@/stores/authStore";
 import AccountCard from "@/components/feature/home/AccountCard";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
-import ScreenContainer from "@/components/common/ScreenContainer";
 
 const tabList = [
   { key: "insight", label: "Insight" },
@@ -51,9 +51,9 @@ export default function Home() {
       .join("") || "";
 
   return (
-    <ScreenContainer className="bg-white">
+    <Box className="bg-white">
       {/* Header */}
-      <Box className="flex flex-column pb-3 px-6 bg-[#F9F9F9]">
+      <Box className="flex flex-column pt-5 pb-3 px-6 bg-[#F9F9F9]">
         {/* Row 1: wondr icon and logout */}
         <Box className="flex flex-row items-center justify-between">
           <Image
@@ -132,10 +132,10 @@ export default function Home() {
         />
       </Box>
 
-      <ScrollView className="flex-1 px-6">
+      <ScrollView className="px-6">
         <AccountCard user={user} />
         <SelectedFeature />
       </ScrollView>
-    </ScreenContainer>
+    </Box>
   );
 }

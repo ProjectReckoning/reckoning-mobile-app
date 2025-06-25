@@ -24,13 +24,13 @@ export default function Statement() {
     source,
     destination,
     transactionResult, // The result from the API call
-    resetTransactionData,
+    resetTransactionState,
   } = useTransactionStore();
-  const { resetTransactionState } = usePocketStore();
+  const { resetPocketData } = usePocketStore();
 
   const handleFinish = () => {
     // Reset the amount and go back to the home screen.
-    resetTransactionData();
+    resetPocketData();
     resetTransactionState();
     router.replace("(main)/home");
   };

@@ -2,27 +2,24 @@
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { useState, useEffect, useCallback } from "react";
+import { usePocketStore } from "../../../../stores/pocketStore";
 import {
   router,
   useLocalSearchParams,
   useNavigation,
   useFocusEffect,
 } from "expo-router";
-import { usePocketStore } from "@/stores/pocketStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
+import { CommonActions } from "@react-navigation/native";
 import PocketCard from "@/components/common/cards/PocketCard";
+import { personalIcons } from "@/utils/pocketCustomization/personalPocketIconUtils";
+import { businessIcons } from "@/utils/pocketCustomization/businessPocketIconUtils";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
-import { CommonActions } from "@react-navigation/native";
-import {
-  iconKeys,
-  iconMap,
-  iconWhiteMap,
-} from "@/utils/pocketCustomization/personalPocketIconUtils";
 
 const colors = [
   "bg-orange-wondr",
@@ -78,7 +75,7 @@ export default function Customization() {
   useFocusEffect(
     useCallback(() => {
       if (isEditMode) {
-        const pocketToEdit = allPockets.find((p) => p.pocket_id == pocketId);
+        const pocketToEdit = allPockets.find((p) => p.pocket_id === pocketId);
         if (pocketToEdit) {
           setPocketForEditing(pocketToEdit);
         }
@@ -94,7 +91,9 @@ export default function Customization() {
     const colorIndex = colors.indexOf(pocketColor);
     setSelectedColorIndex(colorIndex >= 0 ? colorIndex : 0);
 
-    const iconIndex = iconKeys.indexOf(pocketIcon);
+    const iconArray =
+      pocketType === "Business Fund" ? businessIcons : personalIcons;
+    const iconIndex = iconArray.indexOf(pocketIcon);
     setSelectedIconIndex(iconIndex >= 0 ? iconIndex : 0);
   }, [pocketColor, pocketIcon]);
 
@@ -104,7 +103,11 @@ export default function Customization() {
   }, [selectedColorIndex]);
 
   useEffect(() => {
-    setPocketIcon(iconKeys[selectedIconIndex]);
+    if (pocketType === "Business Fund") {
+      setPocketIcon(businessIcons[selectedIconIndex] || businessIcons[0]);
+    } else {
+      setPocketIcon(personalIcons[selectedIconIndex] || personalIcons[0]);
+    }
   }, [selectedIconIndex]);
 
   // Validate pocket name
@@ -113,6 +116,10 @@ export default function Customization() {
   }, [pocketName]);
 
   // --- Handlers ---
+  const isBusiness = pocketType === "Business Fund";
+  const selectedColor =
+    selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
+  const selectedSolid = colorMap[selectedColor]?.solid;
 
   const handleCreatePocket = async () => {
     if (!pocketName || pocketName.trim().length === 0 || isNameInvalid) {
@@ -177,10 +184,6 @@ export default function Customization() {
     }
   };
 
-  const PocketWhite = iconWhiteMap.Pocket;
-  const selectedSolid = colorMap[pocketColor]?.solid;
-  const SelectedIconWhite = iconWhiteMap[pocketIcon] || PocketWhite;
-
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
@@ -189,7 +192,7 @@ export default function Customization() {
           pocketName={pocketName}
           pocketType={pocketType}
           color={selectedSolid}
-          icon={SelectedIconWhite}
+          icon={pocketIcon}
           iconSize="16"
           space="my-7"
           cardWidth="min-w-48"
@@ -207,21 +210,23 @@ export default function Customization() {
             contentContainerStyle={{ flexGrow: 1 }}
           >
             <VStack space="2xl" className="w-full px-3">
-              <PocketNameInput
-                pocketName={pocketName}
-                setPocketName={setPocketName}
-                isNameInvalid={isNameInvalid}
-              />
+              {isEditMode && (
+                <PocketNameInput
+                  pocketName={pocketName}
+                  setPocketName={setPocketName}
+                  isNameInvalid={isNameInvalid}
+                />
+              )}
               <PocketColorSelector
                 colors={colors}
                 selectedIndex={selectedColorIndex}
                 setSelectedColorIndex={setSelectedColorIndex}
               />
               <PocketIconSelector
-                iconKeys={iconKeys}
-                iconMap={iconMap}
+                icons={isBusiness ? businessIcons : personalIcons}
                 selectedIndex={selectedIconIndex}
                 setSelectedIconIndex={setSelectedIconIndex}
+                isBusiness={isBusiness}
               />
             </VStack>
           </ScrollView>

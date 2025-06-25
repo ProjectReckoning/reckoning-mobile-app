@@ -42,9 +42,9 @@ export const usePocketStore = create((set, get) => ({
   setTargetDuration: (duration) => set({ targetDuration: duration }),
   selectedFriends: [],
   setSelectedFriends: (friends) => set({ selectedFriends: friends }),
-  pocketColor: "bg-orange-wondr",
+  pocketColor: null,
   setPocketColor: (color) => set({ pocketColor: color }),
-  pocketIcon: "Pocket",
+  pocketIcon: "pocket",
   setPocketIcon: (icon) => set({ pocketIcon: icon }),
   isCreating: false,
   createError: null,
@@ -163,7 +163,10 @@ export const usePocketStore = create((set, get) => ({
       pocketType: pocket.type,
       pocketIcon: pocket.icon_name,
       pocketColor:
-        hexToColorClass[pocket.color_hex.toUpperCase()] || "bg-orange-wondr",
+        hexToColorClass[pocket.color_hex.toUpperCase()] ||
+        pocket.type === "Business Fund"
+          ? "bg-purple-wondr"
+          : "bg-orange-wondr",
     });
   },
 
@@ -176,8 +179,8 @@ export const usePocketStore = create((set, get) => ({
       pocketBalanceTarget: null,
       targetDuration: { startDate: undefined, endDate: undefined },
       selectedFriends: [],
-      pocketColor: "bg-orange-wondr",
-      pocketIcon: "Pocket",
+      pocketColor: null,
+      pocketIcon: "pocket",
       isCreating: false,
       createError: null,
       isUpdating: false,

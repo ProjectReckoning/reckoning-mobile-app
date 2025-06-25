@@ -1,7 +1,6 @@
 import { Box } from "@/components/ui/box";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
@@ -13,7 +12,6 @@ export default function GoalCard({
   subtitle,
   icon,
   className,
-  iconClassName,
   selected = false,
   onPress,
   isCustom = false,
@@ -34,12 +32,7 @@ export default function GoalCard({
             />
           </Box>
         ) : (
-          <Image
-            source={icon}
-            alt={`${title}-icon`}
-            className={`w-32 h-32 absolute -top-1 -right-1 ${iconClassName}`}
-            resizeMode="contain"
-          />
+          <>{icon}</>
         )}
         <Heading size="md" className="leading-tight">
           {title}
