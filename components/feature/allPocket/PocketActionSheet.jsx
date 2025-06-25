@@ -59,7 +59,7 @@ export default function PocketActionSheet({
             onClose();
           }}
           buttonTitle="Ubah pocket"
-          className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
+          className="bg-yellow-wondr mb-4 active:bg-yellow-wondr-dark"
         />
 
         {/* Delete */}
@@ -70,7 +70,8 @@ export default function PocketActionSheet({
           }}
           buttonTitle="Hapus pocket"
           className="bg-white border-2 border-red-wondr mb-4 active:bg-red-wondr"
-          textPressable="text-white"
+          textClassName="text-red-wondr"
+          textPressed="text-white"
         />
       </ActionsheetContent>
     </Actionsheet>

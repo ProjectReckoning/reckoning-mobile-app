@@ -20,6 +20,12 @@ const hexToColorClass = {
   "#FF69B4": "bg-pink-wondr",
 };
 
+const typeToDisplayType = {
+  saving: "Saving",
+  spending: "Spending",
+  business: "Business",
+};
+
 export const usePocketStore = create((set, get) => ({
   // --- State ---
   pocketSubject: null,
@@ -80,7 +86,7 @@ export const usePocketStore = create((set, get) => ({
     const typeMapping = {
       Spending: "spending",
       Saving: "saving",
-      "Business Fund": "saving",
+      "Business Fund": "business",
     };
 
     const requestBody = {
@@ -195,8 +201,14 @@ export const usePocketStore = create((set, get) => ({
     try {
       const response = await api.get("/pocket"); // Intentionally incorrect path for testing
       if (response.data && response.data.ok) {
+        const pockets = (response.data.data || []).map((pocket) => ({
+          ...pocket,
+          color:
+            hexToColorClass[pocket.color_hex?.toUpperCase()] || pocket.color,
+          type: typeToDisplayType[pocket.type] || pocket.type,
+        }));
         set({
-          allPockets: response.data.data || [],
+          allPockets: pockets,
           isAllPocketsLoading: false,
         });
       } else {
@@ -218,8 +230,15 @@ export const usePocketStore = create((set, get) => ({
     try {
       const response = await api.get(`/pocket/${id}`);
       if (response.data && response.data.ok) {
+        const pocket = response.data.data;
+        const pocketWithColor = {
+          ...pocket,
+          color:
+            hexToColorClass[pocket.color_hex?.toUpperCase()] || pocket.color,
+          type: typeToDisplayType[pocket.type] || pocket.type,
+        };
         set({
-          currentPocket: response.data.data,
+          currentPocket: pocketWithColor,
           isLoading: false,
         });
       } else {
