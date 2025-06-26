@@ -1,6 +1,7 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
@@ -11,7 +12,7 @@ import RoleIcon from "@/assets/images/icon/pocketcreation2.png";
 import ScheduleIcon from "@/assets/images/icon/pocketcreation1.png";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransparentIcon from "@/assets/images/icon/pocketcreation3.png";
-import OnboardingDecorator from "@/assets/images/decorators/onboarding2.svg";
+import OnboardingDecorator from "@/assets/images/decorators/onboarding2.png";
 
 export default function CreatePocketOnboarding() {
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function CreatePocketOnboarding() {
   };
 
   return (
-    <Box className="flex-1 bg-white justify-stretch -z-20">
+    <Box className="flex-1 bg-white -z-20">
       <Box className="flex flex-col pt-5">
         <Box className="w-full h-64 -z-10">
           <Image
@@ -35,7 +36,7 @@ export default function CreatePocketOnboarding() {
         </Box>
       </Box>
 
-      <Box className="flex-1 px-6 mt-5 justify-between">
+      <Box className="flex-1 px-6 mt-10 justify-between">
         <Box className="flex">
           <Heading size="xl" bold="true" className="font-extrabold mb-5">
             Kelola Impian Finansial Bersama Lebih Mudah!

@@ -4,7 +4,7 @@ import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import OnboardingIllustration from "@/assets/images/decorators/onboarding.svg";
@@ -40,6 +40,7 @@ export default function PocketOnboarding() {
   }, [progress]);
 
   const handleNext = () => {
+    hasNavigated.current = true;
     router.push("/(main)/pocket/onboarding/CreatePocketOnboarding");
   };
 
