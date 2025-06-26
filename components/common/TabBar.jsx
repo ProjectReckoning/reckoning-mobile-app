@@ -75,6 +75,7 @@ export default function TabBar({
               fontWeight: "bold",
               fontSize: size,
               color: activeTab === tab.key ? "#000" : "#22223A",
+              textDecorationLine: "underline",
             }}
           >
             {tab.label}
