@@ -20,13 +20,12 @@ export default function autoBudgeting() {
   };
 
   const handleNext = () => {
-    router.push("pocket/transaction/autoBudgeting");
+    router.push("pocket/transaction/autoBudgeting/SetAutoBudgeting");
   };
 
   return (
     <Box className="flex-1 bg-white px-6 py-5 justify-between">
       <Box className="flex flex-col">
-        <AppBar title="Auto Budgeting" />
         <Center className="w-full h-16 mt-2">
           <Progress
             value={40}

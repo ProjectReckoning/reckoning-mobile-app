@@ -49,6 +49,8 @@ const CustomDatePicker = ({
   onPickerModeChange,
   minDate,
 }) => {
+  // Ganti seluruh fungsi renderDateGrid Anda dengan ini
+
   const renderDateGrid = () => {
     const year = displayDate.getFullYear();
     const month = displayDate.getMonth();
@@ -62,11 +64,23 @@ const CustomDatePicker = ({
 
     allCells.forEach((day, index) => {
       cells.push(day);
-      if ((index + 1) % 7 === 0 || index === allCells.length - 1) {
+      if ((index + 1) % 7 === 0) {
+        // Hanya push jika baris sudah penuh 7 sel
         rows.push([...cells]);
         cells = [];
       }
     });
+
+    // --- START: Perubahan Logika ---
+    // Jika masih ada sisa sel setelah loop (untuk baris terakhir yang tidak penuh)
+    if (cells.length > 0) {
+      // Tambahkan sel kosong (padding) sampai baris tersebut memiliki 7 sel
+      while (cells.length < 7) {
+        cells.push(null); // Kita bisa gunakan 'null' yang sama seperti 'blanks'
+      }
+      rows.push([...cells]); // Push baris terakhir yang sekarang sudah penuh
+    }
+    // --- END: Perubahan Logika ---
 
     const today = new Date();
     const isCurrentMonth =
@@ -90,6 +104,7 @@ const CustomDatePicker = ({
         {rows.map((row, rowIndex) => (
           <Box key={`row-${rowIndex}`} className="flex-row justify-around">
             {row.map((day, colIndex) => {
+              // Logika render sel tidak perlu diubah, karena sudah menangani 'null'
               if (day === null)
                 return (
                   <Box
@@ -115,8 +130,8 @@ const CustomDatePicker = ({
                 >
                   <Box
                     className={`rounded-full items-center justify-center w-8 h-8 
-                      ${isSelected ? "bg-green-select" : ""} 
-                      ${isCurrentDay && !isSelected ? "border-2 border-green-select" : ""}`}
+                    ${isSelected ? "bg-green-select" : ""} 
+                    ${isCurrentDay && !isSelected ? "border-2 border-green-select" : ""}`}
                     style={isPastDate ? { opacity: 0.3 } : {}}
                   >
                     <Text

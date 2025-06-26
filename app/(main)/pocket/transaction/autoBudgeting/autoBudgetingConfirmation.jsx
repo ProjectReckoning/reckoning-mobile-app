@@ -5,7 +5,6 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { router, useLocalSearchParams } from "expo-router";
 import { Modal, ScrollView } from "react-native";
-import AppBar from "@/components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import { Info } from "lucide-react-native";
@@ -17,25 +16,40 @@ export default function AutoBudgetingConfirmation() {
 
   const nominal = params.nominal ? parseFloat(params.nominal) : 0;
   const frequency = params.frequency || "Mingguan";
-  const selectedDateRaw = params.selectedDate;
-  const selectedDate = selectedDateRaw
-    ? `Setiap tanggal ${selectedDateRaw}`
-    : "Tanggal belum dipilih";
 
-  const startDate = params.startDate
-    ? new Date(params.startDate).toLocaleDateString("id-ID", {
+  const startDateObj = params.startDate ? new Date(params.startDate) : null;
+
+  let detailTanggalText = "Tanggal tidak diatur";
+  if (startDateObj) {
+    if (frequency === "Mingguan") {
+      // Jika mingguan, tampilkan nama harinya
+      detailTanggalText = `Setiap hari ${startDateObj.toLocaleDateString("id-ID", { weekday: "long" })}`;
+    } else if (frequency === "Bulanan" || frequency === "Satu kali") {
+      // Jika bulanan atau sekali, tampilkan tanggalnya
+      detailTanggalText = `Setiap tanggal ${startDateObj.getDate()}`;
+    } else if (frequency === "Harian") {
+      detailTanggalText = "Setiap hari";
+    }
+  }
+
+  // 3. Teks untuk "Tanggal mulai" tetap sama
+  const startDateText = startDateObj
+    ? startDateObj.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
       })
     : "Belum ditentukan";
-  const endDate = params.endDate
+
+  const endDateText = params.endDate
     ? new Date(params.endDate).toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
       })
     : null;
+
+  // --- END: Perubahan Logika Tampilan Tanggal ---
 
   const pocketDetail = {
     name: params.pocketDetail?.name || "Pergi ke Korea 2026",
@@ -74,8 +88,6 @@ export default function AutoBudgetingConfirmation() {
 
   return (
     <Box className="flex-1 bg-white">
-      <AppBar title="Auto budgeting" onBack={handleBack} />
-
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
         className="px-6 py-5"
@@ -138,25 +150,27 @@ export default function AutoBudgetingConfirmation() {
             <Text size="md" color="$text-black-600">
               Tanggal
             </Text>
+            {/* Menggunakan variabel baru yang lebih dinamis */}
             <Text size="md" color="$text-black-600">
-              {selectedDate}
+              {detailTanggalText}
             </Text>
           </Box>
           <Box className="flex-row justify-between mb-2">
             <Text size="md" color="$text-black-600">
               Tanggal mulai
             </Text>
+            {/* Menggunakan variabel baru */}
             <Text size="md" color="$text-black-600">
-              {startDate}
+              {startDateText}
             </Text>
           </Box>
-          {endDate && (
+          {endDateText && (
             <Box className="flex-row justify-between">
               <Text size="md" color="$text-black-600">
                 Tanggal selesai
               </Text>
               <Text size="md" color="$text-black-600">
-                {endDate}
+                {endDateText}
               </Text>
             </Box>
           )}
@@ -172,7 +186,7 @@ export default function AutoBudgetingConfirmation() {
           />
         </Box>
       </ScrollView>
-
+      {/* ... Tombol Hapus & Modal (tidak berubah) ... */}
       {!isDeleteModalVisible && (
         <Box className="mx-4 mb-8 mt-4">
           <PrimaryButton
