@@ -35,7 +35,7 @@ export default function Confirmation() {
             <PocketCard
               mode="icon"
               pocketName={destination.name}
-              color={currentPocket?.color_hex}
+              color={currentPocket?.color}
               icon={currentPocket?.icon_name}
               iconSize="8"
               whiteSpace="mb-5"

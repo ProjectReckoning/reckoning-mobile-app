@@ -81,11 +81,9 @@ export default function TransactionDetail() {
             />
 
             {/* --- NEW: Description Input Field --- */}
-            <VStack space="xs">
-              <Text className="font-semibold text-sm text-typography-700">
-                Deskripsi (Opsional)
-              </Text>
-              <Input>
+            <VStack space="sm">
+              <Text className="text-sm">Deskripsi (Opsional)</Text>
+              <Input className="w-full h-14 rounded-xl border border-gray-wondr-border data-[focus=true]:border-green-select">
                 <InputField
                   placeholder="Contoh: Pembayaran ke vendor"
                   value={description}

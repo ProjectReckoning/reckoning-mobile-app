@@ -21,7 +21,7 @@ export default function NominalInput({
       <Text className="text-sm text-black font-light">Nominal</Text>
       <Input
         variant="underlined"
-        className="w-full h-16 border-[#C3C3C3] data-[focus=true]:border-[#007BE5]"
+        className="w-full h-16 border-[#C3C3C3] data-[focus=true]:border-green-select"
         size="xl"
       >
         <InputSlot className="ml-2">

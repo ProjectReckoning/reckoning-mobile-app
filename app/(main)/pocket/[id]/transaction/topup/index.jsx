@@ -115,7 +115,7 @@ export default function Topup() {
               <PocketCard
                 mode="icon"
                 pocketName={destination.name}
-                color={currentPocket.color_hex}
+                color={currentPocket.color}
                 icon={currentPocket.icon_name}
                 iconSize="8"
                 whiteSpace="mb-5"
@@ -137,7 +137,7 @@ export default function Topup() {
 
             <TransactionCard
               title="Sumber dana"
-              heading={source.category.bank.type}
+              heading={source?.category?.bank?.type || "TAPLUS PEGAWAI BNI"}
               subheading={source.id}
               showBalance={true}
               balance={source.balance}
