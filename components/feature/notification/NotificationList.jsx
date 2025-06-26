@@ -1,108 +1,83 @@
-import React from "react";
-// Pastikan Anda mengimpor Text dari react-native atau library UI Anda
-import { FlatList, Text, View } from "react-native";
+import { useEffect } from "react";
 import { Box } from "@/components/ui/box";
-import { Icon } from "@/components/ui/icon";
-import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
+import { FlatList, Text, View } from "react-native";
 
+import { router } from "expo-router";
 import {
-  Pocket,
-  Laptop,
-  Diamond,
-  Airplane,
-  Moonstar,
-  Group,
-} from "@/assets/Icons/PocketIcon.js";
-
-const iconMap = {
-  Pocket,
-  Laptop,
-  Diamond,
-  Airplane,
-  Moonstar,
-  Group,
-  Default: Pocket,
-};
-
-const notificationData = [
-  {
-    id: "1",
-    title: "Pocket Pergi ke Korea 2026",
-    description: "Permintaan Persetujuan Penarikan Dana",
-    date: "25 Jun 2026",
-    type: "transaction_approval_needed",
-  },
-  {
-    id: "2",
-    title: "Pocket Liburan ke Jepang 2025",
-    description: "Penarikan Dana",
-    date: "15 Agu 2025",
-    type: "transaction_success",
-  },
-  {
-    id: "3",
-    title: "Dana Darurat",
-    description: "Transfer Dana",
-    date: "03 Mar 2026",
-    type: "transaction_success",
-  },
-  {
-    id: "4",
-    title: "Beli Laptop Baru",
-    description: "Shidqi dihapus dari Pocket.",
-    date: "20 Nov 2028",
-  },
-  {
-    id: "5",
-    title: "Pocket Dana Pendidikan Anak",
-    description: "Laras keluar dari Pocket.",
-    date: "10 Jan 2030",
-  },
-  {
-    id: "6",
-    title: "Pocket Dana Pendidikan Hantu",
-    description: "Permintaan persetujuan undang anggota.",
-    type: "member_approval_needed",
-    date: "10 Jan 2030",
-  },
-];
+  notificationData,
+  getUnreadCount,
+} from "@/utils/notification/notification";
+import { useNotificationStore } from "@/stores/notificationStore";
+import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
+import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
 
 export default function NotificationList() {
+  const {
+    setSelectedNotification,
+    readIds,
+    markAsRead,
+    loadReadIds,
+    resetReadIds,
+  } = useNotificationStore();
+  const unreadCount = getUnreadCount(readIds, notificationData);
+
+  // for testing purposes only
+  // useEffect(() => {
+  //   resetReadIds();
+  // }, []);
+
+  const handleNotificationPress = (id, type) => {
+    markAsRead(id);
+    setSelectedNotification(id);
+
+    if (type !== "information") {
+      router.push(`/home/notification/${id}`);
+    }
+  };
+
+  useEffect(() => {
+    loadReadIds();
+  }, []);
+
   const renderNotificationItem = ({ item }) => {
-    const IconComponent = iconMap.Default;
-    const notificationIcon = <Icon as={IconComponent} size="xl" />;
+    const IconComponent = personalIconMap.pocket;
+    const notificationIcon = (
+      <IconComponent width="40%" height="40%" color="#848688" />
+    );
+
+    const notificationId = item.data._id;
+    const notificationType = item.data.type;
+    const isRead = readIds.includes(notificationId);
+    const formattedDate = new Date(item.data.date).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
     return (
       <ReusableCellContent
         icon={notificationIcon}
         title={item.title}
-        description={item.description}
-        date={item.date}
+        description={item.body}
+        date={formattedDate}
+        isRead={isRead}
+        onPress={() =>
+          handleNotificationPress(notificationId, notificationType)
+        }
       />
     );
   };
 
-  const renderSeparator = () => <Box style={{ height: 16 }} />;
+  // separator or spacing between items
+  const renderSeparator = () => <Box className="h-5" />;
 
-  // PERUBAHAN DI SINI
+  // Header for the notification list
   const renderListHeader = () => (
-    <View
-      style={{
-        marginBottom: 24,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: "#E5E7EB", // Warna garis
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 17,
-          fontWeight: "bold",
-          color: "#000000",
-        }}
-      >
-        Pesan lainnya
-      </Text>
+    <View className="flex flex-row gap-3 mb-7 pb-3 items-center border-b border-gray-300">
+      <Text className="text-lg font-bold text-black">Pesan lainnya</Text>
+      <Box className="w-7 h-7 items-center justify-center bg-red-wondr rounded">
+        <Text className="text-sm text-white font-bold">{unreadCount}</Text>
+      </Box>
     </View>
   );
 
@@ -110,14 +85,15 @@ export default function NotificationList() {
     <FlatList
       data={notificationData}
       renderItem={renderNotificationItem}
-      keyExtractor={(item) => item.id}
-      style={{ flex: 1, backgroundColor: "white", color: "#000000" }}
+      keyExtractor={(item) => item.data._id}
+      className="flex-1 bg-white text-black"
       ItemSeparatorComponent={renderSeparator}
       ListHeaderComponent={renderListHeader}
       contentContainerStyle={{
         paddingHorizontal: 24,
         paddingVertical: 16,
       }}
+      extraData={readIds}
     />
   );
 }
