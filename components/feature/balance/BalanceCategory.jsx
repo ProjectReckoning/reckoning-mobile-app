@@ -13,6 +13,7 @@ import {
   BanknoteArrowDown,
   WalletCards,
   Wallet,
+  Send,
 } from "lucide-react-native";
 
 // Impor Palet Warna Kustom Anda
@@ -44,6 +45,12 @@ const CATEGORY_DETAILS = {
     color: WondrColors["purple-wondr"],
     bgColor: "bg-purple-wondr-light-translucent",
   },
+  transfer: {
+    name: "Transfer",
+    Icon: Send,
+    color: WondrColors["pink-wondr"],
+    bgColor: "bg-pink-wondr-light-translucent",
+  },
   lainnya: {
     name: "Lainnya",
     Icon: WalletCards,
@@ -53,7 +60,7 @@ const CATEGORY_DETAILS = {
 };
 
 const MAIN_INCOME_CATEGORIES = ["penjualan", "top up"];
-const MAIN_EXPENSE_CATEGORIES = ["gaji", "withdraw"];
+const MAIN_EXPENSE_CATEGORIES = ["gaji", "withdraw", "transfer"];
 
 // --- DATA TRANSAKSI (CONTOH) ---
 const allTransactions = [
@@ -65,6 +72,7 @@ const allTransactions = [
   { id: 6, type: "pengeluaran", category: "Withdraw", amount: 500000 },
   { id: 7, type: "pengeluaran", category: "Pembelian Stok", amount: 1200000 },
   { id: 8, type: "pengeluaran", category: "Listrik", amount: 450000 },
+  { id: 9, type: "pengeluaran", category: "Transfer", amount: 450000 },
 ];
 
 // --- FUNGSI LOGIKA UNTUK MEMPROSES DATA ---
@@ -152,7 +160,7 @@ export default function BalanceCategory() {
     );
   };
 
-  const renderSeparator = () => <Box style={{ height: 24 }} />;
+  const renderSeparator = () => <Box style={{ height: 12 }} />;
 
   const ListHeader = () => (
     <Box mb="$6">
