@@ -81,7 +81,12 @@ export default function MainLayout() {
       />
       <Stack.Screen
         name="pocket/onboarding/CreatePocketOnboarding"
-        options={{ title: "Create Pocket" }}
+        options={{
+          title: "Create Pocket",
+          headerStyle: {
+            backgroundColor: WondrColors["tosca-wondr-light-translucent"],
+          },
+        }}
       />
       <Stack.Screen
         name="pocket/create/index"
