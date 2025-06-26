@@ -10,12 +10,21 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  Modal,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import AppBar from "@/components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { CalendarClock, ChevronRight, Check, X } from "lucide-react-native";
+import {
+  CalendarClock,
+  ChevronRight,
+  Check,
+  X,
+  CircleHelp,
+} from "lucide-react-native";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 import { useTransactionStore } from "@/stores/transactionStore";
 
@@ -27,6 +36,7 @@ import {
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
 import { WondrColors } from "@/utils/colorUtils";
+
 import CustomDatePicker from "../../../../../components/common/CustomDatePicker/CustomDatePicker";
 
 export default function SetAutoBudgeting() {
@@ -55,52 +65,111 @@ export default function SetAutoBudgeting() {
   const [selectedFrequency, setSelectedFrequency] = useState(null);
   const [isFrequencyActionsheetOpen, setIsFrequencyActionsheetOpen] =
     useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
 
-  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState("date");
+  const [displayDate, setDisplayDate] = useState(new Date());
+  const [tempSelectedDay, setTempSelectedDay] = useState(null);
+  const [errors, setErrors] = useState({});
+
+  // State untuk modal info
+  const [isInfoModalVisible, setInfoModalVisible] = useState(false);
 
   const frequencyOptions = ["Satu kali", "Harian", "Mingguan", "Bulanan"];
 
   const handleSelectFrequency = (value) => {
     setSelectedFrequency(value);
+    if (errors.frekuensi) {
+      setErrors((prevErrors) => ({ ...prevErrors, frekuensi: null }));
+    }
     setIsFrequencyActionsheetOpen(false);
   };
 
-  const handleOpenDatePicker = () => setDatePickerVisible(true);
-  const handleCloseDatePicker = () => setDatePickerVisible(false);
-
-  const handleConfirmDate = (date) => {
-    setSelectedDate(date);
-    setSelectedStartDate(date);
+  const handleConfirmDate = () => {
+    if (tempSelectedDay) {
+      const newSelectedDate = new Date(
+        displayDate.getFullYear(),
+        displayDate.getMonth(),
+        tempSelectedDay,
+      );
+      setSelectedDate(newSelectedDate);
+      if (errors.tanggal) {
+        setErrors((prevErrors) => ({ ...prevErrors, tanggal: null }));
+      }
+    }
     handleCloseDatePicker();
   };
 
+  const handleOpenDatePicker = () => {
+    const initialDate = selectedDate || new Date();
+    setDisplayDate(initialDate);
+    setTempSelectedDay(selectedDate ? selectedDate.getDate() : null);
+    setPickerMode("date");
+    setDatePickerOpen(true);
+  };
+
+  const handleCloseDatePicker = () => setDatePickerOpen(false);
+  const handleDaySelect = (day) => setTempSelectedDay(day);
+  const handleResetDate = () => setTempSelectedDay(null);
+
   const formatDateForDisplay = (date) => {
-    if (!date) return "Select date";
-    return `Setiap tanggal ${date.getDate()}`;
+    if (!date) return "Pilih tanggal mulai";
+    if (selectedFrequency === "Mingguan") {
+      return `Setiap hari ${date.toLocaleDateString("id-ID", { weekday: "long" })}`;
+    }
+    if (selectedFrequency === "Bulanan" || selectedFrequency === "Satu kali") {
+      return `Setiap tanggal ${date.getDate()}`;
+    }
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   };
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const handleNextToConfirmation = () => {
-    const dataToPass = {
-      nominal: amount,
-      frequency: selectedFrequency,
-      selectedDate: selectedDate ? selectedDate.getDate() : null,
-
-      startDate: selectedStartDate ? selectedStartDate.toISOString() : null,
-      endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
-      pocketDetail: pocketDetail,
-      sourceFund: sourceFund,
-    };
-    router.push({
-      pathname: "pocket/transaction/autoBudgeting/autoBudgetingConfirmation",
-      params: dataToPass,
-    });
+  const validate = () => {
+    const newErrors = {};
+    if (!selectedFrequency) {
+      newErrors.frekuensi = "Frekuensi harus dipilih.";
+    }
+    if (!selectedDate) {
+      newErrors.tanggal = "Tanggal mulai harus dipilih.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
+
+  const handleNextToConfirmation = () => {
+    if (validate()) {
+      const dataToPass = {
+        nominal: amount,
+        frequency: selectedFrequency,
+        selectedDate: selectedDate ? selectedDate.getDate().toString() : null,
+        startDate: selectedDate ? selectedDate.toISOString() : null,
+        endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
+        pocketDetail: pocketDetail,
+        sourceFund: sourceFund,
+      };
+      router.push({
+        pathname: "pocket/transaction/autoBudgeting/autoBudgetingConfirmation",
+        params: dataToPass,
+      });
+    }
+  };
+
+  const InfoTransferItem = ({ text }) => (
+    <View className="flex-row mb-3">
+      <Text className="text-2xl mr-2" style={{ color: "#00A39D" }}>
+        •
+      </Text>
+      <Text className="text-base text-gray-700 flex-1">{text}</Text>
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView
@@ -108,25 +177,18 @@ export default function SetAutoBudgeting() {
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 50}
       style={{ flex: 1 }}
     >
-      {/* TouchableWithoutFeedback untuk tap-to-dismiss keyboard */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        {/* ScrollView untuk konten yang bisa di-scroll */}
         <ScrollView
-          keyboardShouldPersistTaps="handled" // Penting: taps di dalam ScrollView tetap berfungsi
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
           className="bg-white px-6 py-5"
         >
-          {/* App Bar */}
-          <AppBar title="Auto budgeting" onBack={handleBack} />
-
-          {/* Bagian Pocket Card dan Detail Tujuan */}
           <Box className="flex-row items-center mt-5 mb-6 gap-4">
             <PocketCard
               mode="icon"
               pocketType={pocketDetail.pocketType}
               color={pocketDetail.color}
               icon={pocketDetail.icon}
-              // PROPERTI ICON POCKETCARD INI TIDAK DIUBAH SAMA SEKALI
               iconSize="10"
               whiteSpace="mb-5"
               className="w-12 h-12 rounded-full"
@@ -135,30 +197,41 @@ export default function SetAutoBudgeting() {
               iconBackgroundSize="w-12 h-12"
             />
             <Box flex={1}>
-              <Heading size="md" color="$text-black-600">
-                {pocketDetail.name}
-              </Heading>
+              <View className="flex-row items-center justify-between">
+                <Heading size="md" color="$text-black-600">
+                  {pocketDetail.name}
+                </Heading>
+                <Pressable onPress={() => setInfoModalVisible(true)}>
+                  <CircleHelp size={22} color="orange" />
+                </Pressable>
+              </View>
               <Text size="sm" color="$text-black-600">
                 {pocketDetail.accountNumber}
               </Text>
             </Box>
           </Box>
 
-          {/* Input Nominal */}
           <Box className="mb-4">
             <NominalInput
               amount={amount}
-              setAmount={setAmount}
+              setAmount={(val) => {
+                setAmount(val);
+                if (errors.nominal) {
+                  setErrors((prev) => ({ ...prev, nominal: null }));
+                }
+              }}
               setAmountTouched={setAmountTouched}
-              isAmountInvalid={false}
+              isAmountInvalid={!!errors.nominal}
             />
+            {errors.nominal && (
+              <Text className="text-red-500 mt-1 ml-1">{errors.nominal}</Text>
+            )}
           </Box>
 
-          {/* Input Frekuensi */}
           <Text className="text-black font-light mb-1">Frekuensi</Text>
           <Pressable
             onPress={() => setIsFrequencyActionsheetOpen(true)}
-            className="w-full h-14 p-3 my-1 justify-between rounded-xl border border-gray-300 flex-row items-center"
+            className={`w-full h-14 p-3 my-1 justify-between rounded-xl border ${errors.frekuensi ? "border-red-500" : "border-gray-300"} flex-row items-center`}
           >
             <Text
               className={selectedFrequency ? "text-black" : "text-gray-400"}
@@ -167,20 +240,26 @@ export default function SetAutoBudgeting() {
             </Text>
             <ChevronRight size={16} color="#848688" />
           </Pressable>
+          {errors.frekuensi && (
+            <Text className="text-red-500 mt-1 ml-1">{errors.frekuensi}</Text>
+          )}
 
-          {/* Input Starting Date (Tanggal Mulai) */}
           <Text className="text-black font-light mt-4 mb-1">Starting date</Text>
           <Pressable
             onPress={handleOpenDatePicker}
-            className="w-full h-14 p-3 my-1 justify-start rounded-xl border border-gray-300 flex-row items-center gap-3"
+            className={`w-full h-14 p-3 my-1 justify-start rounded-xl border ${errors.tanggal ? "border-red-500" : "border-gray-300"} flex-row items-center gap-3`}
+            disabled={!selectedFrequency}
+            style={{ opacity: !selectedFrequency ? 0.5 : 1 }}
           >
             <CalendarClock size={16} color="#848688" />
             <Text className={selectedDate ? "text-black" : "text-gray-400"}>
               {formatDateForDisplay(selectedDate)}
             </Text>
           </Pressable>
+          {errors.tanggal && (
+            <Text className="text-red-500 mt-1 ml-1">{errors.tanggal}</Text>
+          )}
 
-          {/* Card Sumber Dana */}
           <Box className="mb-4 mt-4">
             <TransactionCard
               title={sourceFund.title}
@@ -191,29 +270,71 @@ export default function SetAutoBudgeting() {
             />
           </Box>
 
-          {/* Box Kosong untuk mengisi sisa ruang (flex-1) */}
           <Box style={{ flex: 1 }} />
 
-          {/* Tombol Lanjut */}
           <PrimaryButton
             buttonAction={handleNextToConfirmation}
             buttonTitle="Set auto-budgeting"
             className="mb-8"
             textClassName="text-black font-bold text-base"
+            disabled={!amount || !selectedFrequency || !selectedDate}
+            isLoading={false}
           />
         </ScrollView>
       </TouchableWithoutFeedback>
 
-      {/* CustomDatePicker (Modal Pemilih Tanggal) */}
+      {/* Modal Info Transfer Terjadwal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isInfoModalVisible}
+        onRequestClose={() => {
+          setInfoModalVisible(!isInfoModalVisible);
+        }}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View
+            className="w-11/12 bg-white rounded-2xl p-5"
+            style={{ elevation: 5 }}
+          >
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-bold text-black">
+                Info transfer terjadwal
+              </Text>
+              <TouchableOpacity onPress={() => setInfoModalVisible(false)}>
+                <X size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                borderTopWidth: 1,
+                borderTopColor: "#E5E7EB",
+                paddingTop: 16,
+              }}
+            >
+              <InfoTransferItem text="Transfer akan diproses jam 00.00 WIB pada jadwal kamu. Pastiin saldo kamu cukup sebelumnya." />
+              <InfoTransferItem text="Kamu tidak akan dikenakan biaya apa pun kalau transfer terjadwal gagal karena saldo tidak cukup." />
+              <InfoTransferItem text="Kalau kamu jadwalin transfer bulanan di tanggal 31 dan bulan berikutnya memiliki kurang dari 31 hari, transfer akan dikirim di hari terakhir bulan tersebut." />
+              <InfoTransferItem text="Transfer terjadwal kamu bisa dibatalin oleh sistem karena rekening tujuan kamu tidak aktif atau nominal transfer yang terjadwal melebihi limit harian." />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <CustomDatePicker
-        isVisible={isDatePickerVisible}
+        isOpen={isDatePickerOpen}
         onClose={handleCloseDatePicker}
         onConfirm={handleConfirmDate}
-        initialDate={selectedDate || new Date()}
-        minDate={today} // Meneruskan minDate untuk menonaktifkan tanggal lampau
+        onReset={handleResetDate}
+        displayDate={displayDate}
+        selectedDay={tempSelectedDay}
+        pickerMode={pickerMode}
+        onDaySelect={handleDaySelect}
+        onDisplayDateChange={setDisplayDate}
+        onPickerModeChange={setPickerMode}
+        minDate={today}
       />
 
-      {/* Actionsheet untuk Pemilihan Frekuensi */}
       <Actionsheet
         isOpen={isFrequencyActionsheetOpen}
         onClose={() => {
