@@ -2,20 +2,27 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
 import { ScrollView } from "react-native";
 import { Bell } from "lucide-react-native";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useAuthStore from "@/stores/authStore";
+import TabBar from "@/components/common/TabBar";
+import { WondrColors } from "@/utils/colorUtils";
 import { router, useFocusEffect } from "expo-router";
-import TabBar from "../../../components/common/TabBar";
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
 import AccountCard from "@/components/feature/home/AccountCard";
+import { useNotificationStore } from "@/stores/notificationStore";
+import {
+  notificationData,
+  getUnreadCount,
+} from "@/utils/notification/notification";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
 
 const tabList = [
@@ -27,6 +34,13 @@ const tabList = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
   const { user, removeToken, fetchUser } = useAuthStore();
+
+  useEffect(() => {
+    useNotificationStore.getState().loadReadIds();
+  }, []);
+
+  const readIds = useNotificationStore((state) => state.readIds);
+  const unreadCount = getUnreadCount(readIds, notificationData);
 
   // Fetch user data every time the screen comes into focus
   useFocusEffect(
@@ -42,13 +56,12 @@ export default function Home() {
     router.replace("/(auth)/login");
   };
 
+  const GoToNotification = () => {
+    router.push("/(main)/home/notification");
+  };
+
   // Helper to get first name and initials
   const firstName = user?.name?.split(" ")[0] || "";
-  const initials =
-    user?.name
-      ?.split(" ")
-      .map((n) => n[0])
-      .join("") || "";
 
   return (
     <Box className="bg-white">
@@ -65,7 +78,7 @@ export default function Home() {
 
           <Button
             size="xs"
-            className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center"
+            className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center data-[active=true]:bg-slate-100"
             onPress={handleLogout}
           >
             <Image
@@ -74,7 +87,9 @@ export default function Home() {
               className="aspect-square w-4"
               alt="logout"
             />
-            <ButtonText className="text-black">Keluar</ButtonText>
+            <ButtonText className="text-black data-[active=true]:text-black">
+              Keluar
+            </ButtonText>
           </Button>
         </Box>
 
@@ -83,10 +98,10 @@ export default function Home() {
           <Box className="flex flex-row gap-2 jus items-center">
             <Avatar
               size={"sm"}
-              className="bg-[#00DDD8] items-center justify-center"
+              className="bg-[#F2F2F2] items-center justify-center mr-1"
             >
-              <AvatarFallbackText className="text-[#0F0F19]">
-                {initials}
+              <AvatarFallbackText className="text-[#58ABA1]">
+                {user?.name}
               </AvatarFallbackText>
             </Avatar>
             <Text className="text-xl font-bold text-gray-800">
@@ -96,13 +111,29 @@ export default function Home() {
 
           <Box className="flex flex-row items-center justify-center gap-4">
             <Pressable
-              onPress={() => {}}
+              onPress={GoToNotification}
               className="items-center justify-center"
             >
-              <Box className="flex flex-column items-center justify-center gap-1.5">
-                <Bell size={20} />
-                <Text className="text-black text-xs">Notifikasi</Text>
-              </Box>
+              {({ pressed }) => (
+                <VStack className="flex flex-column items-center justify-center gap-1.5">
+                  {unreadCount > 0 && (
+                    <Box className="w-2.5 h-2.5 z-10 self-end bg-orange-wondr rounded-full -mb-3 mr-4" />
+                  )}
+                  <Bell
+                    size={20}
+                    color={
+                      pressed
+                        ? WondrColors["orange-wondr-dark"]
+                        : "currentColor"
+                    }
+                  />
+                  <Text
+                    className={`text-xs underline ${pressed ? "text-orange-wondr-dark" : "text-black"}`}
+                  >
+                    Notifikasi
+                  </Text>
+                </VStack>
+              )}
             </Pressable>
             <Pressable
               onPress={() => {}}
@@ -115,7 +146,9 @@ export default function Home() {
                   className="aspect-square w-4"
                   alt="logout"
                 />
-                <Text className="text-black text-xs">Bukti Transaksi</Text>
+                <Text className="text-black text-xs underline">
+                  Bukti Transaksi
+                </Text>
               </Box>
             </Pressable>
           </Box>
