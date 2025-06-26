@@ -1,126 +1,52 @@
-import React, { useEffect, useState, useMemo } from "react"; // <-- Import useMemo
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
-import { Box } from "@/components/ui/box";
-import { WondrColors } from "@/utils/colorUtils";
-import useAuthStore from "@/stores/authStore";
-import { Crown, Info } from "lucide-react-native";
 
-import ReusableInformationCell from "../../common/tableCells/ReusableInformationCell";
-import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import { Info } from "lucide-react-native";
+import useAuthStore from "@/stores/authStore";
+import { useEffect, useState, useMemo } from "react";
 import { ScrollView, Platform, StyleSheet } from "react-native";
 
-import notificationApproval from "../../../assets/images/notification-approval.png";
-import notificationWithdraw from "../../../assets/images/notification-withdraw.png";
-
-export const mockNotifications = [
-  // [0] Notifikasi 1: Butuh persetujuan transaksi
-  {
-    title: "Persetujuan Penarikan Dana",
-    date: "19 Jun 2025",
-    type: "transaction_approval_needed",
-    message:
-      "Penarikan ini melebihi jumlah kontribusi anggota ke Shared Pocket.",
-
-    data: [
-      {
-        title: "Diminta oleh",
-        content: ["Sdr IVANKA LARASATI KUSUMADEWI", "BNI. 1915615851"],
-      },
-      {
-        title: "Nominal",
-        content: ["Rp200.000"],
-        textClassName: "font-semibold",
-      },
-      {
-        title: "Sumber Dana",
-        content: ["Pergi ke Korea 2026", "SHARED POCKET BNI. 0238928039"],
-      },
-    ],
-  },
-
-  // [1] Notifikasi 2: Butuh persetujuan anggota
-  {
-    title: "Undangan Shared Pocket Baru!",
-    date: "18 Jun 2025",
-    type: "member_approval_needed",
-    message:
-      "Ivanka mengajakmu berkolaborasi di Shared Pocket 'Pergi ke Korea 2026'. Bersama, kita bisa ciptakan hal-hal menakjubkan!",
-    data: [
-      {
-        title: "Detail pengundang",
-        content: ["Sdr IVANKA LARASATI KUSUMADEWI", "BNI. 1915615851"],
-      },
-      {
-        title: "Detail pocket",
-        content: ["Pergi ke Korea 2026", "SHARED POCKET BNI. 0238928039"],
-      },
-    ],
-  },
-
-  // [2] Notifikasi 3: Transaksi berhasil
-  {
-    title: "Penarikan Dana Berhasil",
-    date: "17 Jun 2025",
-    type: "transaction_success",
-    message:
-      "Penarikan ini sesuai dengan jumlah kontribusi anggota ke Shared Pocket.",
-    data: [
-      {
-        title: "Diminta oleh",
-        content: ["Sdr IVANKA LARASATI KUSUMADEWI", "BNI. 1915615851"],
-      },
-      {
-        title: "Nominal",
-        content: ["Rp200.000"],
-        textClassName: "font-semibold",
-      },
-      {
-        title: "Sumber Dana",
-        content: ["Pergi ke Korea 2026", "SHARED POCKET BNI. 0238928039"],
-      },
-    ],
-  },
-];
-// Mock data yang baru dan lebih lengkap
-// const mockNotification = {
-//   title: "Persetujuan Penarikan Dana",
-//   date: "19 Jun 2025",
-//   type: "transaction_approval_needed",
-//   message: "Penarikan ini melebihi jumlah kontribusi anggota ke Shared Pocket.",
-//   data: [
-//     {
-//       title: "Diminta oleh",
-//       content: ["Sdr IVANKA LARASATI KUSUMADEWI", "BNI. 1915615851"],
-//     },
-//     {
-//       title: "Nominal",
-//       content: ["Rp200.000"],
-//       textClassName: "font-semibold",
-//     },
-//     {
-//       title: "Sumber Dana",
-//       content: ["Pergi ke Korea 2026", "SHARED POCKET BNI. 0238928039"],
-//     },
-//   ],
-// };
+import {
+  notificationData,
+  mockNotifications,
+} from "@/utils/notification/notification";
+import { WondrColors } from "@/utils/colorUtils";
+import { formatRupiah } from "@/utils/helperFunction";
+import { useNotificationStore } from "@/stores/notificationStore";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import notificationApproval from "@/assets/images/notification-approval.png";
+import notificationWithdraw from "@/assets/images/notification-withdraw.png";
+import ReusableInformationCell from "@/components/common/tableCells/ReusableInformationCell";
 
 export default function NotificationDetailContent() {
-  // <-- 1. State disederhanakan menjadi satu objek notifikasi
-  const [notification, setNotification] = useState(null);
   const user = useAuthStore((state) => state.user);
+  const selectedNotification = useNotificationStore(
+    (state) => state.selectedNotification,
+  );
 
-  useEffect(() => {
-    // Di aplikasi nyata, Anda mungkin akan fetch data ini dari API
-    setNotification(mockNotifications[0]);
-  }, []); // Cukup dijalankan sekali
+  // get mock notification data
+  const notif = notificationData.find(
+    (notification) => notification.data._id === selectedNotification,
+  );
+  // const notif = notificationData[5];
+  const formattedDate = new Date(notif.data.date).toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
-  // <-- 2. Gunakan useMemo untuk menghitung gambar agar lebih efisien
+  // const [notification, setNotification] = useState(null);
+
+  // useEffect(() => {
+  //   setNotification(mockNotifications[1]);
+  // }, []);
+
   const notificationImage = useMemo(() => {
-    if (!notification) return null;
+    if (!notif) return null;
 
-    switch (notification.type) {
+    switch (notif?.data.type) {
       case "member_approval_needed":
       case "transaction_approval_needed":
         return notificationApproval;
@@ -129,12 +55,11 @@ export default function NotificationDetailContent() {
       default:
         return null;
     }
-  }, [notification]);
+  }, [notif]);
 
   const renderButtonBasedOnType = () => {
-    if (!notification) return null;
-    // ... (logika renderButtonBasedOnType tidak perlu diubah)
-    switch (notification.type) {
+    if (!notif) return null;
+    switch (notif?.data.type) {
       case "transaction_approval_needed":
       case "member_approval_needed":
         return (
@@ -157,9 +82,9 @@ export default function NotificationDetailContent() {
   };
 
   const renderMessageBasedOnType = () => {
-    if (!notification) return null;
+    if (!notif) return null;
 
-    switch (notification.type) {
+    switch (notif?.data.type) {
       case "transaction_approval_needed":
         return (
           <HStack className="items-center gap-2">
@@ -168,7 +93,7 @@ export default function NotificationDetailContent() {
               className="text-sm font-semibold text-black"
               style={{ flex: 1 }}
             >
-              {notification.message}
+              {notif?.data.message}
             </Text>
           </HStack>
         );
@@ -178,7 +103,7 @@ export default function NotificationDetailContent() {
             className="text-sm font-semibold text-black"
             style={{ flex: 1 }}
           >
-            {notification.message}
+            {notif?.data.message}
           </Text>
         );
       case "member_approval_needed":
@@ -191,7 +116,7 @@ export default function NotificationDetailContent() {
               Hai, {user?.name.toUpperCase()}
             </Text>
             <Text className="text-m text-black" style={{ flex: 1 }}>
-              {notification.message}
+              {notif?.data.message}
             </Text>
           </>
         );
@@ -200,27 +125,77 @@ export default function NotificationDetailContent() {
     }
   };
 
-  // <-- Gunakan optional chaining (?.) untuk mencegah error jika notifikasi masih null
-  if (!notification) {
+  const renderDetailData = () => {
+    if (!notif) return [];
+    let detailData = [];
+
+    switch (notif?.data.type) {
+      case "transaction_approval_needed":
+      case "transaction_success":
+        detailData = [
+          {
+            title: "Diminta oleh",
+            content: [
+              `Sdr ${notif?.data.requestedBy.name}`,
+              `${notif?.data.requestedBy.category.bank.name}. ${notif?.data.requestedBy.id}`,
+            ],
+          },
+          {
+            title: "Nominal",
+            content: [formatRupiah(notif?.data.amount)],
+            textClassName: "font-semibold",
+          },
+          {
+            title: "Sumber Dana",
+            content: [
+              notif?.title,
+              `SHARED POCKET BNI. ${notif?.data.pocket.id}`,
+            ],
+          },
+        ];
+        break;
+      case "member_approval_needed":
+        detailData = [
+          {
+            title: "Detail pengundang",
+            content: [
+              `Sdr ${notif?.data.requestedBy.name}`,
+              `${notif?.data.requestedBy.category.bank.name}. ${notif?.data.requestedBy.id}`,
+            ],
+          },
+          {
+            title: "Detail pocket",
+            content: [
+              notif?.title,
+              `SHARED POCKET BNI. ${notif?.data.pocket.id}`,
+            ],
+          },
+        ];
+        break;
+      default:
+        detailData = [];
+    }
+    return detailData;
+  };
+
+  if (!notif) {
     return (
       <Box className="flex-1 justify-center items-center bg-white">
         <Text>Loading...</Text>
       </Box>
-    ); // Atau loading indicator
+    );
   }
 
   return (
     <Box className="flex-1 flex-col bg-white">
       <ScrollView className="flex-1 px-8 py-6">
         <Box className="mb-5">
-          <Text className="text-xl font-bold text-black">
-            {notification.title}
-          </Text>
+          <Text className="text-xl font-bold text-black">{notif?.title}</Text>
           <Text
             className="text-sm"
             style={{ color: WondrColors["dark-gray-wondr-deactive"] }}
           >
-            {notification.date}
+            {formattedDate}
           </Text>
         </Box>
 
@@ -231,6 +206,7 @@ export default function NotificationDetailContent() {
             resizeMode="cover"
             size="none"
             style={{ height: undefined, width: undefined }}
+            alt="Notification Image"
           />
         </Box>
 
@@ -238,12 +214,12 @@ export default function NotificationDetailContent() {
 
         {/* <-- 3. Render sel informasi secara dinamis menggunakan .map() */}
         <Box className="mb-5" gap={10}>
-          {notification.data.map((item, index) => (
+          {renderDetailData().map((item, index) => (
             <ReusableInformationCell
-              key={index} // <-- Key sangat penting untuk performa list
+              key={index}
               cellTitle={item.title}
               cellValue={item.content}
-              textClassName={item.textClassName} // Akan undefined jika tidak ada, tidak masalah
+              textClassName={item.textClassName}
             />
           ))}
         </Box>

@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUnreadCount } from "../utils/notification/notification";
 
 const STORAGE_KEY = "notification-read-ids";
 
 export const useNotificationStore = create((set, get) => ({
+  selectedNotification: null,
+  setSelectedNotification: (notification) =>
+    set({ selectedNotification: notification }),
+
   readIds: [],
   loadReadIds: async () => {
     try {

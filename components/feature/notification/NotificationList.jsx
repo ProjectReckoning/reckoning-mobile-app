@@ -2,20 +2,23 @@ import { useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { FlatList, Text, View } from "react-native";
 
-import { WondrColors } from "@/utils/colorUtils";
-import { usePocketStore } from "@/stores/pocketStore";
-import { useNotificationStore } from "@/stores/notificationStore";
+import { router } from "expo-router";
 import {
   notificationData,
   getUnreadCount,
 } from "@/utils/notification/notification";
+import { useNotificationStore } from "@/stores/notificationStore";
 import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
 import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
-import { businessIconMap } from "@/utils/pocketCustomization/businessPocketIconUtils";
 
 export default function NotificationList() {
-  const { allPockets } = usePocketStore();
-  const { readIds, markAsRead, resetReadIds } = useNotificationStore();
+  const {
+    setSelectedNotification,
+    readIds,
+    markAsRead,
+    loadReadIds,
+    resetReadIds,
+  } = useNotificationStore();
   const unreadCount = getUnreadCount(readIds, notificationData);
 
   // for testing purposes only
@@ -23,40 +26,44 @@ export default function NotificationList() {
   //   resetReadIds();
   // }, []);
 
-  const handleNotificationPress = (id) => {
-    console.log("Notification pressed");
+  const handleNotificationPress = (id, type) => {
     markAsRead(id);
+    setSelectedNotification(id);
+
+    if (type !== "information") {
+      router.push(`/home/notification/${id}`);
+    }
   };
 
+  useEffect(() => {
+    loadReadIds();
+  }, []);
+
   const renderNotificationItem = ({ item }) => {
-    const matchingPocket = allPockets.find((pocket) =>
-      item.title.includes(pocket.name),
-    );
-
-    const iconKey = matchingPocket?.icon_name || "pocket";
-    const colorClass = matchingPocket?.color || "bg-orange-wondr";
-
-    const iconMap =
-      matchingPocket?.type === "Business" ? businessIconMap : personalIconMap;
-    const IconComponent =
-      iconMap[iconKey.toLowerCase()] || personalIconMap.pocket;
-
-    const colorName = colorClass.replace(/^bg-/, "");
+    const IconComponent = personalIconMap.pocket;
     const notificationIcon = (
-      <IconComponent width="40%" height="40%" color={WondrColors[colorName]} />
+      <IconComponent width="40%" height="40%" color="#848688" />
     );
 
-    const isRead = readIds.includes(item.id);
+    const notificationId = item.data._id;
+    const notificationType = item.data.type;
+    const isRead = readIds.includes(notificationId);
+    const formattedDate = new Date(item.data.date).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
     return (
       <ReusableCellContent
         icon={notificationIcon}
-        iconContainerBgColor={`${colorClass}-light-translucent`}
         title={item.title}
-        description={item.description}
-        date={item.date}
+        description={item.body}
+        date={formattedDate}
         isRead={isRead}
-        onPress={() => handleNotificationPress(item.id)}
+        onPress={() =>
+          handleNotificationPress(notificationId, notificationType)
+        }
       />
     );
   };
@@ -74,15 +81,11 @@ export default function NotificationList() {
     </View>
   );
 
-  useEffect(() => {
-    useNotificationStore.getState().loadReadIds();
-  }, []);
-
   return (
     <FlatList
       data={notificationData}
       renderItem={renderNotificationItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.data._id}
       className="flex-1 bg-white text-black"
       ItemSeparatorComponent={renderSeparator}
       ListHeaderComponent={renderListHeader}
