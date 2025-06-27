@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import api from "@/lib/api";
 
+// --- Helper Objects ---
 const colorClassToHex = {
   "bg-orange-wondr": "#FF7A00",
   "bg-yellow-wondr": "#FFC700",
@@ -56,8 +57,6 @@ export const usePocketStore = create((set, get) => ({
   createError: null,
   isUpdating: false,
   updateError: null,
-  newFriend: null,
-  setNewFriend: (friend) => set({ newFriend: friend }),
   currentPocket: null,
   isLoading: false,
   error: null,
@@ -67,110 +66,13 @@ export const usePocketStore = create((set, get) => ({
   allPockets: [],
   isAllPocketsLoading: false,
   allPocketsError: null,
+  pocketMembers: [],
+  isMembersLoading: false,
+  membersError: null,
+  isMemberActionLoading: false,
+  memberActionError: null,
 
   // --- Actions ---
-
-  createPocket: async () => {
-    console.log("--- [STORE] createPocket: Initiated ---");
-    set({ isCreating: true, createError: null });
-    const {
-      pocketName,
-      pocketType,
-      pocketBalanceTarget,
-      targetDuration,
-      pocketIcon,
-      pocketColor,
-      selectedFriends,
-    } = get();
-
-    const typeMapping = {
-      Spending: "spending",
-      Saving: "saving",
-      "Business Fund": "business",
-    };
-
-    const requestBody = {
-      name: pocketName,
-      type: typeMapping[pocketType] || "spending",
-      status: "active",
-      icon_name: pocketIcon,
-      color_hex: colorClassToHex[pocketColor] || "#FF7A00",
-      members: selectedFriends.map((friend) => ({
-        user_id: friend.id,
-        role: "viewer",
-      })),
-    };
-
-    if (pocketType === "Saving" || pocketType === "Business Fund") {
-      requestBody.target_nominal = pocketBalanceTarget;
-      requestBody.deadline = targetDuration?.endDate
-        ? new Date(targetDuration.endDate).toISOString()
-        : null;
-    }
-
-    try {
-      const response = await api.post("/pocket", requestBody);
-      if (response.data && response.data.ok) {
-        set({ isCreating: false });
-        get().fetchAllPockets();
-        return response.data.data;
-      } else {
-        throw new Error(
-          response.data?.message ||
-            "Pocket creation failed, response was not OK.",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      set({ createError: errorMessage, isCreating: false });
-      throw error;
-    }
-  },
-
-  updatePocket: async (pocketId) => {
-    console.log(`--- [STORE] updatePocket: Initiated for ID: ${pocketId} ---`);
-    set({ isUpdating: true, updateError: null });
-
-    const { pocketName, pocketType, pocketIcon, pocketColor } = get();
-
-    const requestBody = {
-      name: pocketName,
-      type: pocketType === "Spending" ? "spending" : "saving",
-      icon_name: pocketIcon,
-      color_hex: colorClassToHex[pocketColor] || "#FF7A00",
-    };
-
-    try {
-      const response = await api.patch(`/pocket/${pocketId}`, requestBody);
-      if (response.data && response.data.ok) {
-        set({ isUpdating: false });
-        get().fetchAllPockets();
-        return response.data.data;
-      } else {
-        throw new Error(response.data?.message || "Pocket update failed.");
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      set({ updateError: errorMessage, isUpdating: false });
-      throw error;
-    }
-  },
-
-  setPocketForEditing: (pocket) => {
-    if (!pocket) return;
-    set({
-      pocketName: pocket.name,
-      pocketType: pocket.type,
-      pocketIcon: pocket.icon_name,
-      pocketColor: pocket.color,
-    });
-  },
 
   resetPocketData: () => {
     set({
@@ -183,83 +85,243 @@ export const usePocketStore = create((set, get) => ({
       selectedFriends: [],
       pocketColor: null,
       pocketIcon: "pocket",
-      isCreating: false,
       createError: null,
-      isUpdating: false,
       updateError: null,
-      newFriend: null,
+    });
+  },
+
+  setPocketForEditing: (pocket) => {
+    set({
+      pocketName: pocket.name,
+      pocketBalanceTarget: parseInt(pocket.target_nominal, 10),
+      targetDuration: {
+        startDate: new Date(),
+        endDate: new Date(pocket.deadline),
+      },
+      pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
+      pocketIcon: pocket.icon_name,
     });
   },
 
   fetchAllPockets: async () => {
-    console.log("--- [STORE] fetchAllPockets: Initiated ---");
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: GET /pocket");
+    console.log(
+      "================================================================",
+    );
     set({ isAllPocketsLoading: true, allPocketsError: null });
     try {
-      const response = await api.get("/pocket"); // Intentionally incorrect path for testing
+      const response = await api.get("/pocket");
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
-        const pockets = (response.data.data || []).map((pocket) => ({
+        const pocketsWithColors = response.data.data.map((pocket) => ({
           ...pocket,
           color:
-            hexToColorClass[pocket.color_hex?.toUpperCase()] || pocket.color,
+            hexToColorClass[pocket.color_hex?.toUpperCase()] || "bg-gray-200",
           type: typeToDisplayType[pocket.type] || pocket.type,
         }));
-        set({
-          allPockets: pockets,
-          isAllPocketsLoading: false,
-        });
+        set({ allPockets: pocketsWithColors, isAllPocketsLoading: false });
       } else {
         throw new Error(response.data.message || "Failed to fetch pockets.");
       }
     } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
       set({
-        allPocketsError: error.message || "An unexpected error occurred.",
+        allPocketsError: errorMessage,
         isAllPocketsLoading: false,
         allPockets: [],
       });
-      throw error; // <-- RE-THROW THE ERROR
+      throw error;
     }
   },
 
   fetchPocketById: async (id) => {
-    console.log(`--- [STORE] fetchPocketById: Initiated for ID: ${id} ---`);
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: GET /pocket/${id}`);
+    console.log(
+      "================================================================",
+    );
     set({ isLoading: true, error: null });
     try {
       const response = await api.get(`/pocket/${id}`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         const pocket = response.data.data;
-        const pocketWithColor = {
+        const pocketWithData = {
           ...pocket,
+          members: [
+            { ...pocket.owner, PocketMember: pocket.owner.PocketMember },
+            ...pocket.members,
+          ],
           color:
             hexToColorClass[pocket.color_hex?.toUpperCase()] || pocket.color,
           type: typeToDisplayType[pocket.type] || pocket.type,
         };
-        set({
-          currentPocket: pocketWithColor,
-          isLoading: false,
-        });
+        set({ currentPocket: pocketWithData, isLoading: false });
       } else {
         throw new Error(
           response.data.message || "Failed to fetch pocket data.",
         );
       }
     } catch (error) {
-      set({
-        error: error.message || "An unexpected error occurred.",
-        isLoading: false,
-        currentPocket: null,
-      });
-      throw error; // <-- RE-THROW THE ERROR
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ error: errorMessage, isLoading: false, currentPocket: null });
+      throw error;
     }
   },
 
-  fetchTransactionHistory: async (monthString) => {
-    const pocketId = get().currentPocket?.id;
-    if (!pocketId) return;
+  createPocket: async () => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: POST /pocket");
+    console.log(
+      "================================================================",
+    );
+    set({ isCreating: true, createError: null });
+    const {
+      pocketName,
+      pocketType,
+      pocketBalanceTarget,
+      targetDuration,
+      pocketColor,
+      pocketIcon,
+      selectedFriends,
+    } = get();
+
+    const membersWithRoles = selectedFriends.map((friend) => ({
+      user_id: friend.id,
+      role: "viewer",
+    }));
+
+    const requestBody = {
+      name: pocketName,
+      type: pocketType?.toLowerCase(),
+      target_nominal: pocketBalanceTarget,
+      deadline: targetDuration.endDate,
+      color_hex: colorClassToHex[pocketColor] || "#58ABA1",
+      icon_name: pocketIcon,
+      members: membersWithRoles,
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/pocket", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isCreating: false });
+        get().fetchAllPockets();
+        return response.data.data;
+      } else {
+        throw new Error(response.data.message || "Failed to create pocket.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ createError: errorMessage, isCreating: false });
+      throw error;
+    }
+  },
+
+  updatePocket: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId}`);
+    console.log(
+      "================================================================",
+    );
+    set({ isUpdating: true, updateError: null });
+    const {
+      pocketName,
+      pocketBalanceTarget,
+      targetDuration,
+      pocketColor,
+      pocketIcon,
+    } = get();
+
+    const requestBody = {
+      name: pocketName,
+      target_nominal: pocketBalanceTarget,
+      deadline: targetDuration.endDate,
+      color_hex: colorClassToHex[pocketColor] || "#58ABA1",
+      icon_name: pocketIcon,
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(`/pocket/${pocketId}`, requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isUpdating: false });
+        get().fetchAllPockets();
+        get().fetchPocketById(pocketId);
+        return response.data.data;
+      } else {
+        throw new Error(response.data.message || "Failed to update pocket.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ updateError: errorMessage, isUpdating: false });
+      throw error;
+    }
+  },
+
+  deletePocket: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: DELETE /pocket/${pocketId}`);
+    console.log(
+      "================================================================",
+    );
+    set({ isAllPocketsLoading: true, allPocketsError: null });
+    try {
+      const response = await api.delete(`/pocket/${pocketId}`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set((state) => ({
+          allPockets: state.allPockets.filter((p) => p.pocket_id !== pocketId),
+          isAllPocketsLoading: false,
+        }));
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to delete pocket.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.message || "An unexpected error occurred while deleting.";
+      console.error("API Error:", errorMessage);
+      set({
+        allPocketsError: errorMessage,
+        isAllPocketsLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  fetchTransactionHistory: async (pocketId, monthString) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: GET /pocket/${pocketId}/history`);
+    console.log(
+      "================================================================",
+    );
     set({ isHistoryLoading: true, historyError: null });
     try {
-      const response = await api.get(
-        `/pocket/${pocketId}/history?month=${monthString}`,
-      );
+      console.log("Request Params:", { month: monthString });
+      const response = await api.get(`/pocket/${pocketId}/history`, {
+        params: { month: monthString },
+      });
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         set({
           transactionHistory: response.data.data,
@@ -271,40 +333,242 @@ export const usePocketStore = create((set, get) => ({
         );
       }
     } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
       set({
-        historyError: error.message || "An unexpected error occurred.",
+        historyError: errorMessage,
         isHistoryLoading: false,
         transactionHistory: [],
       });
-      throw error; // <-- RE-THROW THE ERROR
+      throw error;
     }
   },
 
-  removePocketFromList: (pocketId) => {
-    set((state) => ({
-      allPockets: state.allPockets.filter((p) => p.pocket_id !== pocketId),
-    }));
-  },
-
-  deletePocket: async (pocketId) => {
-    console.log(`--- [STORE] deletePocket: Initiated for ID: ${pocketId} ---`);
-    set({ isAllPocketsLoading: true, allPocketsError: null });
+  // --- Member Management Actions ---
+  fetchPocketMembers: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: GET /pocket/${pocketId}/members`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMembersLoading: true, membersError: null });
     try {
-      const response = await api.delete(`/pocket/${pocketId}`);
+      const response = await api.get(`/pocket/${pocketId}/members`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
-        get().removePocketFromList(pocketId);
-        set({ isAllPocketsLoading: false });
-        return response.data;
+        set({
+          pocketMembers: response.data.data || [],
+          isMembersLoading: false,
+        });
       } else {
-        throw new Error(response.data.message || "Failed to delete pocket.");
+        throw new Error(
+          response.data.message || "Failed to fetch pocket members.",
+        );
       }
     } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
       set({
-        allPocketsError:
-          error.message || "An unexpected error occurred while deleting.",
-        isAllPocketsLoading: false,
+        membersError: errorMessage,
+        isMembersLoading: false,
+        pocketMembers: [],
       });
-      throw error; // <-- RE-THROW THE ERROR
+      throw error;
+    }
+  },
+
+  invitePocketMembers: async (pocketId, friends) => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: POST /pocket/invite");
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const membersToInvite = friends.map((friend) => ({
+      user_id: friend.id,
+      role: "viewer",
+    }));
+    const requestBody = {
+      pocket_id: parseInt(pocketId, 10),
+      members: membersToInvite,
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/pocket/invite", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        get().fetchPocketMembers(pocketId);
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to invite members.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  respondToPocketInvite: async (inviteId, responseAction) => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: POST /pocket/respond-invite");
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { inviteId: inviteId, response: responseAction };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/pocket/respond-invite", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        if (responseAction === "accepted") {
+          get().fetchAllPockets();
+        }
+        return response.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to respond to invite.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  removePocketMembers: async (pocketId, memberUserIds) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: DELETE /pocket/${pocketId}/members`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    try {
+      console.log("Request Body (in data):", { members: memberUserIds });
+      const response = await api.delete(`/pocket/${pocketId}/members`, {
+        data: { members: memberUserIds },
+      });
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to remove members.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  updateMemberRole: async (pocketId, userId, role) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId}/members/role`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { user_id: userId, role: role };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(
+        `/pocket/${pocketId}/members/role`,
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to update member role.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  changePocketOwner: async (pocketId, newOwnerId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId}/members/change-owner`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { new_owner_id: newOwnerId };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(
+        `/pocket/${pocketId}/members/change-owner`,
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to change owner.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  leavePocket: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: DELETE /pocket/${pocketId}/leave`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    try {
+      const response = await api.delete(`/pocket/${pocketId}/leave`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        get().fetchAllPockets();
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to leave pocket.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
     }
   },
 }));
