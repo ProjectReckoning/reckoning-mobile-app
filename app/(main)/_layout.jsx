@@ -55,7 +55,7 @@ export default function MainLayout() {
         ),
       }}
     >
-      {/* ===== Non-Transaction Screens ===== */}
+      {/* ===== General and Home Screens ===== */}
       <Stack.Screen name="home/index" options={{ headerShown: false }} />
       <Stack.Screen
         name="home/notification/index"
@@ -65,6 +65,12 @@ export default function MainLayout() {
         name="home/notification/[id]/index"
         options={{ title: "Notification Detail" }}
       />
+      <Stack.Screen
+        name="home/testscreen/index"
+        options={{ title: "Test Screen" }}
+      />
+
+      {/* ===== Pocket Screens ===== */}
       <Stack.Screen
         name="pocket/all/index"
         options={{
@@ -83,6 +89,8 @@ export default function MainLayout() {
         name="pocket/onboarding/CreatePocketOnboarding"
         options={{ title: "Create Pocket" }}
       />
+
+      {/* ===== Pocket Creation Flow ===== */}
       <Stack.Screen
         name="pocket/create/index"
         options={{
@@ -142,7 +150,7 @@ export default function MainLayout() {
         }}
       />
 
-      {/* ===== Transaction Screens (Updated Paths) ===== */}
+      {/* ===== Transaction Screens ===== */}
       <Stack.Screen
         name="pocket/[id]/transaction/topup/index"
         options={{ title: "Top Up" }}
@@ -182,13 +190,41 @@ export default function MainLayout() {
           headerTransparent: true,
         }}
       />
+
+      {/* ===== Additional Transaction Features ===== */}
+      <Stack.Screen
+        name="pocket/[id]/transaction/autoBudgeting/index"
+        options={{ title: "Auto Budgeting" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/autoBudgeting/SetAutoBudgeting"
+        options={{ title: "Set Auto Budgeting" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/autoBudgeting/autoBudgetingConfirmation"
+        options={{ title: "Auto Budgeting Confirmation" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/balance/index"
+        options={{ title: "Balance" }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/transaction/info/index"
+        options={{ title: "Info" }}
+      />
+      <Stack.Screen
+        name="pocket/transaction/setTarget/index"
+        options={{ title: "Change Target" }}
+      />
+
+      {/* ===== Scheduled Transfers ===== */}
       <Stack.Screen
         name="pocket/[id]/scheduleTransfer/index"
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="pocket/transaction/setTarget/index"
-        options={{ title: "Change Target" }}
+        name="pocket/[id]/transferSchedule/index"
+        options={{ title: "Transfer Schedule" }}
       />
     </Stack>
   );

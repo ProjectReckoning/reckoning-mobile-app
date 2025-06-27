@@ -1,19 +1,20 @@
 import React from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, Share } from "react-native";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
-import AccountNumber from "@/components/feature/pocketDashboard/balance/AccountNumber";
-import PaymentDateInfo from "@/components/feature/pocketDashboard/balance/PaymentDateInfo";
-import CircularProgressBar from "@/components/feature/pocketDashboard/balance/CircularProgressBar";
-import TransactionButtonGroup from "@/components/feature/pocketDashboard/balance/TransactionButtonGroup";
-import BalanceMemberList from "@/components/feature/pocketDashboard/balance/BalanceMemberList";
+import AccountNumber from "@/components/feature/pocketDashboard/common/balance/AccountNumber";
+import PaymentDateInfo from "@/components/feature/pocketDashboard/common/balance/PaymentDateInfo";
+import CircularProgressBar from "@/components/feature/pocketDashboard/common/balance/CircularProgressBar";
+import TransactionButtonGroup from "@/components/feature/pocketDashboard/common/balance/TransactionButtonGroup";
+import BalanceMemberList from "@/components/feature/pocketDashboard/common/balance/BalanceMemberList";
+import SharedPocketButtonGroup from "@/components/feature/pocketDashboard/common/SharedPocketButtonGroup";
 import AppText from "@/components/common/typography/AppText";
 
 /**
  * Renders the 'Balance' tab, showing account details, progress,
  * transaction buttons, and a list of member targets.
  */
-export default function BalanceScreen() {
+export default function SavingBalanceScreen() {
   const currentPocket = usePocketStore((state) => state.currentPocket);
 
   if (!currentPocket) {
@@ -42,6 +43,8 @@ export default function BalanceScreen() {
         />
       </Box>
       <TransactionButtonGroup />
+
+      <SharedPocketButtonGroup />
 
       {/* --- Scrollable List Section --- */}
       <Box className="flex-1 mt-4">

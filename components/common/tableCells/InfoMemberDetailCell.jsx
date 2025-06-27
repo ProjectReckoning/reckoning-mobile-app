@@ -2,6 +2,7 @@ import React from "react";
 import { Box } from "@/components/ui/box";
 import { Avatar } from "@/components/ui/avatar";
 import { VStack } from "@/components/ui/vstack";
+import { Pressable } from "@/components/ui/pressable";
 import {
   WondrColors,
   COLOR_PALETTE_LIGHT_TRANSLUCENT,
@@ -23,15 +24,20 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-export default function InfoMemberDetailCell({ member, index = 0 }) {
+// --- FIX: Add onManagePress prop to handle button clicks ---
+export default function InfoMemberDetailCell({
+  member,
+  index = 0,
+  onManagePress,
+}) {
   if (!member || !member.PocketMember) {
     return null;
   }
 
   const memberName = member.name || "Unknown Member";
   const memberRoleRaw = member.PocketMember.role || "viewer";
-  const isOwnerCreator = memberRoleRaw.toLowerCase() === "owner";
-  const displayRole = isOwnerCreator ? "ADMIN" : memberRoleRaw.toUpperCase();
+  const isOwner = memberRoleRaw.toLowerCase() === "owner";
+  const displayRole = isOwner ? "ADMIN" : memberRoleRaw.toUpperCase();
   const displayInitials = getConsistentInitials(memberName);
   const selectedColor =
     COLOR_PALETTE_LIGHT_TRANSLUCENT[
@@ -64,7 +70,7 @@ export default function InfoMemberDetailCell({ member, index = 0 }) {
             >
               <AppText variant="small">{displayRole}</AppText>
             </Box>
-            {isOwnerCreator ? <Crown size={12} /> : null}
+            {isOwner ? <Crown size={12} /> : null}
           </Box>
           <AppText variant="cardTitle" className="uppercase">
             {memberName}
@@ -72,10 +78,14 @@ export default function InfoMemberDetailCell({ member, index = 0 }) {
         </VStack>
       </Box>
 
-      {!isOwnerCreator ? (
-        <Box className="justify-center items-center p-4">
+      {/* --- FIX: Only show the button for non-owners and make it pressable --- */}
+      {!isOwner ? (
+        <Pressable
+          className="justify-center items-center p-4 active:bg-gray-100 rounded-full"
+          onPress={onManagePress}
+        >
           <EllipsisVertical />
-        </Box>
+        </Pressable>
       ) : null}
     </Box>
   );

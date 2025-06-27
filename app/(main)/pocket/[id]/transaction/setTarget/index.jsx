@@ -6,7 +6,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { CalendarClock, X } from "lucide-react-native";
 
 import { Box } from "@/components/ui/box";
@@ -24,10 +24,11 @@ import {
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import CustomDatePicker from "../../../../../components/common/CustomDatePicker/CustomDatePicker";
+import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function SetTarget() {
+  const { id } = useLocalSearchParams();
   const { amount, setAmount } = useTransactionStore();
   const [isFrequencyActionsheetOpen, setIsFrequencyActionsheetOpen] =
     useState(false);
@@ -55,8 +56,8 @@ export default function SetTarget() {
   };
 
   const handleNext = () => {
-    if (validateForm()) {
-      router.push("pocket/transaction/setTarget");
+    if (validateForm() && id) {
+      `/(main)/pocket/${id}/transaction/setTarget`;
     }
   };
 

@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { Box } from "@/components/ui/box";
 import { WondrColors } from "@/utils/colorUtils"; // Import WondrColors
 
-import BalanceCategory from "@/components/feature/balance/BalanceCategory";
+import BalanceCategory from "@/components/feature/pocketDashboard/common/BalanceCategory";
 
 export default function TestScreen() {
   return (

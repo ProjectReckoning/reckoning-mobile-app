@@ -1,3 +1,4 @@
+import React from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -5,22 +6,22 @@ import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
-import AppBar from "../../../../../components/common/AppBar";
+import AppBar from "@/components/common/AppBar";
 
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 
-import PrimaryButton from "../../../../../components/common/buttons/PrimaryButton";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 import AutoBudgetingIllustration from "@/assets/images/decorators/auto-budgeting-image.png";
 
-export default function autoBudgeting() {
-  const handleBack = () => {
-    router.back();
-  };
+export default function AutoBudgeting() {
+  const { id } = useLocalSearchParams();
 
   const handleNext = () => {
-    router.push("pocket/transaction/autoBudgeting/SetAutoBudgeting");
+    router.push(
+      `/(main)/pocket/${id}/transaction/autoBudgeting/SetAutoBudgeting`,
+    );
   };
 
   return (

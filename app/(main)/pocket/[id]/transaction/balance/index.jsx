@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { Box } from "@/components/ui/box";
 import { WondrColors } from "@/utils/colorUtils"; // Import WondrColors
 
-import BalanceModalContent from "@/components/feature/balance/BalanceModalContent";
+import BalanceModalContent from "@/components/feature/pocketDashboard/common/BalanceModalContent";
 
 export default function InfoScreen() {
   return (

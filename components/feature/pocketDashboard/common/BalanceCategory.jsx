@@ -173,7 +173,7 @@ export default function BalanceCategory() {
   );
 
   return (
-    <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border">
+    <Box className="flex-1 bg-white p-5 rounded-3xl border border-gray-wondr-border">
       <ListHeader />
       {displayData && displayData.length > 0 ? (
         <FlatList

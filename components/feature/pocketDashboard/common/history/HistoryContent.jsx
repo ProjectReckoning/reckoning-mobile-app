@@ -10,8 +10,11 @@ import TransactionHistoryTableCell from "@/components/common/tableCells/Transact
 import { MOCK_MONTH_DATA } from "@/utils/mockData/monthMockData";
 import { formatDateForHeader } from "@/utils/helperFunction";
 import { WondrColors } from "@/utils/colorUtils";
+import { useLocalSearchParams } from "expo-router";
 
 export default function HistoryContent() {
+  const { id: pocketId } = useLocalSearchParams();
+
   const transactionHistory = usePocketStore(
     (state) => state.transactionHistory,
   );
@@ -63,7 +66,7 @@ export default function HistoryContent() {
   }, []);
 
   useEffect(() => {
-    fetchTransactionHistory(selectedMonth.fullValue);
+    fetchTransactionHistory(pocketId, selectedMonth.fullValue);
   }, [selectedMonth, fetchTransactionHistory]);
 
   const handleMonthSelect = (monthItem) => {

@@ -3,7 +3,7 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   ScrollView,
   KeyboardAvoidingView,
@@ -13,8 +13,8 @@ import {
   Modal,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
-import AppBar from "@/components/common/AppBar";
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -37,20 +37,15 @@ import {
 } from "@/components/ui/actionsheet";
 import { WondrColors } from "@/utils/colorUtils";
 
-import CustomDatePicker from "../../../../../components/common/CustomDatePicker/CustomDatePicker";
+import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
+import { usePocketStore } from "@/stores/pocketStore";
 
 export default function SetAutoBudgeting() {
-  const handleBack = () => {
-    router.back();
-  };
+  const { id: pocketId } = useLocalSearchParams();
+  const { currentPocket } = usePocketStore();
 
-  const pocketDetail = {
-    name: "Pergi ke Korea 2026",
-    accountNumber: "0238928039",
-    color: "bg-orange-wondr",
-    icon: "Airplane",
-    pocketType: "Saving",
-  };
+  const { amount, setAmount, setAutoBudgeting, isProcessing } =
+    useTransactionStore();
 
   const sourceFund = {
     title: "Sumber dana",
@@ -58,8 +53,6 @@ export default function SetAutoBudgeting() {
     subheading: "1916826757",
     balance: "10495750",
   };
-
-  const { amount, setAmount } = useTransactionStore();
 
   const [isAmountTouched, setAmountTouched] = useState(false);
   const [selectedFrequency, setSelectedFrequency] = useState(null);
@@ -73,11 +66,9 @@ export default function SetAutoBudgeting() {
   const [displayDate, setDisplayDate] = useState(new Date());
   const [tempSelectedDay, setTempSelectedDay] = useState(null);
   const [errors, setErrors] = useState({});
-
-  // State untuk modal info
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
 
-  const frequencyOptions = ["Satu kali", "Harian", "Mingguan", "Bulanan"];
+  const frequencyOptions = ["Harian", "Mingguan", "Bulanan"];
 
   const handleSelectFrequency = (value) => {
     setSelectedFrequency(value);
@@ -117,9 +108,11 @@ export default function SetAutoBudgeting() {
   const formatDateForDisplay = (date) => {
     if (!date) return "Pilih tanggal mulai";
     if (selectedFrequency === "Mingguan") {
-      return `Setiap hari ${date.toLocaleDateString("id-ID", { weekday: "long" })}`;
+      return `Setiap hari ${date.toLocaleDateString("id-ID", {
+        weekday: "long",
+      })}`;
     }
-    if (selectedFrequency === "Bulanan" || selectedFrequency === "Satu kali") {
+    if (selectedFrequency === "Bulanan") {
       return `Setiap tanggal ${date.getDate()}`;
     }
     return date.toLocaleDateString("id-ID", {
@@ -134,6 +127,9 @@ export default function SetAutoBudgeting() {
 
   const validate = () => {
     const newErrors = {};
+    if (!amount || amount <= 0) {
+      newErrors.nominal = "Nominal harus diisi.";
+    }
     if (!selectedFrequency) {
       newErrors.frekuensi = "Frekuensi harus dipilih.";
     }
@@ -144,21 +140,50 @@ export default function SetAutoBudgeting() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextToConfirmation = () => {
-    if (validate()) {
-      const dataToPass = {
-        nominal: amount,
-        frequency: selectedFrequency,
-        selectedDate: selectedDate ? selectedDate.getDate().toString() : null,
-        startDate: selectedDate ? selectedDate.toISOString() : null,
-        endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
-        pocketDetail: pocketDetail,
-        sourceFund: sourceFund,
-      };
-      router.push({
-        pathname: "pocket/transaction/autoBudgeting/autoBudgetingConfirmation",
-        params: dataToPass,
-      });
+  const handleNextToConfirmation = async () => {
+    if (!validate()) {
+      return;
+    }
+
+    const scheduleTypeMap = {
+      Harian: "daily",
+      Mingguan: "weekly",
+      Bulanan: "monthly",
+    };
+
+    const budgetData = {
+      recurring_amount: amount,
+      schedule_type: scheduleTypeMap[selectedFrequency],
+      schedule_value:
+        selectedFrequency === "Mingguan"
+          ? selectedDate.getDay() // Sunday = 0, Monday = 1, ...
+          : selectedDate.getDate(), // Day of the month
+      status: "active",
+    };
+
+    try {
+      const result = await setAutoBudgeting(pocketId, budgetData);
+      if (result) {
+        // API call was successful, now navigate
+        router.push({
+          pathname: `/(main)/pocket/${pocketId}/transaction/autoBudgeting/autoBudgetingConfirmation`,
+          params: {
+            ...result, // Pass the successful API response
+            pocketName: currentPocket?.name,
+            pocketAccountNumber: currentPocket?.account_number,
+            pocketColor: currentPocket?.color,
+            pocketIcon: currentPocket?.icon_name,
+            sourceFundName: sourceFund.heading,
+            sourceFundNumber: sourceFund.subheading,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Failed to set auto-budgeting:", error);
+      Alert.alert(
+        "Gagal",
+        error.message || "Tidak dapat mengatur auto-budgeting. Coba lagi.",
+      );
     }
   };
 
@@ -186,27 +211,23 @@ export default function SetAutoBudgeting() {
           <Box className="flex-row items-center mt-5 mb-6 gap-4">
             <PocketCard
               mode="icon"
-              pocketType={pocketDetail.pocketType}
-              color={pocketDetail.color}
-              icon={pocketDetail.icon}
+              pocketType={currentPocket?.type}
+              color={currentPocket?.color}
+              icon={currentPocket?.icon_name}
               iconSize="10"
-              whiteSpace="mb-5"
               className="w-12 h-12 rounded-full"
-              iconColor="$text-white"
-              iconBackgroundColor="$orange-wondr"
-              iconBackgroundSize="w-12 h-12"
             />
             <Box flex={1}>
               <View className="flex-row items-center justify-between">
                 <Heading size="md" color="$text-black-600">
-                  {pocketDetail.name}
+                  {currentPocket?.name}
                 </Heading>
                 <Pressable onPress={() => setInfoModalVisible(true)}>
                   <CircleHelp size={22} color="orange" />
                 </Pressable>
               </View>
               <Text size="sm" color="$text-black-600">
-                {pocketDetail.accountNumber}
+                {currentPocket?.account_number}
               </Text>
             </Box>
           </Box>
@@ -231,7 +252,9 @@ export default function SetAutoBudgeting() {
           <Text className="text-black font-light mb-1">Frekuensi</Text>
           <Pressable
             onPress={() => setIsFrequencyActionsheetOpen(true)}
-            className={`w-full h-14 p-3 my-1 justify-between rounded-xl border ${errors.frekuensi ? "border-red-500" : "border-gray-300"} flex-row items-center`}
+            className={`w-full h-14 p-3 my-1 justify-between rounded-xl border ${
+              errors.frekuensi ? "border-red-500" : "border-gray-300"
+            } flex-row items-center`}
           >
             <Text
               className={selectedFrequency ? "text-black" : "text-gray-400"}
@@ -244,10 +267,14 @@ export default function SetAutoBudgeting() {
             <Text className="text-red-500 mt-1 ml-1">{errors.frekuensi}</Text>
           )}
 
-          <Text className="text-black font-light mt-4 mb-1">Starting date</Text>
+          <Text className="text-black font-light mt-4 mb-1">
+            Tanggal Eksekusi
+          </Text>
           <Pressable
             onPress={handleOpenDatePicker}
-            className={`w-full h-14 p-3 my-1 justify-start rounded-xl border ${errors.tanggal ? "border-red-500" : "border-gray-300"} flex-row items-center gap-3`}
+            className={`w-full h-14 p-3 my-1 justify-start rounded-xl border ${
+              errors.tanggal ? "border-red-500" : "border-gray-300"
+            } flex-row items-center gap-3`}
             disabled={!selectedFrequency}
             style={{ opacity: !selectedFrequency ? 0.5 : 1 }}
           >
@@ -278,7 +305,7 @@ export default function SetAutoBudgeting() {
             className="mb-8"
             textClassName="text-black font-bold text-base"
             disabled={!amount || !selectedFrequency || !selectedDate}
-            isLoading={false}
+            isLoading={isProcessing}
           />
         </ScrollView>
       </TouchableWithoutFeedback>

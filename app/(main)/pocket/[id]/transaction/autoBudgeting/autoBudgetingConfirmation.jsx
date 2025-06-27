@@ -1,85 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
-import { Pressable } from "@/components/ui/pressable";
-import { router, useLocalSearchParams } from "expo-router";
-import { Modal, ScrollView } from "react-native";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Modal, ScrollView, Pressable } from "react-native";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { Info } from "lucide-react-native";
 import { WondrColors } from "@/utils/colorUtils";
 import TransactionCard from "@/components/common/cards/TransactionCard";
+import { CommonActions } from "@react-navigation/native";
+import { ArrowLeft } from "lucide-react-native";
 
 export default function AutoBudgetingConfirmation() {
   const params = useLocalSearchParams();
+  const navigation = useNavigation();
 
-  const nominal = params.nominal ? parseFloat(params.nominal) : 0;
-  const frequency = params.frequency || "Mingguan";
+  const pocketId = params.pocket_id;
+  const nominal = params.recurring_amount
+    ? parseFloat(params.recurring_amount)
+    : 0;
+  const scheduleType = params.schedule_type || "weekly";
+  const scheduleValue = params.schedule_value
+    ? parseInt(params.schedule_value, 10)
+    : null;
+  const nextRunDate = params.next_run_date
+    ? new Date(params.next_run_date)
+    : null;
 
-  const startDateObj = params.startDate ? new Date(params.startDate) : null;
-
+  // --- Display Logic ---
   let detailTanggalText = "Tanggal tidak diatur";
-  if (startDateObj) {
-    if (frequency === "Mingguan") {
-      // Jika mingguan, tampilkan nama harinya
-      detailTanggalText = `Setiap hari ${startDateObj.toLocaleDateString("id-ID", { weekday: "long" })}`;
-    } else if (frequency === "Bulanan" || frequency === "Satu kali") {
-      // Jika bulanan atau sekali, tampilkan tanggalnya
-      detailTanggalText = `Setiap tanggal ${startDateObj.getDate()}`;
-    } else if (frequency === "Harian") {
+  if (scheduleValue !== null) {
+    if (scheduleType === "weekly") {
+      const weekdays = [
+        "Minggu",
+        "Senin",
+        "Selasa",
+        "Rabu",
+        "Kamis",
+        "Jumat",
+        "Sabtu",
+      ];
+      detailTanggalText = `Setiap hari ${weekdays[scheduleValue]}`;
+    } else if (scheduleType === "monthly") {
+      detailTanggalText = `Setiap tanggal ${scheduleValue}`;
+    } else if (scheduleType === "daily") {
       detailTanggalText = "Setiap hari";
     }
   }
 
-  // 3. Teks untuk "Tanggal mulai" tetap sama
-  const startDateText = startDateObj
-    ? startDateObj.toLocaleDateString("id-ID", {
+  const nextRunDateText = nextRunDate
+    ? nextRunDate.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
       })
     : "Belum ditentukan";
-
-  const endDateText = params.endDate
-    ? new Date(params.endDate).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : null;
-
-  // --- END: Perubahan Logika Tampilan Tanggal ---
-
-  const pocketDetail = {
-    name: params.pocketDetail?.name || "Pergi ke Korea 2026",
-    accountNumber:
-      params.pocketDetail?.accountNumber || "BNI SHARED POCKET. 0238928039",
-    color: params.pocketDetail?.color || "bg-orange-wondr",
-    icon: params.pocketDetail?.icon || "Airplane",
-    pocketType: "Saving",
-  };
-
-  const sourceFund = {
-    title: params.sourceFund?.title || "Sumber dana",
-    heading: params.sourceFund?.heading || "TAPLUS PEGAWAI BNI",
-    subheading: params.sourceFund?.subheading || "1916826757",
-    balance: params.sourceFund?.balance || "10495750",
-  };
+  // --- End Display Logic ---
 
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  const handleBack = () => {
-    router.back();
+  const handleDone = () => {
+    // This action will reset the navigation stack, taking the user to the pocket dashboard
+    // with a clean history behind it.
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [
+          { name: "home/index" },
+          { name: "pocket/all/index" },
+          { name: "pocket/[id]/index", params: { id: pocketId } },
+        ],
+      }),
+    );
   };
+
+  // Override the header back button to perform the stack reset
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable onPress={handleDone} style={{ paddingLeft: 24 }}>
+          <ArrowLeft size={24} color="black" />
+        </Pressable>
+      ),
+    });
+  }, [navigation, pocketId]);
 
   const handleDelete = () => {
     setIsDeleteModalVisible(true);
   };
 
   const handleConfirmDelete = () => {
-    console.log("Auto budgeting benar-benar dihapus!");
+    // Here you would call the API to delete/deactivate the auto-budgeting
+    console.log("Auto budgeting will be deleted!");
     setIsDeleteModalVisible(false);
+    // After deletion, navigate back to the dashboard
+    handleDone();
   };
 
   const handleCancelDelete = () => {
@@ -95,9 +110,8 @@ export default function AutoBudgetingConfirmation() {
         <Box className="items-center mt-5 mb-6">
           <PocketCard
             mode="icon"
-            pocketType={pocketDetail.pocketType}
-            color={pocketDetail.color}
-            icon={pocketDetail.icon}
+            color={params.pocketColor || "bg-orange-wondr"}
+            icon={params.pocketIcon || "pocket"}
             iconSize="10"
             whiteSpace="mb-5"
             className="w-12 h-12 rounded-full"
@@ -107,10 +121,10 @@ export default function AutoBudgetingConfirmation() {
             color="$text-black-600"
             className="text-center mt-2"
           >
-            {pocketDetail.name}
+            {params.pocketName || "Pocket"}
           </Heading>
           <Text size="sm" color="$text-black-600" className="text-center">
-            {pocketDetail.accountNumber}
+            {params.pocketAccountNumber || "N/A"}
           </Text>
 
           <Box className="mb-6 mt-4 items-center">
@@ -142,65 +156,51 @@ export default function AutoBudgetingConfirmation() {
             <Text size="md" color="$text-black-600">
               Frekuensi
             </Text>
-            <Text size="md" color="$text-black-600">
-              {frequency}
+            <Text size="md" color="$text-black-600" className="capitalize">
+              {scheduleType}
             </Text>
           </Box>
           <Box className="flex-row justify-between mb-2">
             <Text size="md" color="$text-black-600">
-              Tanggal
+              Tanggal Eksekusi
             </Text>
-            {/* Menggunakan variabel baru yang lebih dinamis */}
             <Text size="md" color="$text-black-600">
               {detailTanggalText}
             </Text>
           </Box>
           <Box className="flex-row justify-between mb-2">
             <Text size="md" color="$text-black-600">
-              Tanggal mulai
+              Jadwal Berikutnya
             </Text>
-            {/* Menggunakan variabel baru */}
             <Text size="md" color="$text-black-600">
-              {startDateText}
+              {nextRunDateText}
             </Text>
           </Box>
-          {endDateText && (
-            <Box className="flex-row justify-between">
-              <Text size="md" color="$text-black-600">
-                Tanggal selesai
-              </Text>
-              <Text size="md" color="$text-black-600">
-                {endDateText}
-              </Text>
-            </Box>
-          )}
         </Box>
 
         <Box className="mb-4 mt-4">
           <TransactionCard
-            title={sourceFund.title}
-            heading={sourceFund.heading}
-            subheading={sourceFund.subheading}
-            balance={sourceFund.balance}
-            showBalance={true}
+            title={"Sumber dana"}
+            heading={params.sourceFundName || "Sumber Dana"}
+            subheading={params.sourceFundNumber || ""}
+            showBalance={false}
           />
         </Box>
       </ScrollView>
-      {/* ... Tombol Hapus & Modal (tidak berubah) ... */}
-      {!isDeleteModalVisible && (
-        <Box className="mx-4 mb-8 mt-4">
-          <PrimaryButton
-            buttonAction={handleDelete}
-            buttonTitle="Hapus"
-            buttonColor="bg-white"
-            buttonActiveColor="active:bg-red-wondr-light"
-            disabled={false}
-            className="border border-red-wondr"
-            textClassName="text-red-wondr font-bold"
-          />
-        </Box>
-      )}
 
+      {/* --- Action Buttons --- */}
+      <Box className="px-6 mb-8 mt-4 space-y-3">
+        <PrimaryButton
+          buttonAction={handleDelete}
+          buttonTitle="Hapus Jadwal"
+          buttonColor="bg-white"
+          buttonActiveColor="active:bg-red-wondr-light"
+          className="border border-red-wondr"
+          textClassName="text-red-wondr font-bold"
+        />
+      </Box>
+
+      {/* Delete Confirmation Modal */}
       <Modal
         animationType="fade"
         transparent={true}
