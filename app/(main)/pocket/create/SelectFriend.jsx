@@ -8,59 +8,123 @@ import { Pressable } from "@/components/ui/pressable";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { router } from "expo-router";
-import { ScrollView } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { ScrollView, ActivityIndicator } from "react-native";
+import { useState, useMemo } from "react";
+
 import FriendList from "@/components/common/FriendList";
-
-import { usePocketStore } from "@/stores/pocketStore";
-import CustomGoalIcon from "@/assets/images/icon/customGoal.png";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import { usePocketStore } from "@/stores/pocketStore";
+import { useFriendshipStore } from "@/stores/friendshipStore";
+import CustomGoalIcon from "@/assets/images/icon/customGoal.png";
+import { WondrColors } from "@/utils/colorUtils";
 
-export default function FriendsList() {
-  const { selectedFriends, setSelectedFriends } = usePocketStore();
+export default function SelectFriendScreen() {
+  const { id: pocketId } = useLocalSearchParams();
+  const isInviteMode = !!pocketId;
 
-  const handleBack = () => {
-    router.push("pocket/create/Details");
+  // --- Store Hooks ---
+  const { invitePocketMembers, isMemberActionLoading } = usePocketStore();
+  const { friends: allFriends } = useFriendshipStore();
+  const {
+    selectedFriends: globalSelectedFriends,
+    setSelectedFriends: setGlobalSelectedFriends,
+  } = usePocketStore();
+
+  // --- State Management for the two flows ---
+  const [localSelectedFriends, setLocalSelectedFriends] = useState([]);
+
+  const currentSelection = isInviteMode
+    ? localSelectedFriends
+    : globalSelectedFriends;
+  const setSelection = isInviteMode
+    ? setLocalSelectedFriends
+    : setGlobalSelectedFriends;
+
+  const handleSelectionChange = (selectedNames) => {
+    const newSelectedFriendObjects = allFriends.filter((friend) =>
+      selectedNames.includes(friend.name),
+    );
+    setSelection(newSelectedFriendObjects);
+  };
+
+  const selectedFriendNames = useMemo(
+    () => currentSelection.map((f) => f.name),
+    [currentSelection],
+  );
+
+  const handleLanjut = async () => {
+    console.log("--- handleLanjut called. isInviteMode:", isInviteMode);
+
+    if (isInviteMode) {
+      // --- Flow 2: Invite to Existing Pocket ---
+      if (!pocketId || currentSelection.length === 0) {
+        console.log("Invite mode: No pocketId or no selection. Aborting.");
+        return;
+      }
+
+      console.log(
+        "Invite mode: Attempting to invite friends to pocketId:",
+        pocketId,
+        currentSelection,
+      );
+      try {
+        const result = await invitePocketMembers(pocketId, currentSelection);
+        console.log("Invite API call result:", result);
+
+        if (result) {
+          console.log("Invite successful, navigating back.");
+          router.back(); // Navigate back on success
+        } else {
+          console.warn("Invite result was falsy, not navigating back.");
+        }
+      } catch (e) {
+        console.error("Failed to invite members on screen:", e);
+      }
+    } else {
+      // --- Flow 1: Create Pocket ---
+      console.log("Create mode: Navigating back.");
+      router.back();
+    }
   };
 
   return (
     <Box className="flex-1 bg-white">
       <Box className="w-full flex-1 flex-col px-6 pt-5">
-        {selectedFriends.length > 0 && (
-          <VStack size="2xl" className="mb-6">
-            <Heading size={"md"} className="font-bold mb-3">
-              Siapa aja isi group kamu?
+        {currentSelection.length > 0 && (
+          <VStack space="md" className="mb-6">
+            <Heading size={"md"} className="font-bold">
+              {isInviteMode
+                ? "Undang teman ke pocket"
+                : "Siapa aja isi group kamu?"}
             </Heading>
-            <HStack size="2xl" className="w-full overflow-hidden">
+            <HStack>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={{ flex: 1 }}
               >
-                {selectedFriends.map((friend, index) => (
+                {currentSelection.map((friend) => (
                   <Pressable
-                    key={index}
+                    key={friend.id}
                     onPress={() => {
-                      // Remove the friend from selectedFriends
-                      setSelectedFriends(
-                        selectedFriends.filter((f) => f !== friend),
+                      setSelection((prev) =>
+                        prev.filter((f) => f.id !== friend.id),
                       );
                     }}
                   >
                     <Avatar
                       size="lg"
-                      className={
-                        "border-2 border-outline-0 bg-[#F2F2F2] items-center justify-center mr-3"
-                      }
+                      className="border-2 border-outline-0 bg-[#F2F2F2] items-center justify-center mr-3"
                     >
                       <Badge
-                        className="z-10 self-end w-4 h-4 bg-red-wondr rounded-full -mr-1 items-center justify-center"
+                        className="z-10 self-end w-5 h-5 bg-red-wondr rounded-full -mr-1 items-center justify-center"
                         variant="solid"
                       >
                         <BadgeText className="text-white text-xs">-</BadgeText>
                       </Badge>
                       <AvatarFallbackText className="text-[#58ABA1]">
-                        {friend}
+                        {friend.name}
                       </AvatarFallbackText>
                     </Avatar>
                   </Pressable>
@@ -72,7 +136,7 @@ export default function FriendsList() {
 
         <Pressable
           onPress={() => {
-            router.push("pocket/create/NewUser");
+            router.push("/pocket/create/NewUser");
           }}
           className="flex flex-row gap-5 items-center mb-6 active:bg-gray-100 rounded-xl"
         >
@@ -95,13 +159,26 @@ export default function FriendsList() {
         </Pressable>
 
         <FriendList
-          selectedFriends={selectedFriends}
-          setSelectedFriends={setSelectedFriends}
+          mode="checkbox"
+          selectedFriends={selectedFriendNames}
+          setSelectedFriends={handleSelectionChange}
         />
 
         <PrimaryButton
-          buttonAction={handleBack}
-          buttonTitle="Lanjut"
+          // --- FIX: The `onPress` prop has been corrected to `buttonAction` ---
+          // This ensures the handleLanjut function is correctly passed to the button component.
+          buttonAction={handleLanjut}
+          buttonTitle={
+            isInviteMode && isMemberActionLoading ? (
+              <ActivityIndicator color={WondrColors.white} />
+            ) : (
+              "Lanjut"
+            )
+          }
+          disabled={
+            isInviteMode &&
+            (isMemberActionLoading || currentSelection.length === 0)
+          }
           className="mt-3 mb-8"
         />
       </Box>

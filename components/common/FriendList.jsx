@@ -13,16 +13,17 @@ import {
   CheckboxGroup,
 } from "@/components/ui/checkbox";
 
-// --- NEW: Import useLocalSearchParams to get the pocket ID from the URL ---
-import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView } from "react-native";
-import { useState, useEffect } from "react";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { ScrollView, ActivityIndicator } from "react-native";
+import { useCallback } from "react";
 import { Check } from "lucide-react-native";
 
-import { friendsList } from "@/utils/mockData/friendsListData";
+import { useFriendshipStore } from "@/stores/friendshipStore";
+import { WondrColors } from "@/utils/colorUtils";
 
 // Helper to group friends by first initial
 const groupFriendsByInitial = (list) => {
+  if (!list || list.length === 0) return {};
   const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name, "id"));
   return sorted.reduce((acc, friend) => {
     const initial = friend.name[0].toUpperCase();
@@ -38,24 +39,48 @@ export default function FriendList({
   setSelectedFriends,
   setDestination,
 }) {
-  // --- NEW: Get the dynamic 'id' from the current route ---
   const { id } = useLocalSearchParams();
-  const [values, setValues] = useState(selectedFriends || []);
 
-  // Group and sort friends
-  const groupedFriends = groupFriendsByInitial(friendsList);
+  // Fetching data from the friendship store
+  const { friends, isLoadingFriends, friendsError, fetchAllFriends } =
+    useFriendshipStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllFriends();
+    }, [fetchAllFriends]),
+  );
+
+  const groupedFriends = groupFriendsByInitial(friends);
   const initials = Object.keys(groupedFriends).sort();
 
-  useEffect(() => {
-    // This check prevents an unnecessary update on initial render
-    if (setSelectedFriends) {
-      setSelectedFriends(values);
-    }
-  }, [values, setSelectedFriends]);
+  // Render States
+  if (isLoadingFriends) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color={WondrColors["tosca-wondr"]} />
+      </Box>
+    );
+  }
 
-  useEffect(() => {
-    setValues(selectedFriends || []);
-  }, [selectedFriends]);
+  if (friendsError) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <Text className="text-red-500">Error: {friendsError}</Text>
+      </Box>
+    );
+  }
+
+  if (friends.length === 0) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <Text>No friends found.</Text>
+        <Text className="text-gray-500 text-center mt-2">
+          Add some friends to see them here!
+        </Text>
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex-1 pb-2">
@@ -70,9 +95,14 @@ export default function FriendList({
             </Heading>
             <Divider className="mb-2" />
             {mode === "checkbox" && (
+              // FIX: The component is now fully controlled by its parent.
               <CheckboxGroup
-                value={values}
-                onChange={(keys) => setValues(keys)}
+                value={selectedFriends} // Directly use the prop for value
+                onChange={(keys) => {
+                  if (setSelectedFriends) {
+                    setSelectedFriends(keys); // Directly call the parent's state setter
+                  }
+                }}
               >
                 <VStack space="md">
                   {groupedFriends[initial].map((friend) => (
@@ -80,8 +110,6 @@ export default function FriendList({
                       key={friend.id}
                       value={friend.name}
                       className="flex-row items-center px-0 py-3 rounded-lg bg-white"
-                      defaultIsChecked={false}
-                      isChecked={values.includes(friend.name) ? true : false}
                     >
                       <Avatar
                         size={"md"}
@@ -96,7 +124,7 @@ export default function FriendList({
                           {friend.name}
                         </CheckboxLabel>
                         <Text size="sm" className="text-[#848688]">
-                          {friend.bank} - {friend.id}
+                          Account: {friend.account_number}
                         </Text>
                       </Box>
                       <CheckboxIndicator className="w-6 h-6 rounded-full ml-2">
@@ -122,19 +150,14 @@ export default function FriendList({
                           name: friend.name,
                           category: {
                             bank: {
-                              name: friend.bank,
-                              type: "TAPLUS PEGAWAI BNI",
+                              name: "Wondr Bank",
+                              type: "Friend Account",
                             },
                           },
                         });
                       }
-                      // --- KEY CHANGE: Use the dynamic ID for navigation ---
                       if (id) {
                         router.push(`/(main)/pocket/${id}/transaction/Detail`);
-                      } else {
-                        console.error(
-                          "FriendList: Pocket ID is missing, cannot navigate.",
-                        );
                       }
                     }}
                     className="flex-row items-center px-0 py-3 bg-white active:active:bg-gray-50"
@@ -152,7 +175,7 @@ export default function FriendList({
                         {friend.name}
                       </Text>
                       <Text size="sm" className="text-[#848688]">
-                        {friend.bank} - {friend.id}
+                        Account: {friend.account_number}
                       </Text>
                     </Box>
                   </Pressable>
