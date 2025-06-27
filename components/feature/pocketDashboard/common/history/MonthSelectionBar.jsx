@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { FlatList, View } from "react-native";
-import SmallRoundedButton from "../../../common/buttons/SmallRoundedButton";
+import SmallRoundedButton from "../../../../common/buttons/SmallRoundedButton";
 
 const MONTH_BUTTON_WIDTH = 70;
 const SEPARATOR_WIDTH = 12;

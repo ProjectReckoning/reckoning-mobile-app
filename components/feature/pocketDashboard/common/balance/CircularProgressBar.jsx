@@ -18,10 +18,8 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
   const [displayProgress, setDisplayProgress] = useState(0);
   const [percentage, setPercentage] = useState(0);
 
-  // Using two separate animated values as per your original logic
   const animatedProgressBarValue = useRef(new Animated.Value(0)).current;
   const animatedSmallCircleValue = useRef(new Animated.Value(0)).current;
-
   const smallCircleRef = useRef();
 
   const safeCalculatedCircleDimension =
@@ -34,10 +32,14 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
   const safeCurrentAmount = Number(currentAmount) || 0;
   const safeTargetAmount = Number(targetAmount) || 1;
 
-  const targetProgress =
+  // Calculate the raw progress, which can exceed 1 (100%)
+  const rawProgress =
     safeTargetAmount > 0 ? safeCurrentAmount / safeTargetAmount : 0;
 
-  // Restoring all layout and animation calculations from your original code
+  // --- KEY CHANGE: Clamp the visual progress to a maximum of 1 (100%) ---
+  // This ensures the progress bar and animated circle do not go beyond a full circle.
+  const visualProgress = Math.min(1, rawProgress);
+
   const smallCircleSize = 50;
   const progressLineThickness = 25;
   const circleSizeForProgressComponent = Math.max(
@@ -78,22 +80,24 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
         });
       }
 
+      // --- KEY CHANGE: Because the animation is capped at 1, this percentage will now be capped at 100 ---
       setPercentage(Math.floor(animation.value * 100));
     });
 
     const progressBarAnimationDuration = 800;
-    // Restoring your 1.2x duration multiplier to create the intended visual effect
     const smallCircleAnimationDuration = 1.2 * progressBarAnimationDuration;
 
     Animated.parallel([
       Animated.timing(animatedProgressBarValue, {
-        toValue: targetProgress,
+        // Animate to the clamped visual progress value
+        toValue: visualProgress,
         duration: progressBarAnimationDuration,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
       Animated.timing(animatedSmallCircleValue, {
-        toValue: targetProgress,
+        // Animate to the clamped visual progress value
+        toValue: visualProgress,
         duration: smallCircleAnimationDuration,
         easing: Easing.linear,
         useNativeDriver: false,
@@ -104,7 +108,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
       animatedProgressBarValue.removeListener(progressListener);
       animatedSmallCircleValue.removeListener(circleListener);
     };
-  }, [targetProgress, safeCalculatedCircleDimension]);
+  }, [visualProgress, safeCalculatedCircleDimension]); // Depend on visualProgress
 
   return (
     <Box
@@ -120,7 +124,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
     >
       <Progress.Circle
         size={circleSizeForProgressComponent}
-        progress={displayProgress}
+        progress={displayProgress} // This will be capped due to the animation
         showsText={false}
         color={WondrColors["tosca-wondr"]}
         unfilledColor={WondrColors["light-gray-wondr"]}
@@ -134,6 +138,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
           Saldo Terkumpul
         </AppText>
         <AppText variant="pageTitle" className="mb-1 text-black">
+          {/* This text remains uncapped and shows the true current amount */}
           {formatCurrency(safeCurrentAmount)}
         </AppText>
         <AppText variant="caption">/{formatCurrency(safeTargetAmount)}</AppText>
@@ -164,6 +169,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
           className="items-center justify-center"
         >
           <AppText variant="small" className="font-bold text-white">
+            {/* This percentage text is now capped at 100% */}
             {`${percentage}%`}
           </AppText>
         </Box>

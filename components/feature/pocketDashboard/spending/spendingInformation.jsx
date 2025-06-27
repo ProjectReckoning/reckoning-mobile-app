@@ -2,16 +2,16 @@ import React from "react";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
-import PocketDetail from "./information/PocketDetail";
-import OwnerDetail from "./information/OwnerDetail";
-import MemberDetail from "./information/MemberDetail";
-import MemberDetailList from "./information/MemberDetailList";
+import PocketDetail from "@/components/feature/pocketDashboard/common/information/PocketDetail";
+import OwnerDetail from "@/components/feature/pocketDashboard/common/information/OwnerDetail";
+import MemberDetail from "@/components/feature/pocketDashboard/common/information/MemberDetail";
+import MemberDetailList from "@/components/feature/pocketDashboard/common/information/MemberDetailList";
 
 /**
  * Renders the 'Info' tab, displaying details about the pocket,
  * its owner, and a scrollable list of members.
  */
-export default function InfoScreen() {
+export default function SpendingInfoScreen() {
   const currentPocket = usePocketStore((state) => state.currentPocket);
 
   if (!currentPocket) {
