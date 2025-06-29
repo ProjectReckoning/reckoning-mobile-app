@@ -10,22 +10,21 @@ import AppText from "@/components/common/typography/AppText";
 import BalanceCategory from "@/components/feature/pocketDashboard/common/BalanceCategory";
 
 /**
- * Renders the 'Balance' tab, showing account details, progress,
- * transaction buttons, and a list of member targets.
+ * Renders the 'Balance' tab for a Business pocket, passing the correct
+ * data to the pressable circle.
  */
 export default function BusinessBalanceScreen() {
   const currentPocket = usePocketStore((state) => state.currentPocket);
+  const summary = usePocketStore((state) => state.businessHistorySummary);
 
   if (!currentPocket) {
     return null;
   }
 
   const { width: screenWidth } = Dimensions.get("window");
-  // Maintain a consistent size ratio for the progress circle based on original design.
   const circleSizePercentageOfScreenWidth = 520 / 906;
   const calculatedCircleDimension =
     screenWidth * circleSizePercentageOfScreenWidth;
-  // Calculate overlap to create the desired visual effect.
   const overlapAmount = calculatedCircleDimension / 4.25;
 
   return (
@@ -39,6 +38,10 @@ export default function BusinessBalanceScreen() {
       >
         <PressableCircle
           calculatedCircleDimension={calculatedCircleDimension}
+          pocketType={currentPocket.type}
+          currentBalance={currentPocket.current_balance}
+          income={summary?.pemasukan}
+          expense={summary?.pengeluaran}
         />
       </Box>
       <TransactionButtonGroup />
