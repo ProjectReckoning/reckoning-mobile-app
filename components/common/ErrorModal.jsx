@@ -9,12 +9,21 @@ import {
   ActionsheetContent,
 } from "@/components/ui/actionsheet";
 
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+
 export default function ErrorModal({
   isOpen,
   onClose,
   imageSource,
   title,
   subtitle,
+  // This prop now controls whether ANY buttons are shown
+  showSpecialActions = false,
+  // Props for the action buttons (only used if showSpecialActions is true)
+  specialButton1Title,
+  specialButton1Action,
+  specialButton2Title,
+  specialButton2Action,
 }) {
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose} zIndex={999}>
@@ -22,8 +31,7 @@ export default function ErrorModal({
       <ActionsheetContent>
         <VStack
           w="$full"
-          // The ONLY change is here: "paddingSide" is corrected to "paddingHorizontal"
-          style={{ paddingBottom: 30, paddingHorizontal: 20, gap: 7 }}
+          style={{ paddingBottom: 30, paddingHorizontal: 20, gap: 12 }}
         >
           <Box w="$full" alignItems="center">
             <Image
@@ -46,6 +54,25 @@ export default function ErrorModal({
           <Text size="sm" textAlign="center">
             {subtitle}
           </Text>
+
+          {/* The entire button section is now conditional */}
+          {showSpecialActions && (
+            <Box w="$full" mt={10}>
+              <PrimaryButton
+                buttonAction={specialButton1Action}
+                buttonTitle={specialButton1Title}
+                className="mb-2"
+                textClassName="text-black font-bold text-base"
+              />
+              <PrimaryButton
+                buttonAction={specialButton2Action}
+                buttonTitle={specialButton2Title}
+                buttonColor="bg-white"
+                className="border border-gray-300"
+                textClassName="text-black font-bold"
+              />
+            </Box>
+          )}
         </VStack>
       </ActionsheetContent>
     </Actionsheet>
