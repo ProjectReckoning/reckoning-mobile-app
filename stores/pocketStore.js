@@ -61,6 +61,7 @@ export const usePocketStore = create((set, get) => ({
   isLoading: false,
   error: null,
   transactionHistory: [],
+  businessHistorySummary: null, // NEW: State for business history summary
   isHistoryLoading: false,
   historyError: null,
   allPockets: [],
@@ -316,17 +317,39 @@ export const usePocketStore = create((set, get) => ({
       "================================================================",
     );
     set({ isHistoryLoading: true, historyError: null });
+    const { currentPocket } = get(); // Get the current pocket to check its type
+
     try {
       console.log("Request Params:", { month: monthString });
       const response = await api.get(`/pocket/${pocketId}/history`, {
         params: { month: monthString },
       });
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
+
       if (response.data && response.data.ok) {
-        set({
-          transactionHistory: response.data.data,
-          isHistoryLoading: false,
-        });
+        // Check if the pocket type is Business and the data structure matches
+        if (
+          currentPocket?.type === "Business" &&
+          typeof response.data.data === "object" &&
+          response.data.data.transaksi
+        ) {
+          // It's a business pocket, extract the transaction list and summary
+          const { transaksi, ...summary } = response.data.data;
+          set({
+            transactionHistory: transaksi || [],
+            businessHistorySummary: summary,
+            isHistoryLoading: false,
+          });
+        } else {
+          // It's a standard pocket (Saving/Spending) or the business response is just an array
+          set({
+            transactionHistory: Array.isArray(response.data.data)
+              ? response.data.data
+              : [],
+            businessHistorySummary: null, // Reset summary for non-business pockets
+            isHistoryLoading: false,
+          });
+        }
       } else {
         throw new Error(
           response.data.message || "Failed to fetch transaction history.",
@@ -339,6 +362,7 @@ export const usePocketStore = create((set, get) => ({
         historyError: errorMessage,
         isHistoryLoading: false,
         transactionHistory: [],
+        businessHistorySummary: null,
       });
       throw error;
     }
