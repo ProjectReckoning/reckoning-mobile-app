@@ -7,14 +7,11 @@ export const useFriendshipStore = create((set, get) => ({
   friends: [],
   isLoadingFriends: false,
   friendsError: null,
-
   friendRequests: { sent: [], received: [] },
   isLoadingRequests: false,
   requestsError: null,
-
   isSendingRequest: false,
   sendRequestError: null,
-
   isHandlingRequest: false,
   handleRequestError: null,
 

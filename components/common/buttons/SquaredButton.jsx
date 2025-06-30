@@ -30,8 +30,6 @@ export default function SquaredButton({
 
   const finalClasses = classList.join(" ");
 
-  console.log(`SquaredButton: Label="${label}", Classes="${finalClasses}"`);
-
   return (
     <Box className="items-center">
       <Pressable

@@ -93,6 +93,11 @@ export const usePushNotifications = () => {
 
       const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
         .data;
+
+      // --- LOG THE PUSH TOKEN HERE ---
+      console.log("My Expo Push Token:", token);
+      // --------------------------------
+
       setExpoPushToken(token);
 
       // Send the token to your server

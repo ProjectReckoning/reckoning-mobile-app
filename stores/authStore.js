@@ -1,65 +1,80 @@
 // stores/authStore.js
 import { create } from "zustand";
-import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "@/lib/api";
 
 const TOKEN_KEY = "auth_token";
-const USER_KEY = "auth_user";
+const USER_KEY = "auth_user"; // Key to cache user data
 
 const useAuthStore = create((set, get) => ({
   token: null,
-  user: null,
+  user: null, // This will hold user data like name and balance
+  isLoading: true,
   isFetchingUser: false,
-  fetchUserError: null,
-
-  setToken: async (token, user = null) => {
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
-    if (user) {
-      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
-    } else {
-      await SecureStore.deleteItemAsync(USER_KEY);
-    }
-    set({ token, user });
-  },
-
-  loadToken: async () => {
-    const token = await SecureStore.getItemAsync(TOKEN_KEY);
-    const userString = await SecureStore.getItemAsync(USER_KEY);
-    const user = userString ? JSON.parse(userString) : null;
-    set({ token, user });
-    if (token) {
-      get().fetchUser();
-    }
-    return { token, user };
-  },
-
-  removeToken: async () => {
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
-    await SecureStore.deleteItemAsync(USER_KEY);
-    set({ token: null, user: null });
-  },
 
   fetchUser: async () => {
-    set({ isFetchingUser: true, fetchUserError: null });
+    // Prevent multiple simultaneous fetches
+    if (get().isFetchingUser) return;
+
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: GET /user/me");
+    console.log(
+      "================================================================",
+    );
+    set({ isFetchingUser: true });
+
     try {
       const response = await api.get("/user/me");
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
-        const fetchedUserData = response.data.data;
-        set((state) => ({
-          user: { ...state.user, ...fetchedUserData },
-          isFetchingUser: false,
-        }));
-        await SecureStore.setItemAsync(USER_KEY, JSON.stringify(get().user));
+        const userData = response.data.data;
+        set({ user: userData, isFetchingUser: false });
+        // Store user data alongside the token for faster app loads
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(userData));
+        return userData;
       } else {
         throw new Error(response.data.message || "Failed to fetch user data.");
       }
     } catch (error) {
-      set({
-        fetchUserError: error.message,
-        isFetchingUser: false,
-      });
-      // console.error removed, as it's now handled globally by api.js
+      console.error("API Error fetching user:", error);
+      set({ isFetchingUser: false, user: null });
+      throw error;
     }
+  },
+
+  setToken: async (newToken) => {
+    set({ token: newToken, isLoading: false });
+    await AsyncStorage.setItem(TOKEN_KEY, newToken);
+    if (newToken) {
+      // When a new token is set (at login), fetch user data immediately
+      get().fetchUser();
+    }
+  },
+
+  loadToken: async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem(TOKEN_KEY);
+      const userString = await AsyncStorage.getItem(USER_KEY);
+      const cachedUser = userString ? JSON.parse(userString) : null;
+
+      set({ token: storedToken, user: cachedUser, isLoading: false });
+
+      // If a token exists, refresh the user data in the background
+      if (storedToken) {
+        get().fetchUser();
+      }
+    } catch (e) {
+      console.error("Failed to load token/user from storage", e);
+      set({ isLoading: false });
+    }
+  },
+
+  removeToken: async () => {
+    set({ token: null, user: null }); // Also clear user data on logout
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    await AsyncStorage.removeItem(USER_KEY);
   },
 }));
 

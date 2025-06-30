@@ -6,39 +6,13 @@ const initialState = {
   type: { id: "topup", name: "Top-Up" },
   amount: null,
   description: "",
-  source: {
-    id: null,
-    name: "",
-    balance: 19546250,
-    category: {
-      bank: {
-        name: null,
-        type: null,
-      },
-      pocket: {
-        name: null,
-        type: null,
-      },
-    },
-  },
-  destination: {
-    id: null,
-    name: null,
-    category: {
-      bank: {
-        name: null,
-        type: null,
-      },
-      pocket: {
-        name: null,
-        type: null,
-      },
-    },
-  },
   isProcessing: false,
   transactionError: null,
   transactionResult: null,
   scheduledTransfers: [],
+  autoBudgetConfig: null,
+  isFetchingAutoBudget: false,
+  fetchAutoBudgetError: null,
 };
 
 export const useTransactionStore = create((set, get) => ({
@@ -53,14 +27,12 @@ export const useTransactionStore = create((set, get) => ({
           ? parseInt(amount.replace(/\D/g, ""), 10) || 0
           : amount,
     }),
-  setSource: (source) => set({ source }),
-  setDestination: (destination) => set({ destination }),
   setDescription: (description) => set({ description }),
   resetTransactionState: () => {
     set(initialState);
   },
 
-  // --- API FUNCTIONS ---
+  // --- STANDARD TRANSACTION APIS ---
 
   executeTopUp: async (pocketId) => {
     console.log(
@@ -142,37 +114,31 @@ export const useTransactionStore = create((set, get) => ({
     }
   },
 
-  executeTransfer: async (pocketId) => {
+  // --- AUTO-BUDGETING APIS ---
+
+  getAutoBudget: async (pocketId) => {
     console.log(
       "================================================================",
     );
-    console.log(
-      `API Call: POST /transaction/transfer for pocket ID: ${pocketId}`,
-    );
+    console.log(`API Call: GET /transaction/auto-budget/${pocketId}`);
     console.log(
       "================================================================",
     );
-    set({
-      isProcessing: true,
-      transactionError: null,
-      transactionResult: null,
-    });
-    const { amount, destination, description } = get();
-    const requestBody = {
-      balance: amount,
-      pocket_id: parseInt(pocketId, 10),
-      destination: destination.name,
-      description: description || `Transfer to ${destination.name}`,
-    };
+    set({ isFetchingAutoBudget: true, fetchAutoBudgetError: null });
     try {
-      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
-      const response = await api.post("/transaction/transfer", requestBody);
+      const response = await api.get(`/transaction/auto-budget/${pocketId}`);
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
-        set({ isProcessing: false, transactionResult: response.data.data });
-        return response.data.data;
+        const autoBudget = response.data.data[0] || null;
+        set({
+          isFetchingAutoBudget: false,
+          autoBudgetConfig: autoBudget,
+        });
+        return autoBudget;
       } else {
-        throw new Error(response.data.message || "Transfer failed.");
+        throw new Error(
+          response.data.message || "Failed to fetch auto-budget.",
+        );
       }
     } catch (error) {
       const errorMessage =
@@ -180,7 +146,7 @@ export const useTransactionStore = create((set, get) => ({
         error.message ||
         "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
-      set({ isProcessing: false, transactionError: errorMessage });
+      set({ isFetchingAutoBudget: false, fetchAutoBudgetError: errorMessage });
       throw error;
     }
   },
@@ -193,11 +159,7 @@ export const useTransactionStore = create((set, get) => ({
     console.log(
       "================================================================",
     );
-    set({
-      isProcessing: true,
-      transactionError: null,
-      transactionResult: null,
-    });
+    set({ isProcessing: true, transactionError: null });
     try {
       console.log("Request Body:", JSON.stringify(budgetData, null, 2));
       const response = await api.post(
@@ -222,105 +184,24 @@ export const useTransactionStore = create((set, get) => ({
     }
   },
 
-  respondToTransfer: async (transactionId, status) => {
+  deleteAutoBudget: async (pocketId) => {
     console.log(
       "================================================================",
     );
-    console.log(`API Call: PATCH /transaction/transfer/${transactionId}`);
-    console.log(
-      "================================================================",
-    );
-    set({
-      isProcessing: true,
-      transactionError: null,
-      transactionResult: null,
-    });
-    const requestBody = { status };
-    try {
-      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
-      const response = await api.patch(
-        `/transaction/transfer/${transactionId}`,
-        requestBody,
-      );
-      console.log("Response Received:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.ok) {
-        set({ isProcessing: false, transactionResult: response.data.data });
-        return response.data.data;
-      } else {
-        throw new Error(
-          response.data.message || "Failed to respond to transfer.",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      console.error("API Error:", errorMessage);
-      set({ isProcessing: false, transactionError: errorMessage });
-      throw error;
-    }
-  },
-
-  setScheduledTransfer: async (scheduleData) => {
-    console.log(
-      "================================================================",
-    );
-    console.log("API Call: POST /transaction/transfer/schedule");
-    console.log(
-      "================================================================",
-    );
-    set({
-      isProcessing: true,
-      transactionError: null,
-      transactionResult: null,
-    });
-    try {
-      console.log("Request Body:", JSON.stringify(scheduleData, null, 2));
-      const response = await api.post(
-        "/transaction/transfer/schedule",
-        scheduleData,
-      );
-      console.log("Response Received:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.ok) {
-        set({ isProcessing: false, transactionResult: response.data.data });
-        return response.data.data;
-      } else {
-        throw new Error(
-          response.data.message || "Failed to set transfer schedule.",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      console.error("API Error:", errorMessage);
-      set({ isProcessing: false, transactionError: errorMessage });
-      throw error;
-    }
-  },
-
-  fetchScheduledTransfers: async (pocketId) => {
-    console.log(
-      "================================================================",
-    );
-    console.log(`API Call: GET /transaction/transfer/schedule/${pocketId}`);
+    console.log(`API Call: DELETE /transaction/auto-budget/${pocketId}`);
     console.log(
       "================================================================",
     );
     set({ isProcessing: true, transactionError: null });
     try {
-      const response = await api.get(
-        `/transaction/transfer/schedule/${pocketId}`,
-      );
+      const response = await api.delete(`/transaction/auto-budget/${pocketId}`);
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
-        set({ isProcessing: false, scheduledTransfers: response.data.data });
+        set({ isProcessing: false, autoBudgetConfig: null });
         return response.data.data;
       } else {
         throw new Error(
-          response.data.message || "Failed to fetch scheduled transfers.",
+          response.data.message || "Failed to delete auto-budget.",
         );
       }
     } catch (error) {
@@ -329,11 +210,7 @@ export const useTransactionStore = create((set, get) => ({
         error.message ||
         "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
-      set({
-        isProcessing: false,
-        transactionError: errorMessage,
-        scheduledTransfers: [],
-      });
+      set({ isProcessing: false, transactionError: errorMessage });
       throw error;
     }
   },
