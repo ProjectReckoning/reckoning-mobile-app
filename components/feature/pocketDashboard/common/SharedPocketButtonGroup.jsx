@@ -104,7 +104,7 @@ export default function SharedPocketButtonGroup() {
           onClose={() => setIsModalVisible(false)}
           title={changeToSavingModalData.title}
           subtitle={changeToSavingModalData.subTitle}
-          imageSource={savingDecoratorImage}
+          imageSource={changeToSavingModalData.image}
           showSpecialActions={true}
           specialButton1Title={changeToSavingModalData.buttons[0].text}
           specialButton1Action={handleConfirmChangeType}
