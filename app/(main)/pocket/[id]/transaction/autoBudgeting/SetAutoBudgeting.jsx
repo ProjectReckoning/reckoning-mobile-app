@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -27,7 +27,6 @@ import {
 } from "lucide-react-native";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 import { useTransactionStore } from "@/stores/transactionStore";
-
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -36,23 +35,20 @@ import {
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
 import { WondrColors } from "@/utils/colorUtils";
-
 import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
 import { usePocketStore } from "@/stores/pocketStore";
+import useAuthStore from "@/stores/authStore";
 
 export default function SetAutoBudgeting() {
   const { id: pocketId } = useLocalSearchParams();
   const { currentPocket } = usePocketStore();
-
   const { amount, setAmount, setAutoBudgeting, isProcessing } =
     useTransactionStore();
+  const { user, fetchUser } = useAuthStore();
 
-  const sourceFund = {
-    title: "Sumber dana",
-    heading: "TAPLUS PEGAWAI BNI",
-    subheading: "1916826757",
-    balance: "10495750",
-  };
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const [isAmountTouched, setAmountTouched] = useState(false);
   const [selectedFrequency, setSelectedFrequency] = useState(null);
@@ -60,7 +56,6 @@ export default function SetAutoBudgeting() {
     useState(false);
 
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const [pickerMode, setPickerMode] = useState("date");
   const [displayDate, setDisplayDate] = useState(new Date());
@@ -68,7 +63,8 @@ export default function SetAutoBudgeting() {
   const [errors, setErrors] = useState({});
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
 
-  const frequencyOptions = ["Harian", "Mingguan", "Bulanan"];
+  // FIX: Removed "Harian" from the options
+  const frequencyOptions = ["Mingguan", "Bulanan"];
 
   const handleSelectFrequency = (value) => {
     setSelectedFrequency(value);
@@ -145,8 +141,8 @@ export default function SetAutoBudgeting() {
       return;
     }
 
+    // FIX: Removed "Harian" mapping
     const scheduleTypeMap = {
-      Harian: "daily",
       Mingguan: "weekly",
       Bulanan: "monthly",
     };
@@ -156,25 +152,22 @@ export default function SetAutoBudgeting() {
       schedule_type: scheduleTypeMap[selectedFrequency],
       schedule_value:
         selectedFrequency === "Mingguan"
-          ? selectedDate.getDay() // Sunday = 0, Monday = 1, ...
-          : selectedDate.getDate(), // Day of the month
+          ? selectedDate.getDay()
+          : selectedDate.getDate(),
       status: "active",
     };
 
     try {
       const result = await setAutoBudgeting(pocketId, budgetData);
       if (result) {
-        // API call was successful, now navigate
         router.push({
           pathname: `/(main)/pocket/${pocketId}/transaction/autoBudgeting/autoBudgetingConfirmation`,
           params: {
-            ...result, // Pass the successful API response
+            ...result,
             pocketName: currentPocket?.name,
             pocketAccountNumber: currentPocket?.account_number,
             pocketColor: currentPocket?.color,
             pocketIcon: currentPocket?.icon_name,
-            sourceFundName: sourceFund.heading,
-            sourceFundNumber: sourceFund.subheading,
           },
         });
       }
@@ -289,10 +282,10 @@ export default function SetAutoBudgeting() {
 
           <Box className="mb-4 mt-4">
             <TransactionCard
-              title={sourceFund.title}
-              heading={sourceFund.heading}
-              subheading={sourceFund.subheading}
-              balance={sourceFund.balance}
+              title="Sumber dana"
+              heading="TAPLUS PEGAWAI BNI"
+              subheading="1916826757"
+              balance={user?.balance}
               showBalance={true}
             />
           </Box>
@@ -304,7 +297,9 @@ export default function SetAutoBudgeting() {
             buttonTitle="Set auto-budgeting"
             className="mb-8"
             textClassName="text-black font-bold text-base"
-            disabled={!amount || !selectedFrequency || !selectedDate}
+            disabled={
+              !amount || !selectedFrequency || !selectedDate || isProcessing
+            }
             isLoading={isProcessing}
           />
         </ScrollView>

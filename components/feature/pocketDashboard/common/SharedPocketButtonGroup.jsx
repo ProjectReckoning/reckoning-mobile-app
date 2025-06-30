@@ -1,5 +1,6 @@
+// components/feature/pocketDashboard/common/SharedPocketButtonGroup.jsx
 import React, { useState } from "react";
-import { Alert } from "react-native";
+import { Alert, ActivityIndicator } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Pressable } from "@/components/ui/pressable";
 import { Target, ChevronRight, TimerReset } from "lucide-react-native";
@@ -9,57 +10,64 @@ import { VStack } from "@/components/ui/vstack";
 import { Divider } from "@/components/ui/divider";
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
+import { useTransactionStore } from "@/stores/transactionStore";
 import ErrorModal from "@/components/common/ErrorModal";
 import { modalData } from "@/utils/mockData/modalData";
-
-// Using require for the image asset
-const savingDecoratorImage = require("@/assets/images/decorators/savingDecorator.svg");
 
 export default function SharedPocketButtonGroup() {
   const { id } = useLocalSearchParams();
   const { currentPocket, changePocketType, isUpdating } = usePocketStore();
+  const { getAutoBudget, isFetchingAutoBudget } = useTransactionStore();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Find the specific modal content from your data file
   const changeToSavingModalData = modalData.find(
     (item) => item.id === "CHANGE_TO_SAVING_POCKET",
   );
 
-  // Action for existing 'Saving' pockets
   const handleChangeTarget = () => {
-    if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/setTarget`);
-    } else {
-      console.error("Pocket ID is missing, cannot change target.");
-    }
+    router.push(`/(main)/pocket/${id}/transaction/setTarget`);
   };
 
-  // Action for other pocket types to show the modal
   const handleSetTarget = () => {
     setIsModalVisible(true);
   };
 
-  // Action for the modal's primary button ("Ganti ke Saving")
   const handleConfirmChangeType = async () => {
     if (!id || isUpdating) return;
-
     try {
       await changePocketType(id, "saving");
       setIsModalVisible(false);
-      // Navigate to the set target screen after the type has been successfully changed
       router.push(`/(main)/pocket/${id}/transaction/setTarget`);
     } catch (error) {
       setIsModalVisible(false);
-      Alert.alert("Error", "Gagal mengubah tipe pocket. Silakan coba lagi.");
-      console.error("Error changing pocket type:", error);
+      Alert.alert("Error", "Gagal mengubah tipe pocket.");
     }
   };
 
-  const handleAutoBudgeting = () => {
-    if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/autoBudgeting`);
-    } else {
-      console.error("Pocket ID is missing, cannot navigate to auto budgeting.");
+  const handleAutoBudgeting = async () => {
+    if (!id || isFetchingAutoBudget || !currentPocket) return;
+    try {
+      const autoBudgetConfig = await getAutoBudget(id);
+      if (autoBudgetConfig) {
+        // If config exists, navigate to confirmation with all necessary data
+        router.push({
+          pathname: `/(main)/pocket/${id}/transaction/autoBudgeting/autoBudgetingConfirmation`,
+          params: {
+            ...autoBudgetConfig,
+            pocketId: id,
+            pocketName: currentPocket.name,
+            pocketAccountNumber: currentPocket.account_number,
+            pocketColor: currentPocket.color,
+            pocketIcon: currentPocket.icon_name,
+          },
+        });
+      } else {
+        // If no config, navigate to the setup screen
+        router.push(`/(main)/pocket/${id}/transaction/autoBudgeting`);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Gagal memeriksa status Auto-Budget.");
     }
   };
 
@@ -72,7 +80,7 @@ export default function SharedPocketButtonGroup() {
           <Pressable
             className="flex-row items-center justify-between"
             onPress={isSavingPocket ? handleChangeTarget : handleSetTarget}
-            disabled={!currentPocket} // Disable if pocket data isn't loaded
+            disabled={!currentPocket}
           >
             <Box className="flex-row items-center gap-2">
               <Target size={24} color={WondrColors["orange-wondr"]} />
@@ -86,18 +94,21 @@ export default function SharedPocketButtonGroup() {
           <Pressable
             className="flex-row items-center justify-between"
             onPress={handleAutoBudgeting}
-            disabled={!currentPocket}
+            disabled={!currentPocket || isFetchingAutoBudget}
           >
             <Box className="flex-row items-center gap-2">
               <TimerReset size={24} color={WondrColors["purple-wondr"]} />
               <AppText variant="cardTitle">Auto Budgeting</AppText>
             </Box>
-            <ChevronRight size={24} color="black" />
+            {isFetchingAutoBudget ? (
+              <ActivityIndicator />
+            ) : (
+              <ChevronRight size={24} color="black" />
+            )}
           </Pressable>
         </VStack>
       </Box>
 
-      {/* Confirmation Modal */}
       {changeToSavingModalData && (
         <ErrorModal
           isOpen={isModalVisible}
