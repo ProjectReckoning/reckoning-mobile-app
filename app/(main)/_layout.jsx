@@ -218,7 +218,7 @@ export default function MainLayout() {
         options={{ title: "Info" }}
       />
       <Stack.Screen
-        name="pocket/transaction/setTarget/index"
+        name="pocket/[id]/transaction/setTarget/index"
         options={{ title: "Change Target" }}
       />
 

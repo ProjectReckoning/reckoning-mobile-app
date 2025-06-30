@@ -1,94 +1,127 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { CalendarClock, X } from "lucide-react-native";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { CommonActions } from "@react-navigation/native";
+import { CalendarClock } from "lucide-react-native";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-} from "@/components/ui/actionsheet";
-
 import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
-import { useTransactionStore } from "@/stores/transactionStore";
+import { usePocketStore } from "@/stores/pocketStore";
 
-export default function SetTarget() {
-  const { id } = useLocalSearchParams();
-  const { amount, setAmount } = useTransactionStore();
-  const [isFrequencyActionsheetOpen, setIsFrequencyActionsheetOpen] =
-    useState(false);
+export default function SetTargetScreen() {
+  const { id: pocketId } = useLocalSearchParams();
+  const navigation = useNavigation();
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const {
+    currentPocket,
+    fetchPocketById,
+    updatePocketTarget,
+    isUpdating,
+    updateError,
+  } = usePocketStore();
 
+  // Form state
+  const [targetAmount, setTargetAmount] = useState("");
+  const [deadline, setDeadline] = useState(null);
+
+  // Date picker state management
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
-
   const [displayDate, setDisplayDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
   const [pickerMode, setPickerMode] = useState("date");
 
+  // Validation state
   const [isAmountTouched, setAmountTouched] = useState(false);
   const [isDateTouched, setDateTouched] = useState(false);
+
+  useEffect(() => {
+    if (pocketId) {
+      fetchPocketById(pocketId);
+    }
+  }, [pocketId, fetchPocketById]);
+
+  useEffect(() => {
+    if (currentPocket) {
+      setTargetAmount(currentPocket.target_nominal);
+      if (currentPocket.deadline) {
+        const existingDeadline = new Date(currentPocket.deadline);
+        setDeadline(existingDeadline);
+        // Also initialize the picker's display state
+        setDisplayDate(existingDeadline);
+        setSelectedDay(existingDeadline.getDate());
+      }
+    }
+  }, [currentPocket]);
 
   const validateForm = () => {
     setAmountTouched(true);
     setDateTouched(true);
-
-    // Periksa apakah semua field valid
-    const isAmountValid = amount && amount > 0;
-    const isDateValid = selectedDate !== null;
-
-    return isAmountValid && isDateValid;
+    const isAmountValid =
+      targetAmount && parseFloat(String(targetAmount).replace(/\D/g, "")) > 0;
+    return isAmountValid && deadline;
   };
 
-  const handleNext = () => {
-    if (validateForm() && id) {
-      `/(main)/pocket/${id}/transaction/setTarget`;
+  const handleUpdate = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const amountValue = parseFloat(String(targetAmount).replace(/\D/g, ""));
+      await updatePocketTarget(pocketId, {
+        targetAmount: amountValue,
+        deadline: deadline.toISOString(),
+      });
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{ name: "home/index" }, { name: "pocket/all/index" }],
+        }),
+      );
+    } catch (e) {
+      console.error("Failed to update target:", e);
+      Alert.alert(
+        "Update Failed",
+        updateError || "Could not update the pocket target.",
+      );
     }
   };
-
-  const isAmountInvalid = isAmountTouched && (!amount || amount <= 0);
-  const isDateInvalid = isDateTouched && !selectedDate;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const handleOpenDatePicker = () => {
     setDateTouched(true);
-    const initialDate = selectedDate || today;
-    const effectiveInitialDate = initialDate < today ? today : initialDate;
-    setDisplayDate(effectiveInitialDate);
-    setSelectedDay(effectiveInitialDate.getDate());
+    // Initialize the picker with the current deadline or today's date
+    const initialDate = deadline || today;
+    setDisplayDate(initialDate);
+    setSelectedDay(initialDate.getDate());
     setPickerMode("date");
     setDatePickerOpen(true);
   };
 
-  const handleCloseDatePicker = () => setDatePickerOpen(false);
-
   const handleConfirmDate = () => {
+    // Construct the final date from the picker's state
     if (selectedDay) {
       const newDate = new Date(
         displayDate.getFullYear(),
         displayDate.getMonth(),
         selectedDay,
       );
-      setSelectedDate(newDate);
+      setDeadline(newDate);
     }
-    handleCloseDatePicker();
+    setDatePickerOpen(false);
   };
 
   const handleResetDate = () => {
@@ -105,6 +138,11 @@ export default function SetTarget() {
     });
   };
 
+  const isAmountInvalid =
+    isAmountTouched &&
+    (!targetAmount || parseFloat(String(targetAmount).replace(/\D/g, "")) <= 0);
+  const isDateInvalid = isDateTouched && !deadline;
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -117,31 +155,31 @@ export default function SetTarget() {
           contentContainerStyle={{ flexGrow: 1 }}
           className="bg-white px-6 py-5"
         >
-          <Box className="flex-row items-center mb-6 gap-4">
-            <PocketCard
-              mode="icon"
-              pocketType="Saving"
-              color="bg-orange-wondr"
-              icon="Airplane"
-              iconSize="10"
-              whiteSpace="mb-5"
-              className="w-12 h-12 rounded-full"
-              iconColor="$text-white"
-            />
-            <Box flex={1}>
-              <Heading size="md" color="$text-black-600">
-                Pergi ke Korea 2026
-              </Heading>
-              <Text size="sm" color="$text-black-600">
-                0238928039
-              </Text>
+          {currentPocket && (
+            <Box className="flex-row items-center mb-6 gap-4">
+              <PocketCard
+                mode="icon"
+                pocketType={currentPocket.type}
+                color={currentPocket.color}
+                icon={currentPocket.icon_name}
+                iconSize="10"
+                className="w-12 h-12 rounded-full"
+              />
+              <Box flex={1}>
+                <Heading size="md" color="$text-black-600">
+                  {currentPocket.name}
+                </Heading>
+                <Text size="sm" color="$text-black-600">
+                  {currentPocket.account_number}
+                </Text>
+              </Box>
             </Box>
-          </Box>
+          )}
 
           <Box className="mb-1">
             <NominalInput
-              amount={amount}
-              setAmount={setAmount}
+              amount={targetAmount}
+              setAmount={setTargetAmount}
               setAmountTouched={setAmountTouched}
               isAmountInvalid={isAmountInvalid}
             />
@@ -155,8 +193,8 @@ export default function SetTarget() {
             }`}
           >
             <CalendarClock size={16} color="#848688" />
-            <Text className={selectedDate ? "text-black" : "text-gray-400"}>
-              {formatDate(selectedDate)}
+            <Text className={deadline ? "text-black" : "text-gray-400"}>
+              {formatDate(deadline)}
             </Text>
           </Pressable>
           {isDateInvalid && (
@@ -168,18 +206,20 @@ export default function SetTarget() {
           <Box style={{ flex: 1 }} />
 
           <PrimaryButton
-            buttonAction={handleNext}
+            buttonAction={handleUpdate}
             buttonTitle="Ubah target"
             className="mb-8"
             textClassName="text-black font-bold text-base"
-            disabled={!selectedDate || !amount || amount <= 0}
+            disabled={!deadline || !targetAmount || isUpdating}
+            isLoading={isUpdating}
           />
         </ScrollView>
       </TouchableWithoutFeedback>
 
+      {/* The component is now fully controlled */}
       <CustomDatePicker
         isOpen={isDatePickerOpen}
-        onClose={handleCloseDatePicker}
+        onClose={() => setDatePickerOpen(false)}
         onConfirm={handleConfirmDate}
         onReset={handleResetDate}
         displayDate={displayDate}
@@ -190,31 +230,6 @@ export default function SetTarget() {
         onPickerModeChange={setPickerMode}
         minDate={today}
       />
-
-      <Actionsheet
-        isOpen={isFrequencyActionsheetOpen}
-        onClose={() => setIsFrequencyActionsheetOpen(false)}
-        zIndex={999}
-      >
-        <ActionsheetBackdrop />
-        <ActionsheetContent zIndex={999}>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          <Box className="w-full flex-row justify-between items-center px-4 pb-2 mt-5">
-            <Text className="font-bold text-lg text-black">
-              Pilih frekuensi
-            </Text>
-            <Pressable onPress={() => setIsFrequencyActionsheetOpen(false)}>
-              <X size={24} color="#000" />
-            </Pressable>
-          </Box>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            className="w-full mt-5 px-4"
-          ></ScrollView>
-        </ActionsheetContent>
-      </Actionsheet>
     </KeyboardAvoidingView>
   );
 }
