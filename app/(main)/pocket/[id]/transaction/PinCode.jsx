@@ -6,7 +6,7 @@ import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { ActivityIndicator } from "react-native";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { Delete } from "lucide-react-native";
@@ -21,8 +21,12 @@ const keypad = [
 ];
 
 export default function PinCode() {
-  const { id } = useLocalSearchParams();
+  const { id, isSchedule } = useLocalSearchParams();
   const [pin, setPin] = useState("");
+
+  useEffect(() => {
+    console.log("is schedule? ", id, isSchedule, typeof isSchedule);
+  }, []);
 
   const {
     type,
@@ -32,6 +36,7 @@ export default function PinCode() {
     executeWithdraw,
     // --- NEW: Get the transfer action from the store ---
     executeTransfer,
+    executeScheduleTransfer,
   } = useTransactionStore();
 
   const handlePress = async (val) => {
@@ -58,12 +63,15 @@ export default function PinCode() {
           await executeWithdraw(id);
         } else if (type.id === "transfer") {
           await executeTransfer(id);
+        } else if (type.id === "transfer_bulanan") {
+          console.log("Scheduled");
+          await executeScheduleTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
         // On success, navigate to the statement screen
-        router.push(`/(main)/pocket/${id}/transaction/Statement`);
+        router.replace(`/(main)/pocket/${id}/transaction/Statement`);
       } catch (error) {
         console.error(`PIN Screen: ${type.name} failed.`, error);
         alert(

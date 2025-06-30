@@ -224,12 +224,12 @@ export default function MainLayout() {
 
       {/* ===== Scheduled Transfers ===== */}
       <Stack.Screen
-        name="pocket/[id]/scheduleTransfer/index"
-        options={{ headerShown: false }}
+        name="pocket/[id]/transferSchedule/SetScheduleTransfer"
+        options={{ title: "Jadwal transfer bulanan" }}
       />
       <Stack.Screen
         name="pocket/[id]/transferSchedule/index"
-        options={{ title: "Transfer Schedule" }}
+        options={{ title: "Transfer bulanan" }}
       />
     </Stack>
   );
