@@ -4,11 +4,12 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
-import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import useAuthStore from "@/stores/authStore";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
-import { usePocketStore } from "@/stores/pocketStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 
 import { maskId } from "@/utils/helperFunction";
 import PocketCard from "@/components/common/cards/PocketCard";
@@ -26,11 +27,11 @@ export default function Topup() {
     setSource,
     setAmount,
     setDestination,
-    // --- NEW: Get the reset action ---
     resetTransactionState,
     setType,
   } = useTransactionStore();
   const { currentPocket, fetchPocketById } = usePocketStore();
+  const user = useAuthStore((state) => state.user);
 
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
@@ -64,9 +65,9 @@ export default function Topup() {
       });
       // Set a default source for the Top Up flow
       setSource({
-        id: 1916837397,
-        name: "AMIRA FERIAL",
-        balance: 19546250,
+        id: user?.user_id,
+        name: (user?.name || "").toUpperCase(),
+        balance: user?.balance || 0,
         category: {
           bank: {
             name: "BNI",

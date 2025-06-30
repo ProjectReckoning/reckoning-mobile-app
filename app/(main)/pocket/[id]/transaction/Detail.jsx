@@ -2,11 +2,14 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Pressable } from "@/components/ui/pressable";
 import { Input, InputField } from "@/components/ui/input";
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { router, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
+import { CalendarClock } from "lucide-react-native";
+import { usePocketStore } from "@/stores/pocketStore";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
@@ -21,13 +24,14 @@ export default function TransactionDetail() {
     destination,
     amount,
     setAmount,
-    // --- NEW: Get description state from store ---
     description,
     setDescription,
   } = useTransactionStore();
+  const { pocketType } = usePocketStore();
 
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
+  const isBusiness = pocketType?.toLowerCase().includes("business");
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
@@ -85,7 +89,7 @@ export default function TransactionDetail() {
               <Text className="text-sm">Deskripsi (Opsional)</Text>
               <Input className="w-full h-14 rounded-xl border border-gray-wondr-border data-[focus=true]:border-green-select">
                 <InputField
-                  placeholder="Contoh: Pembayaran ke vendor"
+                  placeholder="Contoh: Kopi Sobat tadi sore pas di Kopi Nako"
                   value={description}
                   onChangeText={setDescription}
                 />
@@ -103,12 +107,19 @@ export default function TransactionDetail() {
             />
           </VStack>
 
-          <PrimaryButton
-            buttonAction={handleNext}
-            buttonTitle="Lanjut"
-            className={"my-5"}
-            disabled={amount === null || amount === 0}
-          />
+          <HStack space="sm" className="w-full justify-between items-center">
+            {isBusiness && (
+              <Pressable className="w-16 h-16 rounded-3xl bg-white border border-gray-wondr-border justify-center items-center active:bg-slate-100">
+                <CalendarClock size={21} />
+              </Pressable>
+            )}
+            <PrimaryButton
+              buttonAction={handleNext}
+              buttonTitle="Lanjut"
+              className={"w-fit flex-1 my-5"}
+              disabled={amount === null || amount === 0}
+            />
+          </HStack>
         </ScrollView>
       </KeyboardAvoidingView>
     </Box>

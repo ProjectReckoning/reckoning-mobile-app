@@ -4,13 +4,14 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState, useEffect, useCallback } from "react";
-import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Search } from "lucide-react-native";
+import { useState, useEffect, useCallback } from "react";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
+
 import TabBar from "@/components/common/TabBar";
+import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
 import FriendList from "@/components/common/FriendList";
-import { WondrColors } from "@/utils/colorUtils";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { transferFeatures } from "@/utils/mockData/featureData";
 import FeatureButton from "@/components/common/buttons/FeatureButton";
@@ -27,6 +28,8 @@ export default function Transfer() {
   const {
     selectedFriends,
     setSelectedFriends,
+    pocketType,
+    setPocketType,
     currentPocket,
     fetchPocketById,
   } = usePocketStore();
@@ -60,6 +63,7 @@ export default function Transfer() {
           },
         },
       });
+      setPocketType(currentPocket.type);
     }
   }, [currentPocket]);
 
