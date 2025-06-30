@@ -6,6 +6,7 @@ import AccountNumber from "@/components/feature/pocketDashboard/common/balance/A
 import PaymentDateInfo from "@/components/feature/pocketDashboard/common/balance/PaymentDateInfo";
 import PressableCircle from "@/components/feature/pocketDashboard/common/balance/PressableCircle";
 import TransactionButtonGroup from "@/components/feature/pocketDashboard/common/balance/TransactionButtonGroup";
+import SharedPocketButtonGroup from "@/components/feature/pocketDashboard/common/SharedPocketButtonGroup";
 import BalanceMemberList from "@/components/feature/pocketDashboard/common/balance/BalanceMemberList";
 import AppText from "@/components/common/typography/AppText";
 
@@ -42,6 +43,8 @@ export default function SpendingBalanceScreen() {
         />
       </Box>
       <TransactionButtonGroup />
+
+      <SharedPocketButtonGroup />
 
       {/* --- Scrollable List Section --- */}
       <Box className="flex-1 mt-4">
