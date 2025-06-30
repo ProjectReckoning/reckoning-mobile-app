@@ -27,6 +27,13 @@ const typeToDisplayType = {
   business: "Business",
 };
 
+// NEW: Maps UI display types back to API-friendly values
+const typeMapping = {
+  Spending: "spending",
+  Saving: "saving",
+  "Business Fund": "business",
+};
+
 export const usePocketStore = create((set, get) => ({
   // --- State ---
   pocketSubject: null,
@@ -61,7 +68,7 @@ export const usePocketStore = create((set, get) => ({
   isLoading: false,
   error: null,
   transactionHistory: [],
-  businessHistorySummary: null, // NEW: State for business history summary
+  businessHistorySummary: null,
   isHistoryLoading: false,
   historyError: null,
   allPockets: [],
@@ -102,6 +109,86 @@ export const usePocketStore = create((set, get) => ({
       pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
       pocketIcon: pocket.icon_name,
     });
+  },
+
+  updatePocketTarget: async (pocketId, targetData) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId} (Update Target)`);
+    console.log(
+      "================================================================",
+    );
+    set({ isUpdating: true, updateError: null });
+
+    const requestBody = {
+      target_nominal: targetData.targetAmount,
+      deadline: targetData.deadline,
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(`/pocket/${pocketId}`, requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+
+      if (response.data && response.data.ok) {
+        set({ isUpdating: false });
+        get().fetchAllPockets();
+        get().fetchPocketById(pocketId);
+        return response.data.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to update pocket target.",
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ updateError: errorMessage, isUpdating: false });
+      throw error;
+    }
+  },
+
+  changePocketType: async (pocketId, newType) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId} (Change Type)`);
+    console.log(
+      "================================================================",
+    );
+    set({ isUpdating: true, updateError: null });
+
+    const requestBody = {
+      type: newType, // e.g., "saving"
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(`/pocket/${pocketId}`, requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+
+      if (response.data && response.data.ok) {
+        set({ isUpdating: false });
+        await get().fetchPocketById(pocketId);
+        return response.data.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to change pocket type.",
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ updateError: errorMessage, isUpdating: false });
+      throw error;
+    }
   },
 
   fetchAllPockets: async () => {
@@ -201,15 +288,24 @@ export const usePocketStore = create((set, get) => ({
       role: "viewer",
     }));
 
+    // Use the typeMapping to convert the display name to the API value
+    const apiPocketType = typeMapping[pocketType] || pocketType?.toLowerCase();
+
     const requestBody = {
       name: pocketName,
-      type: pocketType?.toLowerCase(),
-      target_nominal: pocketBalanceTarget,
-      deadline: targetDuration.endDate,
+      type: apiPocketType,
       color_hex: colorClassToHex[pocketColor] || "#58ABA1",
       icon_name: pocketIcon,
       members: membersWithRoles,
     };
+
+    // Conditionally add target and deadline
+    if (pocketType === "Saving" || pocketType === "Business Fund") {
+      requestBody.target_nominal = pocketBalanceTarget;
+      requestBody.deadline = targetDuration?.endDate
+        ? new Date(targetDuration.endDate).toISOString()
+        : null;
+    }
 
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
@@ -317,7 +413,7 @@ export const usePocketStore = create((set, get) => ({
       "================================================================",
     );
     set({ isHistoryLoading: true, historyError: null });
-    const { currentPocket } = get(); // Get the current pocket to check its type
+    const { currentPocket } = get();
 
     try {
       console.log("Request Params:", { month: monthString });
@@ -327,13 +423,11 @@ export const usePocketStore = create((set, get) => ({
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
 
       if (response.data && response.data.ok) {
-        // Check if the pocket type is Business and the data structure matches
         if (
           currentPocket?.type === "Business" &&
           typeof response.data.data === "object" &&
           response.data.data.transaksi
         ) {
-          // It's a business pocket, extract the transaction list and summary
           const { transaksi, ...summary } = response.data.data;
           set({
             transactionHistory: transaksi || [],
@@ -341,12 +435,11 @@ export const usePocketStore = create((set, get) => ({
             isHistoryLoading: false,
           });
         } else {
-          // It's a standard pocket (Saving/Spending) or the business response is just an array
           set({
             transactionHistory: Array.isArray(response.data.data)
               ? response.data.data
               : [],
-            businessHistorySummary: null, // Reset summary for non-business pockets
+            businessHistorySummary: null,
             isHistoryLoading: false,
           });
         }

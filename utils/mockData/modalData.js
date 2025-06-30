@@ -4,12 +4,13 @@ export const modalData = [
     title: "Persetujuan Anggota Diperlukan",
     subTitle:
       "Untuk transfer di atas nominal kontribusi yang telah kamu setorkan, diperlukan persetujuan dari semua anggota",
+    image: require("@/assets/images/approval.png"), // Added image
     buttons: [
       {
-        text: "Ubah Nominal", //ini balik lagi ke halaman input nominal dia sama kaya batal aja si
+        text: "Ubah Nominal",
       },
       {
-        text: "Kirim Permintaan Persetujuan", // ini bakal kirim permintaan persetujuan ke anggota lain
+        text: "Kirim Permintaan Persetujuan",
       },
     ],
   },
@@ -18,12 +19,13 @@ export const modalData = [
     title: "Penarikan Melebihi Kontribusi",
     subTitle:
       "Untuk melanjutkan, silakan sesuaikan nominal penarikan dengan jumlah kontribusi yang telah kamu setor ke pocket ini.",
+    image: require("@/assets/images/contribution.png"), // Added image
     buttons: [
       {
-        text: "Ubah Nominal", // ini balik lagi ke halaman input nominal dia sama kaya batal aja si
+        text: "Ubah Nominal",
       },
       {
-        text: "Cek saldo pocket", // ini bakal redirect ke halaman pocket detail balance
+        text: "Cek saldo pocket",
       },
     ],
   },
@@ -32,12 +34,13 @@ export const modalData = [
     title: "Ganti ke Saving Pocket",
     subTitle:
       "Untuk dapat menetapkan target tabunganmu, kamu perlu mengganti tipe pocket ini dari 'Spending' menjadi 'Saving'.",
+    image: require("@/assets/images/approval.png"), // Using fallback image
     buttons: [
       {
-        text: "Ganti ke Saving", // ini bakal keganti ke tipe saving langsung dengan ada presentase targetnya
+        text: "Ganti ke Saving",
       },
       {
-        text: "Batal", // gajadi apa-apa, balik ke halaman balance pocket
+        text: "Batal",
       },
     ],
   },
@@ -46,12 +49,13 @@ export const modalData = [
     title: "Ganti ke Spending Pocket",
     subTitle:
       "Untuk menghilangkan target pengeluaranmu, kamu perlu mengganti tipe pocket ini dari 'Saving' menjadi 'Spending'.",
+    image: require("@/assets/images/approval.png"), // Using fallback image
     buttons: [
       {
-        text: "Ganti ke Spending", // ini bakal keganti ke tipe spending gaada targetnya
+        text: "Ganti ke Spending",
       },
       {
-        text: "Batal", // gajadi apa-apa, balik ke halaman balance pocket
+        text: "Batal",
       },
     ],
   },
