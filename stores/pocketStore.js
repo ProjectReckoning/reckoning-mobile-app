@@ -54,6 +54,8 @@ export const usePocketStore = create((set, get) => ({
     }),
   targetDuration: { startDate: undefined, endDate: undefined },
   setTargetDuration: (duration) => set({ targetDuration: duration }),
+  deadline: undefined,
+  setDeadline: (date) => set({ deadline: date }),
   selectedFriends: [],
   setSelectedFriends: (friends) => set({ selectedFriends: friends }),
   pocketColor: null,
@@ -90,6 +92,7 @@ export const usePocketStore = create((set, get) => ({
       pocketName: "",
       pocketBalanceTarget: null,
       targetDuration: { startDate: undefined, endDate: undefined },
+      deadline: undefined,
       selectedFriends: [],
       pocketColor: null,
       pocketIcon: "pocket",
@@ -106,6 +109,7 @@ export const usePocketStore = create((set, get) => ({
         startDate: new Date(),
         endDate: new Date(pocket.deadline),
       },
+      deadline: new Date(pocket.deadline),
       pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
       pocketIcon: pocket.icon_name,
     });
@@ -278,6 +282,7 @@ export const usePocketStore = create((set, get) => ({
       pocketType,
       pocketBalanceTarget,
       targetDuration,
+      deadline,
       pocketColor,
       pocketIcon,
       selectedFriends,
@@ -302,6 +307,7 @@ export const usePocketStore = create((set, get) => ({
     // Conditionally add target and deadline
     if (pocketType === "Saving" || pocketType === "Business Fund") {
       requestBody.target_nominal = pocketBalanceTarget;
+      // requestBody.deadline = deadline ? new Date(deadline).toISOString() : null;
       requestBody.deadline = targetDuration?.endDate
         ? new Date(targetDuration.endDate).toISOString()
         : null;
@@ -339,6 +345,7 @@ export const usePocketStore = create((set, get) => ({
       pocketName,
       pocketBalanceTarget,
       targetDuration,
+      deadline,
       pocketColor,
       pocketIcon,
     } = get();
@@ -347,6 +354,7 @@ export const usePocketStore = create((set, get) => ({
       name: pocketName,
       target_nominal: pocketBalanceTarget,
       deadline: targetDuration.endDate,
+      // deadline: deadline,
       color_hex: colorClassToHex[pocketColor] || "#58ABA1",
       icon_name: pocketIcon,
     };

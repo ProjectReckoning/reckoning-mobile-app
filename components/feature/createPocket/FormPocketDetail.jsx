@@ -14,6 +14,7 @@ import {
   FormControlLabelText,
 } from "@/components/ui/form-control";
 import { CalendarClock } from "lucide-react-native";
+import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
 
 export default function FormPocketDetail({
   pocketName,
@@ -24,11 +25,20 @@ export default function FormPocketDetail({
   setPocketBalanceTarget,
   isBalanceInvalid,
   targetDuration,
+  deadline,
   isDateInvalid,
   open,
   handleOpenDatePicker,
   onDismiss,
   onConfirm,
+  onReset,
+  displayDate,
+  setDisplayDate,
+  tempSelectedDay,
+  handleDaySelect,
+  pickerMode,
+  setPickerMode,
+  today = new Date(),
 }) {
   const formatCurrency = (value) => {
     if (!value) return "";
@@ -143,7 +153,7 @@ export default function FormPocketDetail({
           <FormControl isInvalid={isDateInvalid} size="md" isRequired>
             <FormControlLabel>
               <FormControlLabelText className="font-light">
-                Durasi target
+                Target tanggal tercapai
               </FormControlLabelText>
             </FormControlLabel>
             <Pressable
@@ -152,10 +162,17 @@ export default function FormPocketDetail({
             >
               <Box className="flex flex-row gap-3 items-center">
                 <CalendarClock size={16} color={"#848688"} />
-                {targetDuration.startDate && targetDuration.endDate ? (
+                {/* {targetDuration.startDate && targetDuration.endDate ? (
                   <Text className="text-black text-lg">
                     {targetDuration.startDate.toLocaleDateString("id-ID")} -{" "}
                     {targetDuration.endDate.toLocaleDateString("id-ID")}
+                  </Text>
+                ) : (
+                  <Text className="text-gray-400 text-lg">Pilih tanggal</Text>
+                )} */}
+                {deadline ? (
+                  <Text className="text-black text-lg">
+                    {deadline.toLocaleDateString("id-ID")}
                   </Text>
                 ) : (
                   <Text className="text-gray-400 text-lg">Pilih tanggal</Text>
@@ -165,11 +182,11 @@ export default function FormPocketDetail({
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
               <FormControlErrorText>
-                Target harus memiliki tanggal mulai dan selesai!
+                Target harus memiliki tanggal selesai!
               </FormControlErrorText>
             </FormControlError>
-            {/* Move DatePickerModal here, outside Pressable */}
-            <DatePickerModal
+
+            {/* <DatePickerModal
               locale="id"
               mode="range"
               visible={open}
@@ -178,6 +195,19 @@ export default function FormPocketDetail({
               onDismiss={onDismiss}
               onConfirm={onConfirm}
               presentationStyle="pageSheet"
+            /> */}
+            <CustomDatePicker
+              isOpen={open}
+              onClose={onDismiss}
+              onConfirm={onConfirm}
+              onReset={onReset}
+              displayDate={displayDate}
+              selectedDay={tempSelectedDay}
+              pickerMode={pickerMode}
+              onDaySelect={handleDaySelect}
+              onDisplayDateChange={setDisplayDate}
+              onPickerModeChange={setPickerMode}
+              minDate={today}
             />
           </FormControl>
         </>

@@ -1,6 +1,5 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
@@ -35,6 +34,8 @@ export default function Details() {
     setPocketBalanceTarget,
     targetDuration,
     setTargetDuration,
+    deadline,
+    setDeadline,
     goalTitle,
     selectedFriends,
   } = usePocketStore();
@@ -46,6 +47,13 @@ export default function Details() {
 
   const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
+
+  const [displayDate, setDisplayDate] = useState(new Date());
+  const [tempSelectedDay, setTempSelectedDay] = useState(null);
+  const [pickerMode, setPickerMode] = useState("date");
+  const [errors, setErrors] = useState({});
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const goals =
     pocketType === "Business Fund"
@@ -60,6 +68,10 @@ export default function Details() {
   const remainingCount = extraAvatars.length;
 
   const handleOpenDatePicker = () => {
+    const initialDate = deadline || new Date();
+    setDisplayDate(initialDate);
+    setTempSelectedDay(deadline ? deadline.getDate() : null);
+    setPickerMode("date");
     setOpen(true);
     setDateTouched(true);
   };
@@ -68,13 +80,31 @@ export default function Details() {
     setOpen(false);
   }, []);
 
-  const onConfirm = useCallback(
-    ({ startDate, endDate }) => {
-      setOpen(false);
-      setTargetDuration({ startDate, endDate });
-    },
-    [setTargetDuration],
-  );
+  // const onConfirm = useCallback(
+  //   ({ startDate, endDate }) => {
+  //     setOpen(false);
+  //     setTargetDuration({ startDate, endDate });
+  //   },
+  //   [setTargetDuration],
+  // );
+
+  const onConfirm = () => {
+    if (tempSelectedDay) {
+      const newSelectedDate = new Date(
+        displayDate.getFullYear(),
+        displayDate.getMonth(),
+        tempSelectedDay,
+      );
+      setDeadline(newSelectedDate);
+      if (errors.tanggal) {
+        setErrors((prevErrors) => ({ ...prevErrors, tanggal: null }));
+      }
+    }
+    onDismiss();
+  };
+
+  const handleDaySelect = (day) => setTempSelectedDay(day);
+  const onReset = () => setTempSelectedDay(null);
 
   const validateForm = () => {
     // Name: required, max 20 chars, not only whitespace
@@ -93,7 +123,8 @@ export default function Details() {
         !Number.isInteger(pocketBalanceTarget);
 
       // Duration: required, both start and end date
-      const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+      // const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+      const dateInvalid = !deadline;
 
       setBalanceIsInvalid(balanceInvalid);
       setDateIsInvalid(dateInvalid);
@@ -132,9 +163,10 @@ export default function Details() {
 
   useEffect(() => {
     if (dateTouched) {
-      setDateIsInvalid(!targetDuration.startDate || !targetDuration.endDate);
+      // setDateIsInvalid(!targetDuration.startDate || !targetDuration.endDate);
+      setDateIsInvalid(!deadline);
     }
-  }, [targetDuration, dateTouched]);
+  }, [deadline, dateTouched]);
 
   return (
     <Box className="flex-1 bg-white">
@@ -179,13 +211,20 @@ export default function Details() {
                 }}
                 isBalanceInvalid={isBalanceInvalid}
                 targetDuration={targetDuration}
-                setTargetDuration={setTargetDuration}
+                deadline={deadline}
                 isDateInvalid={isDateInvalid}
                 open={open}
-                setOpen={setOpen}
                 handleOpenDatePicker={handleOpenDatePicker}
                 onDismiss={onDismiss}
                 onConfirm={onConfirm}
+                onReset={onReset}
+                displayDate={displayDate}
+                setDisplayDate={setDisplayDate}
+                tempSelectedDay={tempSelectedDay}
+                handleDaySelect={handleDaySelect}
+                pickerMode={pickerMode}
+                setPickerMode={setPickerMode}
+                today={today}
               />
 
               <Pressable
