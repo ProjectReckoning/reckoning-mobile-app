@@ -1,9 +1,10 @@
 import React from "react";
 import { Box } from "@/components/ui/box";
-import { Send, ArrowUp, ArrowDown } from "lucide-react-native";
+import { Send, Plus, ArrowDown } from "lucide-react-native";
 import SquaredButton from "@/components/common/buttons/SquaredButton";
 // --- NEW: Import router and hooks from expo-router ---
 import { router, useLocalSearchParams } from "expo-router";
+import WithdrawIcon from "@/assets/images/icon/withdraw.svg";
 
 export default function TransactionButtonGroup() {
   // --- NEW: Get the pocket ID from the URL ---
@@ -27,9 +28,9 @@ export default function TransactionButtonGroup() {
   };
 
   return (
-    <Box className="flex-row justify-evenly">
+    <Box className="flex-row justify-evenly mb-3">
       <SquaredButton
-        icon={<ArrowUp color="white" size={20} />}
+        icon={<Plus color="white" size={30} />}
         label="Top up"
         bg="bg-orange-wondr"
         activeBg="bg-orange-wondr-dark"
@@ -37,7 +38,7 @@ export default function TransactionButtonGroup() {
         onPress={handleTopUp}
       />
       <SquaredButton
-        icon={<Send color="white" size={20} />}
+        icon={<Send color="white" size={25} />}
         label="Transfer"
         bg="bg-pink-wondr"
         activeBg="bg-pink-wondr-dark"
@@ -45,7 +46,7 @@ export default function TransactionButtonGroup() {
         onPress={handleTransfer}
       />
       <SquaredButton
-        icon={<ArrowDown color="white" size={20} />}
+        icon={<WithdrawIcon color="white" weight={20} height={20} />}
         label="Withdraw"
         bg="bg-purple-wondr"
         activeBg="bg-purple-wondr-dark"

@@ -169,6 +169,7 @@ export default function SetTargetScreen() {
                 icon={currentPocket.icon_name}
                 iconSize="10"
                 className="w-12 h-12 rounded-full"
+                whiteSpace="mb-5"
               />
               <Box flex={1}>
                 <Heading size="md" color="$text-black-600">

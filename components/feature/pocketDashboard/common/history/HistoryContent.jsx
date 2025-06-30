@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Image, Text } from "react-native"; // <-- Impor Image dan Text
 import { Box } from "@/components/ui/box";
 import { Spinner } from "@/components/ui/spinner";
 import { SectionList } from "@/components/ui/section-list";
@@ -11,6 +12,22 @@ import { MOCK_MONTH_DATA } from "@/utils/mockData/monthMockData";
 import { formatDateForHeader } from "@/utils/helperFunction";
 import { WondrColors } from "@/utils/colorUtils";
 import { useLocalSearchParams } from "expo-router";
+
+// Komponen EmptyState didefinisikan di sini atau diimpor dari file lain
+const EmptyState = ({ imageSource, title, subtitle }) => (
+  <Box className="flex-1 items-center  ">
+    {/* Ganti path gambar sesuai dengan lokasi aset Anda */}
+    <Image
+      source={imageSource}
+      style={{ width: 200, height: 200, marginBottom: -15 }}
+      resizeMode="contain"
+    />
+    <Text className="text-xl font-bold text-center text-gray-800 mb-2">
+      {title}
+    </Text>
+    <Text className="text-sm text-center text-gray-500 px-4">{subtitle}</Text>
+  </Box>
+);
 
 export default function HistoryContent() {
   const { id: pocketId } = useLocalSearchParams();
@@ -115,12 +132,15 @@ export default function HistoryContent() {
     }
 
     if (transactionHistory.length === 0) {
+      // --- PERUBAHAN DI SINI ---
+      // Mengganti pesan teks dengan komponen EmptyState
       return (
-        <Box className="flex-1 justify-center items-center p-5">
-          <AppText variant="bodyMuted" className="text-center">
-            No transactions for this month.
-          </AppText>
-        </Box>
+        <EmptyState
+          // Pastikan path ke gambar ini benar dan sesuai dengan struktur folder Anda
+          imageSource={require("@/assets/images/schedule_done_empty.png")}
+          title="Kamu belum pernah transaksi di bulan ini"
+          subtitle="Setelah transaksi, nanti riwayat transaksi bulanan kamu akan muncul di halaman ini."
+        />
       );
     }
 

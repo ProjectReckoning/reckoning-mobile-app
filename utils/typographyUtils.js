@@ -28,6 +28,10 @@ export const TEXT_VARIANTS = {
     size: 14,
     className: "font-normal text-black",
   },
+  medium: {
+    size: 12,
+    className: "font-normal text-dark-gray-wondr-deactive",
+  },
 
   // Smaller text for captions, metadata, etc.
   caption: {
