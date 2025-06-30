@@ -6,10 +6,10 @@ import { Pressable } from "@/components/ui/pressable";
 import { Input, InputField } from "@/components/ui/input";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { CalendarClock, ChevronRight } from "lucide-react-native";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
@@ -37,6 +37,7 @@ export default function TransactionDetail() {
     setAmount,
     setCategory,
     setDescription,
+    setType,
   } = useTransactionStore();
   const { pocketType } = usePocketStore();
 
@@ -49,6 +50,12 @@ export default function TransactionDetail() {
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
   }, [amount, amountTouched]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setType({ id: "transfer", name: "Transfer" });
+    }, []),
+  );
 
   const handleNext = () => {
     if (id) {

@@ -38,6 +38,7 @@ export default function ScheduleTransferContent() {
   // Fungsi untuk memformat tanggal ke "Bln YYYY", contoh: "Ags 2025"
   const formatMonthYear = (date) => {
     if (!date) return null;
+
     const monthNames = [
       "Jan",
       "Feb",

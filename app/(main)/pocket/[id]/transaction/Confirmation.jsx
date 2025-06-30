@@ -25,13 +25,15 @@ export default function Confirmation() {
   const handleNext = () => {
     // Navigate to the nested PinCode screen for the current pocket
     if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/PinCode`);
+      router.push({
+        pathname: "/(main)/pocket/[id]/transaction/PinCode",
+        params: {
+          id,
+          isSchedule: isSchedule,
+        },
+      });
     }
   };
-
-  useEffect(() => {
-    console.log("transaction type conf: ", type);
-  }, []);
 
   return (
     <Box className="flex-1 bg-white justify-between px-6 py-5">
