@@ -209,6 +209,7 @@ export default function SetAutoBudgeting() {
               icon={currentPocket?.icon_name}
               iconSize="10"
               className="w-12 h-12 rounded-full"
+              whiteSpace="mb-5"
             />
             <Box flex={1}>
               <View className="flex-row items-center justify-between">
@@ -321,7 +322,7 @@ export default function SetAutoBudgeting() {
           >
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-lg font-bold text-black">
-                Info transfer terjadwal
+                Info auto budgeting
               </Text>
               <TouchableOpacity onPress={() => setInfoModalVisible(false)}>
                 <X size={24} color="#000" />

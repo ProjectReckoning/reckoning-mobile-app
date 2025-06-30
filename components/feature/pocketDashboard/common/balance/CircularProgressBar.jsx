@@ -134,14 +134,16 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
       />
 
       <Box className="absolute justify-center items-center">
-        <AppText variant="caption" className="mb-1">
+        <AppText variant="medium" className="mb-1 text-black">
           Saldo Terkumpul
         </AppText>
         <AppText variant="pageTitle" className="mb-1 text-black">
           {/* This text remains uncapped and shows the true current amount */}
           {formatCurrency(safeCurrentAmount)}
         </AppText>
-        <AppText variant="caption">/{formatCurrency(safeTargetAmount)}</AppText>
+        <AppText variant="caption" className="text-black">
+          /{formatCurrency(safeTargetAmount)}
+        </AppText>
       </Box>
 
       <Animated.View
@@ -168,7 +170,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
           }}
           className="items-center justify-center"
         >
-          <AppText variant="small" className="font-bold text-white">
+          <AppText variant="caption" className="font-bold text-white">
             {/* This percentage text is now capped at 100% */}
             {`${percentage}%`}
           </AppText>

@@ -82,6 +82,7 @@ export default function TransferScheduleContent() {
         titleClassName="text-base"
         descriptionClassName="text-sm text-gray-500"
         dateClassName="text-base font-semibold"
+        isRead={true}
       />
     );
   };
@@ -115,7 +116,7 @@ bisa lihat detailnya di sini."
   };
 
   return (
-    <Box className="flex-1 bg-white px-8 py-6">
+    <Box className=" bg-white px-8 py-6">
       {/* Tab bar tetap berada di atas */}
       <ScheduleTopBar initialTab={activeTab} onTabChange={handleTabChange} />
 
@@ -129,7 +130,7 @@ bisa lihat detailnya di sini."
         // Prop ini akan me-render komponen `renderEmptyState` jika data kosong.
         ListEmptyComponent={renderEmptyState}
         // Styling untuk FlatList
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 10 }}
         contentContainerStyle={{
           // flexGrow: 1 dibutuhkan agar `justify-center` pada EmptyState berfungsi
           flexGrow: 1,

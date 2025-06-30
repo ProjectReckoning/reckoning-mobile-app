@@ -2,7 +2,7 @@ import TabunganKeluargaIcon from "@/assets/images/icon/tabunganKeluarga.svg";
 import PernikahanIcon from "@/assets/images/icon/pernikahan.svg";
 import WisataBersamaIcon from "@/assets/images/icon/wisataBersama.svg";
 import MakananIcon from "@/assets/images/icon/makanan.svg";
-import PakaianIcon from "@/assets/images/icon/pakaian.svg";
+import PakaianIcon from "@/assets/images/icon/fashion.svg";
 import OtomotifIcon from "@/assets/images/icon/otomotif.svg";
 
 import WisataBersamaDecorator from "@/assets/images/decorators/wisataBersamaDecorator.svg";
@@ -143,13 +143,13 @@ export const spendingDetails = [
 export const businessGoals = [
   {
     title: "Bisnis Makanan",
-    title2: "Kelola bisnimu",
+    title2: "Kelola bisnismu",
     subtitle: "Kelola dana bisnis makanan secara teratur.",
     subtitle2: "Kelola dana bisnis makanan secara teratur.",
     icon: (
       <MakananIcon
-        width={100}
-        height={100}
+        width={110}
+        height={110}
         style={{
           position: "absolute",
           top: -5,
@@ -171,13 +171,13 @@ export const businessGoals = [
   },
   {
     title: "Bisnis Pakaian",
-    title2: "Kelola bisnimu",
+    title2: "Kelola bisnismu",
     subtitle: "Kelola dana bisnis pakaian secara teratur.",
     subtitle2: "Kelola dana bisnis pakaian secara teratur.",
     icon: (
       <PakaianIcon
-        width={100}
-        height={100}
+        width={110}
+        height={110}
         style={{
           position: "absolute",
           top: -5,
@@ -199,13 +199,13 @@ export const businessGoals = [
   },
   {
     title: "Bisnis Otomotif",
-    title2: "Kelola bisnimu",
+    title2: "Kelola bisnismu",
     subtitle: "Kelola dana bisnis otomotif secara teratur.",
     subtitle2: "Kelola dana bisnis otomotif secara teratur.",
     icon: (
       <OtomotifIcon
-        width={100}
-        height={100}
+        width={110}
+        height={110}
         style={{
           position: "absolute",
           top: -1,

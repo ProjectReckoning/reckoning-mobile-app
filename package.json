@@ -93,7 +93,8 @@
     "react-native-webview": "13.13.5",
     "tailwindcss": "^3.4.17",
     "zustand": "^5.0.5",
-    "expo-clipboard": "~7.1.4"
+    "expo-clipboard": "~7.1.4",
+    "expo-linear-gradient": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -17,10 +17,10 @@ export default function PaymentDateInfo() {
   const lastPaymentDate = "18 Nov 2025";
 
   return (
-    <Box className="rounded-xl p-3 mb-4 bg-purple-wondr">
+    <Box className="rounded-xl p-3 mb-4 bg-purple-wondr ">
       <HStack className="justify-between items-center">
         <VStack>
-          <AppText variant="small" className="text-white font-light">
+          <AppText variant="medium" className="text-white font-light">
             Terakhir Bayar
           </AppText>
           <AppText variant="caption" className="text-white font-semibold">
@@ -28,7 +28,8 @@ export default function PaymentDateInfo() {
           </AppText>
         </VStack>
         <VStack className="items-end">
-          <AppText variant="small" className="text-white font-light">
+          {/* Mengubah variant dari "caption" ke "body2" agar sedikit lebih besar */}
+          <AppText variant="medium" className="text-white font-light">
             Target Selesai
           </AppText>
           <AppText variant="caption" className="text-white font-semibold">
