@@ -128,7 +128,7 @@ export default function Home() {
                     }
                   />
                   <Text
-                    className={`text-xs underline ${pressed ? "text-orange-wondr-dark" : "text-black"}`}
+                    className={`text-xs ${pressed ? "text-orange-wondr-dark" : "text-black"}`}
                   >
                     Notifikasi
                   </Text>
@@ -146,9 +146,7 @@ export default function Home() {
                   className="aspect-square w-4"
                   alt="logout"
                 />
-                <Text className="text-black text-xs underline">
-                  Bukti Transaksi
-                </Text>
+                <Text className="text-black text-xs">Bukti Transaksi</Text>
               </Box>
             </Pressable>
           </Box>

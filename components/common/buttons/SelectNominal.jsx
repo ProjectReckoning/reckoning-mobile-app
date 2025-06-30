@@ -40,7 +40,7 @@ export default function SelectNominal() {
             }}
             className={`w-[48%] mb-4 py-3 border rounded-xl ${
               selectedIndex === i
-                ? "border-[#007BE5]"
+                ? "border-green-select"
                 : "border-light-gray-wondr"
             }`}
           >
