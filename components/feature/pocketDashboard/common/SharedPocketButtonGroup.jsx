@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "@/components/ui/box";
 import { Pressable } from "@/components/ui/pressable";
 import { Target, ChevronRight, TimerReset } from "lucide-react-native";
@@ -12,6 +12,8 @@ import { WondrColors } from "@/utils/colorUtils";
 
 export default function SharedPocketButtonGroup() {
   const { id } = useLocalSearchParams();
+
+  const [pocketType, setPocketType] = useState("spending");
 
   const handleSetTarget = () => {
     if (id) {
@@ -35,7 +37,12 @@ export default function SharedPocketButtonGroup() {
           >
             <Box className="flex-row items-center gap-2">
               <Target size={24} color={WondrColors["orange-wondr"]} />
-              <AppText variant="cardTitle">Change Target</AppText>
+
+              {pocketType === "saving" ? (
+                <AppText variant="cardTitle">Change Target</AppText>
+              ) : (
+                <AppText variant="cardTitle">Set Target</AppText>
+              )}
             </Box>
             <ChevronRight size={24} color="black" />
           </Pressable>
