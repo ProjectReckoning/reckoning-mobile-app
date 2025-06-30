@@ -218,18 +218,18 @@ export default function MainLayout() {
         options={{ title: "Info" }}
       />
       <Stack.Screen
-        name="pocket/transaction/setTarget/index"
+        name="pocket/[id]/transaction/setTarget/index"
         options={{ title: "Change Target" }}
       />
 
       {/* ===== Scheduled Transfers ===== */}
       <Stack.Screen
-        name="pocket/[id]/scheduleTransfer/index"
-        options={{ headerShown: false }}
+        name="pocket/[id]/transferSchedule/SetScheduleTransfer"
+        options={{ title: "Jadwal transfer bulanan" }}
       />
       <Stack.Screen
         name="pocket/[id]/transferSchedule/index"
-        options={{ title: "Transfer Schedule" }}
+        options={{ title: "Transfer bulanan" }}
       />
     </Stack>
   );

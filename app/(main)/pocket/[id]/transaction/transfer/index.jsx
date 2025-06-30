@@ -28,7 +28,6 @@ export default function Transfer() {
   const {
     selectedFriends,
     setSelectedFriends,
-    pocketType,
     setPocketType,
     currentPocket,
     fetchPocketById,
@@ -48,6 +47,12 @@ export default function Transfer() {
         fetchPocketById(id);
       }
     }, [id]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setType({ id: "transfer", name: "Transfer" });
+    }, []),
   );
 
   useEffect(() => {

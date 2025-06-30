@@ -6,6 +6,7 @@ const initialState = {
   type: { id: "topup", name: "Top-Up" },
   amount: null,
   description: "",
+  category: null,
   source: {
     id: null,
     name: "",
@@ -35,6 +36,9 @@ const initialState = {
       },
     },
   },
+  selectedDate: null,
+  selectedStartDate: null,
+  selectedEndDate: null,
   isProcessing: false,
   transactionError: null,
   transactionResult: null,
@@ -56,6 +60,10 @@ export const useTransactionStore = create((set, get) => ({
   setSource: (source) => set({ source }),
   setDestination: (destination) => set({ destination }),
   setDescription: (description) => set({ description }),
+  setCategory: (category) => set({ category }),
+  setSelectedDate: (date) => set({ selectedDate: date }),
+  setSelectedStartDate: (startDate) => set({ selectedStartDate: startDate }),
+  setSelectedEndDate: (endDate) => set({ selectedEndDate: endDate }),
   resetTransactionState: () => {
     set(initialState);
   },
