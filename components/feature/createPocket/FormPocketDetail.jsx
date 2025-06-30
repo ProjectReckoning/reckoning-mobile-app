@@ -46,7 +46,7 @@ export default function FormPocketDetail({
             </FormControlLabelText>
           </FormControlLabel>
           <Input
-            className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
+            className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-green-select"
             size="lg"
           >
             <InputField
@@ -80,7 +80,7 @@ export default function FormPocketDetail({
               </FormControlLabelText>
             </FormControlLabel>
             <Input
-              className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
+              className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-green-select"
               size="lg"
             >
               <InputField
@@ -113,7 +113,7 @@ export default function FormPocketDetail({
               </FormControlLabelText>
             </FormControlLabel>
             <Input
-              className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-[#007BE5]"
+              className="h-14 my-1 rounded-xl border-gray-300 data-[focus=true]:border-green-select"
               size="lg"
             >
               <InputSlot className="ml-4">
@@ -148,7 +148,7 @@ export default function FormPocketDetail({
             </FormControlLabel>
             <Pressable
               onPress={handleOpenDatePicker}
-              className="w-full h-14 p-3 my-1 justify-center rounded-xl border border-gray-300 active:border-[#007BE5] focus:border-[#007BE5]"
+              className="w-full h-14 p-3 my-1 justify-center rounded-xl border border-gray-300 active:border-green-select focus:border-green-select"
             >
               <Box className="flex flex-row gap-3 items-center">
                 <CalendarClock size={16} color={"#848688"} />

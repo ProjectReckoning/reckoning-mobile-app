@@ -216,7 +216,7 @@ export default function Customization() {
       <Box className="flex-1 flex-col mt-5 px-6 justify-between">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={50}
+          keyboardVerticalOffset={90}
           style={{ flex: 1 }}
         >
           <ScrollView

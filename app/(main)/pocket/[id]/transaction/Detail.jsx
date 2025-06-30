@@ -81,7 +81,7 @@ export default function TransactionDetail() {
     <Box className="flex-1 bg-white px-6 pb-5">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={50}
+        keyboardVerticalOffset={90}
         style={{ flex: 1 }}
       >
         <ScrollView

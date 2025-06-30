@@ -83,7 +83,7 @@ export default function NewUser() {
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={50}
+        keyboardVerticalOffset={90}
         style={{ flex: 1 }}
       >
         <ScrollView
