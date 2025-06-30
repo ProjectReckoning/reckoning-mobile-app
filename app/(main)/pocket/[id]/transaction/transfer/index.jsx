@@ -38,7 +38,6 @@ export default function Transfer() {
   // --- NEW: Reset the transaction state every time this screen is focused ---
   useFocusEffect(
     useCallback(() => {
-      console.log("index focused");
       // 1. Reset the state to prevent data pollution
       resetTransactionState();
       // 2. Set the type for this specific flow

@@ -71,7 +71,13 @@ export default function PinCode() {
         }
 
         // On success, navigate to the statement screen
-        router.replace(`/(main)/pocket/${id}/transaction/Statement`);
+        router.replace({
+          pathname: "/(main)/pocket/[id]/transaction/Statement",
+          params: {
+            id,
+            isSchedule,
+          },
+        });
       } catch (error) {
         console.error(`PIN Screen: ${type.name} failed.`, error);
         alert(

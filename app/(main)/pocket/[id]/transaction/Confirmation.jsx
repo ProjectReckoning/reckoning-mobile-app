@@ -29,7 +29,7 @@ export default function Confirmation() {
         pathname: "/(main)/pocket/[id]/transaction/PinCode",
         params: {
           id,
-          isSchedule: isSchedule,
+          isSchedule,
         },
       });
     }

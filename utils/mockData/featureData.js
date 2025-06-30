@@ -17,6 +17,7 @@ import {
   Share2,
   UsersRound,
   Download,
+  CalendarCog,
 } from "lucide-react-native";
 
 export const features = [
@@ -98,13 +99,23 @@ export const transactionFeatures = [
     label: "Bukti Transaksi",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
-    onPress: () => router.push("pocket/[id]/transaction/Receipt"),
+    onPress: () => router.replace("pocket/[id]/transaction/Receipt"),
   },
   {
     icon: <Share2 />,
     label: "Bagikan",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
+  },
+];
+
+export const scheduleTrxFeatures = [
+  {
+    icon: <CalendarCog />,
+    label: "Schedule",
+    bg: "bg-orange-wondr",
+    bgPressed: "bg-orange-wondr-dark",
+    onPress: () => router.push("pocket/[id]/transferSchedule"),
   },
 ];
 
