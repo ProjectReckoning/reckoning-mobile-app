@@ -5,57 +5,59 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import useAuthStore from "@/stores/authStore";
+import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
-import { usePocketStore } from "@/stores/pocketStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 
 import TabunganIcon from "@/assets/images/icon/tabunganIcon.svg";
-
-const savingAccounts = [
-  {
-    id: 1916837397,
-    name: "AMIRA FERIAL",
-    balance: 19546250,
-    category: {
-      bank: {
-        name: "BNI",
-        type: "TAPLUS PEGAWAI BNI",
-      },
-    },
-  },
-  {
-    id: 1826096195,
-    name: "AMIRA FERIAL",
-    balance: 8546250,
-    category: {
-      bank: {
-        name: "BNI",
-        type: "TAPLUS MUDA",
-      },
-    },
-  },
-  {
-    id: 1922276179,
-    name: "AMIRA FERIAL",
-    balance: 26546250,
-    category: {
-      bank: {
-        name: "BNI",
-        type: "BNI RDN",
-      },
-    },
-  },
-];
 
 export default function Withdraw() {
   const { id } = useLocalSearchParams();
   const [selectedIndex, setSelectedIndex] = useState(null);
 
+  const user = useAuthStore((state) => state.user);
   const { setType, setSource, setDestination, resetTransactionState } =
     useTransactionStore();
   const { currentPocket, fetchPocketById } = usePocketStore();
+
+  const savingAccounts = [
+    {
+      id: user?.user_id,
+      name: (user?.name || "").toUpperCase(),
+      balance: user?.balance || 0,
+      category: {
+        bank: {
+          name: "BNI",
+          type: "TAPLUS PEGAWAI BNI",
+        },
+      },
+    },
+    {
+      id: 1826096195,
+      name: "AMIRA FERIAL",
+      balance: 8546250,
+      category: {
+        bank: {
+          name: "BNI",
+          type: "TAPLUS MUDA",
+        },
+      },
+    },
+    {
+      id: 1922276179,
+      name: "AMIRA FERIAL",
+      balance: 26546250,
+      category: {
+        bank: {
+          name: "BNI",
+          type: "BNI RDN",
+        },
+      },
+    },
+  ];
 
   // --- NEW: Reset the transaction state every time this screen is focused ---
   useFocusEffect(

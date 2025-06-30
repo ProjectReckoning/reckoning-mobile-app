@@ -27,19 +27,10 @@ export default function SelectGoal() {
   return (
     <Box className="flex-1 bg-white justify-stretch">
       <Box
-        className={`w-full h-40 bg-[${WondrColors["tosca-wondr-light-translucent"]}] absolute top-0`}
-      />
-
-      <GoalDecorator
-        width={200}
-        height="100%"
-        style={{
-          position: "absolute",
-          top: -345,
-          right: 0,
-          zIndex: 1,
-        }}
-      />
+        className={`w-full h-44 bg-[${WondrColors["tosca-wondr-light-translucent"]}] justify-end items-end absolute top-0`}
+      >
+        <GoalDecorator width={200} height="100%" />
+      </Box>
 
       <Box className="flex-1 flex-col px-6 py-8 justify-between z-10">
         <VStack space="4xl" reversed={false}>
@@ -54,7 +45,7 @@ export default function SelectGoal() {
           </VStack>
         </VStack>
 
-        <Box className="flex-1 justify-between mt-5">
+        <Box className="flex-1 justify-between mt-8">
           <ScrollView
             showsVerticalScrollIndicator={true}
             contentContainerStyle={{ paddingRight: 10 }}

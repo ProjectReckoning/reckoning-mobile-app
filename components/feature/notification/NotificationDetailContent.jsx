@@ -27,26 +27,23 @@ export default function NotificationDetailContent() {
   );
 
   // get mock notification data
-  const notif = notificationData.find(
+  const notification = notificationData.find(
     (notification) => notification.data._id === selectedNotification,
   );
-  // const notif = notificationData[5];
-  const formattedDate = new Date(notif.data.date).toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-
-  // const [notification, setNotification] = useState(null);
-
-  // useEffect(() => {
-  //   setNotification(mockNotifications[1]);
-  // }, []);
+  // const notification = notificationData[5];
+  const formattedDate = new Date(notification.data.date).toLocaleDateString(
+    "id-ID",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    },
+  );
 
   const notificationImage = useMemo(() => {
-    if (!notif) return null;
+    if (!notification) return null;
 
-    switch (notif?.data.type) {
+    switch (notification?.data.type) {
       case "member_approval_needed":
       case "transaction_approval_needed":
         return notificationApproval;
@@ -55,11 +52,11 @@ export default function NotificationDetailContent() {
       default:
         return null;
     }
-  }, [notif]);
+  }, [notification]);
 
   const renderButtonBasedOnType = () => {
-    if (!notif) return null;
-    switch (notif?.data.type) {
+    if (!notification) return null;
+    switch (notification?.data.type) {
       case "transaction_approval_needed":
       case "member_approval_needed":
         return (
@@ -82,9 +79,9 @@ export default function NotificationDetailContent() {
   };
 
   const renderMessageBasedOnType = () => {
-    if (!notif) return null;
+    if (!notification) return null;
 
-    switch (notif?.data.type) {
+    switch (notification?.data.type) {
       case "transaction_approval_needed":
         return (
           <HStack className="items-center gap-2">
@@ -93,7 +90,7 @@ export default function NotificationDetailContent() {
               className="text-sm font-semibold text-black"
               style={{ flex: 1 }}
             >
-              {notif?.data.message}
+              {notification?.data.message}
             </Text>
           </HStack>
         );
@@ -103,7 +100,7 @@ export default function NotificationDetailContent() {
             className="text-sm font-semibold text-black"
             style={{ flex: 1 }}
           >
-            {notif?.data.message}
+            {notification?.data.message}
           </Text>
         );
       case "member_approval_needed":
@@ -116,7 +113,7 @@ export default function NotificationDetailContent() {
               Hai, {user?.name.toUpperCase()}
             </Text>
             <Text className="text-m text-black" style={{ flex: 1 }}>
-              {notif?.data.message}
+              {notification?.data.message}
             </Text>
           </>
         );
@@ -126,30 +123,30 @@ export default function NotificationDetailContent() {
   };
 
   const renderDetailData = () => {
-    if (!notif) return [];
+    if (!notification) return [];
     let detailData = [];
 
-    switch (notif?.data.type) {
+    switch (notification?.data.type) {
       case "transaction_approval_needed":
       case "transaction_success":
         detailData = [
           {
             title: "Diminta oleh",
             content: [
-              `Sdr ${notif?.data.requestedBy.name}`,
-              `${notif?.data.requestedBy.category.bank.name}. ${notif?.data.requestedBy.id}`,
+              `Sdr ${notification?.data.requestedBy.name}`,
+              `${notification?.data.requestedBy.category.bank.name}. ${notification?.data.requestedBy.id}`,
             ],
           },
           {
             title: "Nominal",
-            content: [formatRupiah(notif?.data.amount)],
+            content: [formatRupiah(notification?.data.amount)],
             textClassName: "font-semibold",
           },
           {
             title: "Sumber Dana",
             content: [
-              notif?.title,
-              `SHARED POCKET BNI. ${notif?.data.pocket.id}`,
+              notification?.title,
+              `SHARED POCKET BNI. ${notification?.data.pocket.id}`,
             ],
           },
         ];
@@ -159,15 +156,15 @@ export default function NotificationDetailContent() {
           {
             title: "Detail pengundang",
             content: [
-              `Sdr ${notif?.data.requestedBy.name}`,
-              `${notif?.data.requestedBy.category.bank.name}. ${notif?.data.requestedBy.id}`,
+              `Sdr ${notification?.data.requestedBy.name}`,
+              `${notification?.data.requestedBy.category.bank.name}. ${notification?.data.requestedBy.id}`,
             ],
           },
           {
             title: "Detail pocket",
             content: [
-              notif?.title,
-              `SHARED POCKET BNI. ${notif?.data.pocket.id}`,
+              notification?.title,
+              `SHARED POCKET BNI. ${notification?.data.pocket.id}`,
             ],
           },
         ];
@@ -178,7 +175,7 @@ export default function NotificationDetailContent() {
     return detailData;
   };
 
-  if (!notif) {
+  if (!notification) {
     return (
       <Box className="flex-1 justify-center items-center bg-white">
         <Text>Loading...</Text>
@@ -190,7 +187,9 @@ export default function NotificationDetailContent() {
     <Box className="flex-1 flex-col bg-white">
       <ScrollView className="flex-1 px-8 py-6">
         <Box className="mb-5">
-          <Text className="text-xl font-bold text-black">{notif?.title}</Text>
+          <Text className="text-xl font-bold text-black">
+            {notification?.body}
+          </Text>
           <Text
             className="text-sm"
             style={{ color: WondrColors["dark-gray-wondr-deactive"] }}

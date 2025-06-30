@@ -28,8 +28,14 @@ export default function AllPocket() {
   const [selectedPocket, setSelectedPocket] = useState(null);
   const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
 
-  const { allPockets, isAllPocketsLoading, fetchAllPockets, deletePocket } =
-    usePocketStore();
+  const {
+    setPocketSubject,
+    setPocketType,
+    allPockets,
+    isAllPocketsLoading,
+    fetchAllPockets,
+    deletePocket,
+  } = usePocketStore();
 
   // This useEffect handles the navigation after a pocket is created
   useEffect(() => {
@@ -92,7 +98,15 @@ export default function AllPocket() {
     router.push(`/(main)/pocket/${pocketId}`);
   };
 
-  const GoToCreatePocket = () => router.push("/(main)/pocket/create");
+  const GoToCreatePocket = () => {
+    if (activeTab === "business") {
+      setPocketSubject("Business");
+      setPocketType("Business Fund");
+      router.push("/(main)/pocket/create/SelectGoal");
+    } else {
+      router.push("/(main)/pocket/create");
+    }
+  };
 
   const renderContent = () => {
     if (isAllPocketsLoading && allPockets.length === 0) {

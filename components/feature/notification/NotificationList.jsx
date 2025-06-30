@@ -75,7 +75,7 @@ export default function NotificationList() {
   const renderListHeader = () => (
     <View className="flex flex-row gap-3 mb-7 pb-3 items-center border-b border-gray-300">
       <Text className="text-lg font-bold text-black">Pesan lainnya</Text>
-      <Box className="w-7 h-7 items-center justify-center bg-red-wondr rounded">
+      <Box className="w-7 h-7 items-center justify-center bg-orange-wondr rounded">
         <Text className="text-sm text-white font-bold">{unreadCount}</Text>
       </Box>
     </View>

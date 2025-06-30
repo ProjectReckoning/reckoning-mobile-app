@@ -1,34 +1,55 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 
 import { router } from "expo-router";
-
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-
-import OnboardingIllustration from "@/assets/images/onboarding.png";
+import { useEffect, useRef, useState } from "react";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import OnboardingIllustration from "@/assets/images/decorators/onboarding.svg";
 
 export default function PocketOnboarding() {
-  // The back functionality is now handled by the custom AppBar in the root layout.
-  // const handleBack = () => router.back();
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef(null);
+  const hasNavigated = useRef(false);
+
+  useEffect(() => {
+    const duration = 5000;
+    const interval = 20;
+    const step = 100 / (duration / interval);
+
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(intervalRef.current);
+          return 100;
+        }
+        return prev + step;
+      });
+    }, interval);
+
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (progress >= 100 && !hasNavigated.current) {
+      hasNavigated.current = true;
+      router.push("/(main)/pocket/onboarding/CreatePocketOnboarding");
+    }
+  }, [progress]);
 
   const handleNext = () => {
-    // --- FIX: Use an absolute path for robust navigation ---
+    hasNavigated.current = true;
     router.push("/(main)/pocket/onboarding/CreatePocketOnboarding");
   };
 
   return (
     <Box className="flex-1 bg-white px-6 justify-between pt-5">
       <Box className="flex flex-col">
-        {/* --- FIX: The manual back button has been removed --- */}
-        {/* It is now automatically provided by the root layout's custom AppBar */}
-
         <Center className="w-full h-16 mt-2">
           <Progress
-            value={40}
+            value={progress}
             size="xs"
             orientation="horizontal"
             className="w-full h-2"
@@ -37,12 +58,9 @@ export default function PocketOnboarding() {
           </Progress>
         </Center>
 
-        <Image
-          size="2xl"
-          source={OnboardingIllustration}
-          className="w-full justify-center items-center mt-10 mb-10"
-          alt="onboarding-illustration"
-        />
+        <Center className="w-full h-fit pt-8 pb-12">
+          <OnboardingIllustration width="100%" height={200} />
+        </Center>
 
         <Heading size="xl" bold="true" className="font-extrabold">
           Wujudkan Tujuan Bersama dengan Mudah!

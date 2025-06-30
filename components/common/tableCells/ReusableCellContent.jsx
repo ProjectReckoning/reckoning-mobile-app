@@ -30,7 +30,7 @@ export default function ReusableCellContent({
       <VStack>
         {!isRead && (
           <Badge
-            className="z-10 self-end h-4 w-4 bg-red-wondr rounded-full -mb-3 -mr-0.5"
+            className="z-10 self-end h-4 w-4 bg-orange-wondr rounded-full -mb-3 -mr-0.5"
             variant="solid"
           />
         )}

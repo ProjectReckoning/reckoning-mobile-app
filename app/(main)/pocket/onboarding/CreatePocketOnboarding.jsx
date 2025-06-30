@@ -1,27 +1,31 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
 import { router } from "expo-router";
-import AppBar from "../../../../components/common/AppBar";
-import PrimaryButton from "../../../../components/common/buttons/PrimaryButton";
-import ScheduleIcon from "../../../../assets/images/icon/pocketcreation1.png";
-import RoleIcon from "../../../../assets/images/icon/pocketcreation2.png";
-import TransparentIcon from "../../../../assets/images/icon/pocketcreation3.png";
-import OnboardingDecorator from "../../../../assets/images/decorators/onboarding.png";
+import { useEffect } from "react";
+import RoleIcon from "@/assets/images/icon/pocketcreation2.png";
+import ScheduleIcon from "@/assets/images/icon/pocketcreation1.png";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import TransparentIcon from "@/assets/images/icon/pocketcreation3.png";
+import OnboardingDecorator from "@/assets/images/decorators/onboarding2.png";
 
 export default function CreatePocketOnboarding() {
+  useEffect(() => {
+    console.log("CreatePocketOnboarding: Component mounted");
+  }, []);
+
   const GoToCreatePocket = () => {
     router.push("pocket/create");
   };
 
   return (
-    <Box className="flex-1 bg-white justify-stretch -z-20">
-      <Box className="flex flex-col">
-        <AppBar title="Buat Pocket" className="bg-[#C2F0ED] px-6 pt-5" />
+    <Box className="flex-1 bg-white -z-20">
+      <Box className="flex flex-col pt-5">
         <Box className="w-full h-64 -z-10">
           <Image
             source={OnboardingDecorator}
@@ -32,7 +36,7 @@ export default function CreatePocketOnboarding() {
         </Box>
       </Box>
 
-      <Box className="flex-1 px-6 mt-5 justify-between">
+      <Box className="flex-1 px-6 mt-10 justify-between">
         <Box className="flex">
           <Heading size="xl" bold="true" className="font-extrabold mb-5">
             Kelola Impian Finansial Bersama Lebih Mudah!
