@@ -83,10 +83,17 @@ export default function SetTargetScreen() {
         targetAmount: amountValue,
         deadline: deadline.toISOString(),
       });
+
+      // --- UPDATED NAVIGATION LOGIC ---
+      // Reset the navigation stack to go to the pocket dashboard
       navigation.dispatch(
         CommonActions.reset({
-          index: 1,
-          routes: [{ name: "home/index" }, { name: "pocket/all/index" }],
+          index: 2, // The active route is the 3rd one (index 2)
+          routes: [
+            { name: "home/index" },
+            { name: "pocket/all/index" },
+            { name: "pocket/[id]/index", params: { id: pocketId } }, // Go to the dashboard
+          ],
         }),
       );
     } catch (e) {
@@ -103,7 +110,6 @@ export default function SetTargetScreen() {
 
   const handleOpenDatePicker = () => {
     setDateTouched(true);
-    // Initialize the picker with the current deadline or today's date
     const initialDate = deadline || today;
     setDisplayDate(initialDate);
     setSelectedDay(initialDate.getDate());
@@ -112,7 +118,6 @@ export default function SetTargetScreen() {
   };
 
   const handleConfirmDate = () => {
-    // Construct the final date from the picker's state
     if (selectedDay) {
       const newDate = new Date(
         displayDate.getFullYear(),
@@ -216,7 +221,6 @@ export default function SetTargetScreen() {
         </ScrollView>
       </TouchableWithoutFeedback>
 
-      {/* The component is now fully controlled */}
       <CustomDatePicker
         isOpen={isDatePickerOpen}
         onClose={() => setDatePickerOpen(false)}

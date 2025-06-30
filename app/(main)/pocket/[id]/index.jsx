@@ -3,7 +3,12 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { ActivityIndicator } from "react-native";
-import { useLocalSearchParams, useFocusEffect } from "expo-router";
+// 1. Import useNavigation
+import {
+  useLocalSearchParams,
+  useFocusEffect,
+  useNavigation,
+} from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
 import PocketDashboardTopBar from "@/components/feature/pocketDashboard/PocketDashboardTopBar";
 import AppText from "@/components/common/typography/AppText";
@@ -13,11 +18,9 @@ import { WondrColors } from "@/utils/colorUtils";
 import SavingBalanceScreen from "@/components/feature/pocketDashboard/saving/savingBalance";
 import SavingHistoryScreen from "@/components/feature/pocketDashboard/saving/savingHistory";
 import SavingInfoScreen from "@/components/feature/pocketDashboard/saving/savingInformation";
-
 import BusinessBalanceScreen from "@/components/feature/pocketDashboard/business/businessBalance";
 import BusinessHistoryScreen from "@/components/feature/pocketDashboard/business/businessHistory";
 import BusinessInfoScreen from "@/components/feature/pocketDashboard/business/businessInformation";
-
 import SpendingBalanceScreen from "@/components/feature/pocketDashboard/spending/spendingBalance";
 import SpendingHistoryScreen from "@/components/feature/pocketDashboard/spending/spendingHistory";
 import SpendingInfoScreen from "@/components/feature/pocketDashboard/spending/spendingInformation";
@@ -25,18 +28,26 @@ import SpendingInfoScreen from "@/components/feature/pocketDashboard/spending/sp
 export default function PocketDashboardScreen() {
   const { id } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("balance");
+  // 2. Get the navigation object
+  const navigation = useNavigation();
 
-  // Selectors for Zustand state
-  const currentPocket = usePocketStore((state) => state.currentPocket);
-  const isLoading = usePocketStore((state) => state.isLoading);
-  const error = usePocketStore((state) => state.error);
-  const fetchPocketById = usePocketStore((state) => state.fetchPocketById);
+  const currentPocket = usePocketStore((state) => state.currentPocket); //
+  const isLoading = usePocketStore((state) => state.isLoading); //
+  const error = usePocketStore((state) => state.error); //
+  const fetchPocketById = usePocketStore((state) => state.fetchPocketById); //
   const fetchTransactionHistory = usePocketStore(
-    // Get the history fetch function
     (state) => state.fetchTransactionHistory,
-  );
+  ); //
 
-  // Fetch the main pocket data when the screen comes into focus
+  // 3. Add a useEffect to update the header when pocket data is available
+  useEffect(() => {
+    if (currentPocket) {
+      navigation.setOptions({
+        title: currentPocket.name || "Pocket Details",
+      });
+    }
+  }, [navigation, currentPocket]);
+
   useFocusEffect(
     useCallback(() => {
       if (id) {
@@ -45,33 +56,30 @@ export default function PocketDashboardScreen() {
     }, [id, fetchPocketById]),
   );
 
-  // --- NEW: Fetch business history summary when pocket data is loaded ---
   useEffect(() => {
     if (currentPocket && currentPocket.type === "Business") {
-      // Get current month in YYYY-MM format
       const today = new Date();
       const monthString = `${today.getFullYear()}-${String(
         today.getMonth() + 1,
       ).padStart(2, "0")}`;
-
-      // Fetch history to populate the summary for the balance circle
       fetchTransactionHistory(currentPocket.id, monthString);
     }
   }, [currentPocket, fetchTransactionHistory]);
-  // This effect runs whenever currentPocket changes.
 
   const screenMapping = useMemo(() => {
     if (!currentPocket) {
       return null;
     }
-
+    // ... rest of your code
     if (currentPocket.type === "Business") {
+      //
       return {
         balance: BusinessBalanceScreen,
         info: BusinessInfoScreen,
         history: BusinessHistoryScreen,
       };
     } else if (currentPocket.type === "Spending") {
+      //
       return {
         balance: SpendingBalanceScreen,
         info: SpendingInfoScreen,

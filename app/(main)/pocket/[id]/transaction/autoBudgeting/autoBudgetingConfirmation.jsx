@@ -1,21 +1,31 @@
+// app/(main)/pocket/[id]/transaction/autoBudgeting/autoBudgetingConfirmation.jsx
 import React, { useState, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Modal, ScrollView, Pressable } from "react-native";
+import { Modal, ScrollView, Pressable, Alert } from "react-native";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import { WondrColors } from "@/utils/colorUtils";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 import { CommonActions } from "@react-navigation/native";
 import { ArrowLeft } from "lucide-react-native";
+import { useTransactionStore } from "@/stores/transactionStore";
+import useAuthStore from "@/stores/authStore";
 
 export default function AutoBudgetingConfirmation() {
   const params = useLocalSearchParams();
   const navigation = useNavigation();
+  const { deleteAutoBudget, isProcessing } = useTransactionStore();
+  const { user, fetchUser } = useAuthStore();
 
-  const pocketId = params.pocket_id;
+  useEffect(() => {
+    // Fetch the main user account details to show as "sumber dana"
+    fetchUser();
+  }, []);
+
+  const pocketId = params.pocketId || params.pocket_id;
   const nominal = params.recurring_amount
     ? parseFloat(params.recurring_amount)
     : 0;
@@ -27,7 +37,6 @@ export default function AutoBudgetingConfirmation() {
     ? new Date(params.next_run_date)
     : null;
 
-  // --- Display Logic ---
   let detailTanggalText = "Tanggal tidak diatur";
   if (scheduleValue !== null) {
     if (scheduleType === "weekly") {
@@ -55,13 +64,10 @@ export default function AutoBudgetingConfirmation() {
         year: "numeric",
       })
     : "Belum ditentukan";
-  // --- End Display Logic ---
 
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const handleDone = () => {
-    // This action will reset the navigation stack, taking the user to the pocket dashboard
-    // with a clean history behind it.
     navigation.dispatch(
       CommonActions.reset({
         index: 2,
@@ -74,7 +80,6 @@ export default function AutoBudgetingConfirmation() {
     );
   };
 
-  // Override the header back button to perform the stack reset
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -85,16 +90,17 @@ export default function AutoBudgetingConfirmation() {
     });
   }, [navigation, pocketId]);
 
-  const handleDelete = () => {
-    setIsDeleteModalVisible(true);
-  };
-
-  const handleConfirmDelete = () => {
-    // Here you would call the API to delete/deactivate the auto-budgeting
-    console.log("Auto budgeting will be deleted!");
-    setIsDeleteModalVisible(false);
-    // After deletion, navigate back to the dashboard
-    handleDone();
+  const handleConfirmDelete = async () => {
+    if (!pocketId || isProcessing) return;
+    try {
+      await deleteAutoBudget(pocketId);
+      Alert.alert("Sukses", "Jadwal auto-budgeting telah dihapus.");
+      handleDone();
+    } catch (error) {
+      Alert.alert("Gagal", "Tidak dapat menghapus jadwal auto-budgeting.");
+    } finally {
+      setIsDeleteModalVisible(false);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -131,22 +137,20 @@ export default function AutoBudgetingConfirmation() {
             <Heading size="2xl" color="$text-black-600" className="mt-1">
               Rp{nominal.toLocaleString("id-ID")}
             </Heading>
-            {nominal > 0 && (
-              <Box
-                className="rounded-full py-1 px-3 self-center mt-2"
-                style={{
-                  backgroundColor: WondrColors["green-select"] || "#4CAF50",
-                }}
+            <Box
+              className="rounded-full py-1 px-3 self-center mt-2"
+              style={{
+                backgroundColor: WondrColors["green-select"] || "#4CAF50",
+              }}
+            >
+              <Text
+                size="xs"
+                style={{ color: WondrColors["text-white"] || "#FFFFFF" }}
+                className="font-semibold"
               >
-                <Text
-                  size="xs"
-                  style={{ color: WondrColors["text-white"] || "#FFFFFF" }}
-                  className="font-semibold"
-                >
-                  TERJADWAL
-                </Text>
-              </Box>
-            )}
+                TERJADWAL
+              </Text>
+            </Box>
           </Box>
         </Box>
 
@@ -181,17 +185,17 @@ export default function AutoBudgetingConfirmation() {
         <Box className="mb-4 mt-4">
           <TransactionCard
             title={"Sumber dana"}
-            heading={params.sourceFundName || "Sumber Dana"}
-            subheading={params.sourceFundNumber || ""}
-            showBalance={false}
+            heading={"TAPLUS PEGAWAI BNI"}
+            subheading={"1916826757"}
+            balance={user?.balance}
+            showBalance={true}
           />
         </Box>
       </ScrollView>
 
-      {/* --- Action Buttons --- */}
       <Box className="px-6 mb-8 mt-4 space-y-3">
         <PrimaryButton
-          buttonAction={handleDelete}
+          buttonAction={() => setIsDeleteModalVisible(true)}
           buttonTitle="Hapus Jadwal"
           buttonColor="bg-white"
           buttonActiveColor="active:bg-red-wondr-light"
@@ -219,7 +223,6 @@ export default function AutoBudgetingConfirmation() {
             <Text size="sm" color="$text-gray-500" className="text-center mb-6">
               Pengaturan auto budgeting akan dihapus permanen.
             </Text>
-
             <PrimaryButton
               buttonAction={handleConfirmDelete}
               buttonTitle="Hapus sekarang"
@@ -227,6 +230,7 @@ export default function AutoBudgetingConfirmation() {
               buttonColor="bg-red-wondr"
               textClassName="text-white font-bold text-base"
               buttonActiveColor="active:bg-red-wondr-dark"
+              isLoading={isProcessing}
             />
             <PrimaryButton
               buttonAction={handleCancelDelete}
