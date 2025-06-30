@@ -26,14 +26,14 @@ export default function PressableCircle({
   const displayData = useMemo(() => {
     if (pocketType === "Business") {
       return [
-        { title: "Saldo", amount: currentBalance, color: "bg-green-wondr" },
-        { title: "Pemasukan", amount: income, color: "bg-blue-500" },
+        { title: "Saldo", amount: currentBalance, color: "bg-tosca-wondr" },
+        { title: "Pemasukan", amount: income, color: "bg-green-wondr" },
         { title: "Pengeluaran", amount: expense, color: "bg-red-wondr" },
       ];
     }
     // Default for 'Spending' or other types
     return [
-      { title: "Saldo", amount: currentBalance, color: "bg-green-wondr" },
+      { title: "Saldo", amount: currentBalance, color: "bg-tosca-wondr" },
     ];
   }, [pocketType, currentBalance, income, expense]);
 
@@ -76,7 +76,7 @@ export default function PressableCircle({
             height: circleSize - 65,
           }}
         >
-          <AppText variant="caption" className="font-bold text-black">
+          <AppText variant="body" className="font-light text-black">
             {currentDisplay.title}
           </AppText>
           <AppText

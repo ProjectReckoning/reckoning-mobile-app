@@ -54,7 +54,7 @@ export default function MonthSelectionBar({
   const ItemSeparator = () => <View style={{ width: SEPARATOR_WIDTH }} />;
 
   return (
-    <Box className="mb-4">
+    <Box className="mb-10">
       <FlatList
         ref={flatListRef}
         data={data}
