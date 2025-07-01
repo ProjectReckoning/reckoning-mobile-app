@@ -72,6 +72,7 @@ export default function AutoBudgetingConfirmation() {
       CommonActions.reset({
         index: 2,
         routes: [
+          // --- FIX: Corrected route names ---
           { name: "home/index" },
           { name: "pocket/all/index" },
           { name: "pocket/[id]/index", params: { id: pocketId } },

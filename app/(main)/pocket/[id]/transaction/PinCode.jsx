@@ -1,3 +1,4 @@
+// app/(main)/pocket/[id]/transaction/PinCode.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -30,7 +31,6 @@ export default function PinCode() {
     transactionError,
     executeTopUp,
     executeWithdraw,
-    // --- NEW: Get the transfer action from the store ---
     executeTransfer,
   } = useTransactionStore();
 
@@ -51,23 +51,32 @@ export default function PinCode() {
 
     if (newPin.length === PIN_LENGTH) {
       try {
-        // --- KEY CHANGE: Check the transaction type and call the correct action ---
+        let result;
+        // --- KEY CHANGE: Await the result from the store function ---
         if (type.id === "topup") {
-          await executeTopUp(id);
+          result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
-          await executeWithdraw(id);
+          result = await executeWithdraw(id);
         } else if (type.id === "transfer") {
-          await executeTransfer(id);
+          result = await executeTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
-        // On success, navigate to the statement screen
-        router.push(`/(main)/pocket/${id}/transaction/Statement`);
+        // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
+        if (result) {
+          router.push(`/(main)/pocket/${id}/transaction/Statement`);
+        } else {
+          // This case might occur if the API returns success but no data
+          alert(`Transaction Failed: Could not retrieve transaction details.`);
+          setPin("");
+        }
       } catch (error) {
         console.error(`PIN Screen: ${type.name} failed.`, error);
         alert(
-          `Transaction Failed: ${transactionError || "An unknown error occurred."}`,
+          `Transaction Failed: ${
+            transactionError || "An unknown error occurred."
+          }`,
         );
         setPin("");
       }

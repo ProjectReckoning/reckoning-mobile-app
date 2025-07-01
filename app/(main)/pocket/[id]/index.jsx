@@ -3,13 +3,14 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Box } from "@/components/ui/box";
 import { ActivityIndicator } from "react-native";
-// 1. Import useNavigation
 import {
   useLocalSearchParams,
   useFocusEffect,
   useNavigation,
 } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
+// 1. Import the transaction store
+import { useTransactionStore } from "@/stores/transactionStore";
 import PocketDashboardTopBar from "@/components/feature/pocketDashboard/PocketDashboardTopBar";
 import AppText from "@/components/common/typography/AppText";
 import { WondrColors } from "@/utils/colorUtils";
@@ -28,18 +29,21 @@ import SpendingInfoScreen from "@/components/feature/pocketDashboard/spending/sp
 export default function PocketDashboardScreen() {
   const { id } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState("balance");
-  // 2. Get the navigation object
   const navigation = useNavigation();
 
-  const currentPocket = usePocketStore((state) => state.currentPocket); //
-  const isLoading = usePocketStore((state) => state.isLoading); //
-  const error = usePocketStore((state) => state.error); //
-  const fetchPocketById = usePocketStore((state) => state.fetchPocketById); //
+  const currentPocket = usePocketStore((state) => state.currentPocket);
+  const isLoading = usePocketStore((state) => state.isLoading);
+  const error = usePocketStore((state) => state.error);
+  const fetchPocketById = usePocketStore((state) => state.fetchPocketById);
   const fetchTransactionHistory = usePocketStore(
     (state) => state.fetchTransactionHistory,
-  ); //
+  );
 
-  // 3. Add a useEffect to update the header when pocket data is available
+  // 2. Get the reset action from the transaction store
+  const resetTransactionState = useTransactionStore(
+    (state) => state.resetTransactionState,
+  );
+
   useEffect(() => {
     if (currentPocket) {
       navigation.setOptions({
@@ -50,10 +54,14 @@ export default function PocketDashboardScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // 3. Reset the transaction state every time this screen is focused
+      console.log("Pocket Dashboard focused, resetting transaction state...");
+      resetTransactionState();
+
       if (id) {
         fetchPocketById(id);
       }
-    }, [id, fetchPocketById]),
+    }, [id, fetchPocketById, resetTransactionState]), // 4. Add action to dependency array
   );
 
   useEffect(() => {
@@ -72,14 +80,12 @@ export default function PocketDashboardScreen() {
     }
     // ... rest of your code
     if (currentPocket.type === "Business") {
-      //
       return {
         balance: BusinessBalanceScreen,
         info: BusinessInfoScreen,
         history: BusinessHistoryScreen,
       };
     } else if (currentPocket.type === "Spending") {
-      //
       return {
         balance: SpendingBalanceScreen,
         info: SpendingInfoScreen,
