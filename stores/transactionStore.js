@@ -12,16 +12,28 @@ const initialState = {
     name: "",
     balance: 19546250,
     category: {
-      bank: { name: null, type: null },
-      pocket: { name: null, type: null },
+      bank: {
+        name: null,
+        type: null,
+      },
+      pocket: {
+        name: null,
+        type: null,
+      },
     },
   },
   destination: {
     id: null,
     name: null,
     category: {
-      bank: { name: null, type: null },
-      pocket: { name: null, type: null },
+      bank: {
+        name: null,
+        type: null,
+      },
+      pocket: {
+        name: null,
+        type: null,
+      },
     },
   },
   selectedDate: null,
@@ -217,6 +229,93 @@ export const useTransactionStore = create((set, get) => ({
         "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({ isFetchingAutoBudget: false, fetchAutoBudgetError: errorMessage });
+      throw error;
+    }
+  },
+
+  executeScheduleTransfer: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(
+      `API Call: POST /transaction/transfer/schedule for pocket ID: ${pocketId}`,
+    );
+    console.log(
+      "================================================================",
+    );
+    set({
+      isProcessing: true,
+      transactionError: null,
+      transactionResult: null,
+    });
+    const {
+      amount,
+      destination,
+      selectedDate,
+      selectedStartDate,
+      selectedEndDate,
+      category,
+    } = get();
+
+    // Combine selectedDate (day) with month/year from selectedStartDate for "start"
+    let formattedStartDate = selectedStartDate;
+    if (selectedStartDate && selectedDate) {
+      const startObj = new Date(selectedStartDate);
+      if (!isNaN(startObj.getTime())) {
+        // Use year/month from selectedStartDate, day from selectedDate
+        startObj.setDate(selectedDate);
+        formattedStartDate = startObj.toISOString().slice(0, 10);
+      }
+    }
+
+    // Format selectedEndDate to "YYYY-MM-DD" if it exists and is a valid date
+    let formattedEndDate = selectedEndDate;
+    if (selectedEndDate) {
+      const dateObj = new Date(selectedEndDate);
+      if (!isNaN(dateObj.getTime())) {
+        formattedEndDate = dateObj.toISOString().slice(0, 10);
+      }
+    }
+
+    const categoryMapping = {
+      Pembelian: "pembelian",
+      Gaji: "gaji",
+      "Pemindahan Dana": "transfer",
+    };
+    const formattedCategory =
+      category && categoryMapping[category]
+        ? categoryMapping[category]
+        : "lainnya";
+
+    const requestBody = {
+      balance: amount,
+      pocket_id: parseInt(pocketId, 10),
+      destination: destination.name,
+      date: formattedStartDate,
+      start: formattedStartDate,
+      end: formattedEndDate,
+      category: formattedCategory,
+    };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post(
+        "/transaction/transfer/schedule",
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isProcessing: false, transactionResult: response.data.data });
+        return response.data.data;
+      } else {
+        throw new Error(response.data.message || "Transfer failed.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ isProcessing: false, transactionError: errorMessage });
       throw error;
     }
   },

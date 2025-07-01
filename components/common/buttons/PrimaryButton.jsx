@@ -14,7 +14,7 @@ export default function PrimaryButton({
   return (
     <>
       <Pressable
-        className={`p-4 w-full rounded-full justify-items-center items-center ${buttonColor} ${buttonActiveColor} ${className || ""}`}
+        className={`p-4 w-full rounded-full justify-items-center items-center ${disabled ? "bg-gray-wondr-border" : buttonColor} ${buttonActiveColor} ${className || ""}`}
         onPress={buttonAction}
         disabled={disabled}
       >

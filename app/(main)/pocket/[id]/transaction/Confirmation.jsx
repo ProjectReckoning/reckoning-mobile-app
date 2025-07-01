@@ -5,6 +5,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Divider } from "@/components/ui/divider";
 
+import { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { usePocketStore } from "@/stores/pocketStore";
@@ -19,11 +20,18 @@ export default function Confirmation() {
   const { id } = useLocalSearchParams();
   const { type, source, amount, destination } = useTransactionStore();
   const { currentPocket } = usePocketStore();
+  const isSchedule = type.id === "transfer_bulanan";
 
   const handleNext = () => {
     // Navigate to the nested PinCode screen for the current pocket
     if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/PinCode`);
+      router.push({
+        pathname: "/(main)/pocket/[id]/transaction/PinCode",
+        params: {
+          id,
+          isSchedule,
+        },
+      });
     }
   };
 
@@ -61,7 +69,7 @@ export default function Confirmation() {
           subheading={`${source.category?.bank?.type || source.category?.pocket?.type} - ${source.id}`}
         />
 
-        <DetailConfirmation />
+        <DetailConfirmation isSchedule={isSchedule} />
       </VStack>
 
       <VStack className="gap-8">
@@ -76,7 +84,7 @@ export default function Confirmation() {
 
         <PrimaryButton
           buttonAction={handleNext}
-          buttonTitle={`${type.name} sekarang`}
+          buttonTitle={`${isSchedule ? "Jadwalin Transfer" : `${type.name} sekarang`}`}
           className={"mb-3"}
         />
       </VStack>

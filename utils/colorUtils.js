@@ -43,7 +43,7 @@ export const WondrColors = {
   "green-select": "#03796D",
   "green-select-dark": "#025850",
   "green-select-translucent": "#02C694CC", // 80% opacity
-  "green-select-light-translucent": "#CDE4E2", // 30% opacity
+  "green-select-light-translucent": "#F3FFFE", // 30% opacity
 
   "light-gray-wondr": "#F0F0F0",
   "translucent-gray-wondr": "#F2F2F2", // 80% opacity

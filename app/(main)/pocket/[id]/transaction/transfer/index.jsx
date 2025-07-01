@@ -28,7 +28,6 @@ export default function Transfer() {
   const {
     selectedFriends,
     setSelectedFriends,
-    pocketType,
     setPocketType,
     currentPocket,
     fetchPocketById,

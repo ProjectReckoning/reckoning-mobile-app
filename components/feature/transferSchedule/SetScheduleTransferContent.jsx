@@ -1,7 +1,9 @@
-import React, { useState } from "react";
 import { Box } from "@/components/ui/box";
-import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
+import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
+import { Pressable } from "@/components/ui/pressable";
+import { useState } from "react";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -10,25 +12,33 @@ import {
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
 import { Picker } from "@react-native-picker/picker";
+import { router, useLocalSearchParams } from "expo-router";
+import { useTransactionStore } from "@/stores/transactionStore";
 import { ChevronRight, Calendar, Info } from "lucide-react-native";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import { WondrColors } from "@/utils/colorUtils"; // Pastikan path ini benar
 import CustomMonthPicker from "@/components/common/CustomMonthPicker"; // Pastikan path ini benar
 
 export default function ScheduleTransferContent() {
-  // State untuk pemilih TANGGAL
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [isPickerVisible, setPickerVisible] = useState(false);
+  const { id } = useLocalSearchParams();
 
-  // State untuk pemilih BULAN & TAHUN
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  // State untuk pemilih TANGGAL
+  const [isPickerVisible, setPickerVisible] = useState(false);
   const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
   const [activePicker, setActivePicker] = useState(null); // 'start' atau 'end'
+  const {
+    selectedDate,
+    selectedStartDate,
+    selectedEndDate,
+    setSelectedDate,
+    setSelectedStartDate,
+    setSelectedEndDate,
+  } = useTransactionStore();
 
   // Fungsi untuk memformat tanggal ke "Bln YYYY", contoh: "Ags 2025"
   const formatMonthYear = (date) => {
     if (!date) return null;
+
     const monthNames = [
       "Jan",
       "Feb",
@@ -85,6 +95,12 @@ export default function ScheduleTransferContent() {
   const handleOpenPicker = () => setPickerVisible(true);
   const handleClosePicker = () => setPickerVisible(false);
   const dateOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const handleNext = () => {
+    if (id) {
+      router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+    }
+  };
 
   return (
     <>
@@ -222,8 +238,10 @@ export default function ScheduleTransferContent() {
       {/* Area Tombol Lanjut */}
       <Box className="px-8 py-4 gap-4 bg-white">
         <PrimaryButton
+          buttonAction={handleNext}
           buttonTitle="Lanjut"
           textClassName="text-black text-base text-center font-bold"
+          disabled={!selectedDate || !selectedStartDate || !selectedEndDate}
         />
       </Box>
 

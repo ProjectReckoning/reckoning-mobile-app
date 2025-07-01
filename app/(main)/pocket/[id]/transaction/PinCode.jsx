@@ -5,12 +5,12 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { ActivityIndicator } from "react-native";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Delete } from "lucide-react-native";
+import { ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
-import { Delete } from "lucide-react-native";
 
 const PIN_LENGTH = 6;
 
@@ -22,8 +22,12 @@ const keypad = [
 ];
 
 export default function PinCode() {
-  const { id } = useLocalSearchParams();
+  const { id, isSchedule } = useLocalSearchParams();
   const [pin, setPin] = useState("");
+
+  useEffect(() => {
+    console.log("is schedule? ", id, isSchedule, typeof isSchedule);
+  }, []);
 
   const {
     type,
@@ -32,6 +36,7 @@ export default function PinCode() {
     executeTopUp,
     executeWithdraw,
     executeTransfer,
+    executeScheduleTransfer,
   } = useTransactionStore();
 
   const handlePress = async (val) => {
@@ -59,13 +64,22 @@ export default function PinCode() {
           result = await executeWithdraw(id);
         } else if (type.id === "transfer") {
           result = await executeTransfer(id);
+        } else if (type.id === "transfer_bulanan") {
+          console.log("Scheduled");
+          result = await executeScheduleTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
         // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
         if (result) {
-          router.push(`/(main)/pocket/${id}/transaction/Statement`);
+          router.push({
+            pathname: "/(main)/pocket/[id]/transaction/Statement",
+            params: {
+              id,
+              isSchedule,
+            },
+          });
         } else {
           // This case might occur if the API returns success but no data
           alert(`Transaction Failed: Could not retrieve transaction details.`);
