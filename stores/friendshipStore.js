@@ -40,7 +40,10 @@ export const useFriendshipStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
         friendsError: errorMessage,
@@ -74,7 +77,10 @@ export const useFriendshipStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
         requestsError: errorMessage,
@@ -109,7 +115,10 @@ export const useFriendshipStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
         sendRequestError: errorMessage,
@@ -149,7 +158,10 @@ export const useFriendshipStore = create((set, get) => ({
         );
       }
     } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred.";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
         handleRequestError: errorMessage,

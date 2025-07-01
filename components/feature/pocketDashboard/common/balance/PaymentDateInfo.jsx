@@ -8,23 +8,31 @@ import { formatDateWithMonthAbbreviation } from "@/utils/helperFunction";
 
 export default function PaymentDateInfo() {
   const deadline = usePocketStore((state) => state.currentPocket?.deadline);
+  // --- CHANGE: Get the last_topup date from the store ---
+  const lastTopupDate = usePocketStore(
+    (state) => state.currentPocket?.last_topup?.updatedAt,
+  );
 
   const formattedDeadline = deadline
     ? formatDateWithMonthAbbreviation(deadline)
     : "-";
 
-  // TODO: This value should be made dynamic and fetched from the store/API.
-  const lastPaymentDate = "18 Nov 2025";
+  // --- CHANGE: Format the lastTopupDate, showing "-" if it's null ---
+  const formattedLastTopup = lastTopupDate
+    ? formatDateWithMonthAbbreviation(lastTopupDate)
+    : "-";
 
   return (
     <Box className="rounded-xl p-3 mb-4 bg-purple-wondr ">
       <HStack className="justify-between items-center">
         <VStack>
-          <AppText variant="medium" className="text-white font-light">
-            Terakhir Bayar
+          {/* --- CHANGE: Updated text label --- */}
+          <AppText variant="small" className="text-white font-light">
+            Terakhir Topup
           </AppText>
           <AppText variant="caption" className="text-white font-semibold">
-            {lastPaymentDate}
+            {/* --- CHANGE: Use the formatted last topup date --- */}
+            {formattedLastTopup}
           </AppText>
         </VStack>
         <VStack className="items-end">
