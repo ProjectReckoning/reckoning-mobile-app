@@ -1,3 +1,4 @@
+// Receipt.jsx (Corrected)
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -25,7 +26,8 @@ export default function Receipt() {
     source,
     destination,
     transactionResult, // The result from the API call
-    resetTransactionData,
+    // --- FIX: Corrected function name from resetTransactionData to resetTransactionState ---
+    resetTransactionState,
   } = useTransactionStore();
 
   const createdAt = new Date(transactionResult.createdAt).toLocaleDateString(

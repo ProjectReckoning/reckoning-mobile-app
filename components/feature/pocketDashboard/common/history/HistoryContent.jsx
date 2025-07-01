@@ -24,15 +24,15 @@ export default function HistoryContent() {
     (state) => state.fetchTransactionHistory,
   );
 
-  // --- FIX: Use a hardcoded date to align with the helper function's context ---
-  const MOCK_CURRENT_DATE = new Date("2025-06-16");
+  // --- CHANGE: Use the actual current date instead of a mocked one ---
+  const ACTUAL_CURRENT_DATE = new Date();
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     return {
-      month: MOCK_CURRENT_DATE.getMonth() + 1,
-      year: MOCK_CURRENT_DATE.getFullYear(),
-      fullValue: `${MOCK_CURRENT_DATE.getFullYear()}-${String(
-        MOCK_CURRENT_DATE.getMonth() + 1,
+      month: ACTUAL_CURRENT_DATE.getMonth() + 1,
+      year: ACTUAL_CURRENT_DATE.getFullYear(),
+      fullValue: `${ACTUAL_CURRENT_DATE.getFullYear()}-${String(
+        ACTUAL_CURRENT_DATE.getMonth() + 1,
       ).padStart(2, "0")}`,
     };
   });
@@ -42,8 +42,8 @@ export default function HistoryContent() {
     const generateRollingMonths = () => {
       const allMonths = [...MOCK_MONTH_DATA].sort((a, b) => a.id - b.id);
       const months = [];
-      // Use the same mocked date to generate the month list
-      let date = new Date(MOCK_CURRENT_DATE);
+      // Use the actual current date to generate the month list
+      let date = new Date(ACTUAL_CURRENT_DATE);
       for (let i = 0; i < 12; i++) {
         const year = date.getFullYear();
         const monthValue = date.getMonth() + 1;
@@ -66,8 +66,10 @@ export default function HistoryContent() {
   }, []);
 
   useEffect(() => {
-    fetchTransactionHistory(pocketId, selectedMonth.fullValue);
-  }, [selectedMonth, fetchTransactionHistory]);
+    if (pocketId && selectedMonth.fullValue) {
+      fetchTransactionHistory(pocketId, selectedMonth.fullValue);
+    }
+  }, [selectedMonth, fetchTransactionHistory, pocketId]);
 
   const handleMonthSelect = (monthItem) => {
     setSelectedMonth({
@@ -84,7 +86,6 @@ export default function HistoryContent() {
         className="py-2"
         style={{ color: WondrColors["dark-gray-wondr"] }}
       >
-        {/* This helper function will now work correctly */}
         {formatDateForHeader(title)}
       </AppText>
       <Divider
