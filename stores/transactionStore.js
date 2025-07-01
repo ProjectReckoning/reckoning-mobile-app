@@ -214,6 +214,7 @@ export const useTransactionStore = create((set, get) => ({
       selectedDate,
       selectedStartDate,
       selectedEndDate,
+      category,
     } = get();
 
     // Combine selectedDate (day) with month/year from selectedStartDate for "start"
@@ -236,6 +237,16 @@ export const useTransactionStore = create((set, get) => ({
       }
     }
 
+    const categoryMapping = {
+      Pembelian: "pembelian",
+      Gaji: "gaji",
+      "Pemindahan Dana": "transfer",
+    };
+    const formattedCategory =
+      category && categoryMapping[category]
+        ? categoryMapping[category]
+        : "lainnya";
+
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
@@ -243,6 +254,7 @@ export const useTransactionStore = create((set, get) => ({
       date: formattedStartDate,
       start: formattedStartDate,
       end: formattedEndDate,
+      category: formattedCategory,
     };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));

@@ -90,6 +90,12 @@ export default function Statement() {
   const startDate = formatIndoDateWithDay(selectedDate, selectedStartDate);
   const endDate = formatIndoDateWithDay(selectedDate, selectedEndDate);
 
+  // Helper to convert string to sentence case
+  const toSentenceCase = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
   return (
     <Box className="w-full flex-1 flex-col bg-white justify-between items-center px-6 py-5 mb-3">
       <ScrollView
@@ -109,11 +115,16 @@ export default function Statement() {
           />
           <VStack space="lg" className="items-center mt-5">
             <Heading size="md" className="text-black font-semibold">
-              {type.name} Berhasil {isSchedule ? "Dijadwalin" : ""}
+              {toSentenceCase(type.name)} berhasil{" "}
+              {isSchedule ? "dijadwalin" : ""}
             </Heading>
             {/* Use amount from the transaction result */}
             <Heading size="4xl" className="font-black text-black">
-              {formatRupiah(transactionResult.amount)}
+              {formatRupiah(
+                isSchedule
+                  ? transactionResult.recurring_amount
+                  : transactionResult.amount,
+              )}
             </Heading>
             <VStack space="xs" className="items-center">
               {/* Use date from the transaction result */}
@@ -136,12 +147,12 @@ export default function Statement() {
           <VStack space="lg" className="w-full">
             <TransactionCard
               title="Penerima"
-              heading={destination.name}
+              heading={destination.name.toUpperCase()}
               subheading={`${destination.category?.bank?.type || destination.category?.pocket?.type} . ${destination.id}`}
             />
             <TransactionCard
               title="Sumber dana"
-              heading={source.name}
+              heading={source.name.toUpperCase()}
               subheading={`${source.category?.bank?.type || source.category?.pocket?.type} ${maskId(source.id, 3)}`}
             />
             {isSchedule && (
