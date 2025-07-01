@@ -43,10 +43,9 @@ export default function PocketDetail() {
       <HStack
         className="rounded-2xl justify-center items-center"
         style={{
-          borderWidth: 0.5,
           borderColor: WondrColors["gray-wondr-border"],
           overflow: "hidden",
-          maxHeight: maxHStackHeight,
+          // maxHeight: maxHStackHeight,
         }}
       >
         <PocketCard
@@ -58,13 +57,13 @@ export default function PocketDetail() {
           cardWidth="w-fit"
         />
         <VStack
-          className="ml-4 justify-center flex-1"
+          className="ml-4 flex-1"
           style={{
-            paddingVertical: 8,
             paddingRight: 8,
+            paddingVertical: 20,
           }}
         >
-          <AppText variant="pageTitle">{currentPocket.name}</AppText>
+          <AppText variant="title">{currentPocket.name}</AppText>
           <AppText variant="bodyMuted" className="capitalize">
             {currentPocket.type} Pocket
           </AppText>
