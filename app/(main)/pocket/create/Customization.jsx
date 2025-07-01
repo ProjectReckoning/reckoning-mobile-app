@@ -79,6 +79,7 @@ export default function Customization() {
         if (pocketToEdit) {
           setPocketForEditing(pocketToEdit);
         }
+        console.log(pocketType, "pocket type to edit");
       }
       return () => {
         if (isEditMode) {
@@ -91,8 +92,7 @@ export default function Customization() {
   // When store data changes (in edit mode), update local index state
   useEffect(() => {
     const colorIndex = colors.indexOf(pocketColor);
-    const iconArray =
-      pocketType === "Business Fund" ? businessIcons : personalIcons;
+    const iconArray = isBusiness ? businessIcons : personalIcons;
     const iconIndex = iconArray.indexOf(pocketIcon);
 
     if (
@@ -117,7 +117,7 @@ export default function Customization() {
   }, [selectedColorIndex]);
 
   useEffect(() => {
-    if (pocketType === "Business Fund") {
+    if (isBusiness) {
       setPocketIcon(businessIcons[selectedIconIndex] || businessIcons[0]);
     } else {
       setPocketIcon(personalIcons[selectedIconIndex] || personalIcons[0]);
@@ -130,7 +130,7 @@ export default function Customization() {
   }, [pocketName]);
 
   // --- Handlers ---
-  const isBusiness = pocketType === "Business Fund";
+  const isBusiness = pocketType?.toLowerCase().includes("business");
   const selectedColor =
     selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
   const selectedSolid = colorMap[selectedColor]?.solid;

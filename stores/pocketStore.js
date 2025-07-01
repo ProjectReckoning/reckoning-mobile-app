@@ -108,6 +108,7 @@ export const usePocketStore = create((set, get) => ({
       deadline: new Date(pocket.deadline),
       pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
       pocketIcon: pocket.icon_name,
+      pocketType: pocket.type,
     });
   },
 
