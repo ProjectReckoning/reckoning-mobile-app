@@ -1,3 +1,4 @@
+// app/(main)/pocket/create/NewUser.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -14,60 +15,64 @@ import {
 
 import { useState } from "react";
 import { router } from "expo-router";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+} from "react-native";
 import { Info } from "lucide-react-native";
 import TabBar from "@/components/common/TabBar";
-import { usePocketStore } from "@/stores/pocketStore";
+import { useFriendshipStore } from "@/stores/friendshipStore";
 import { WondrColors } from "../../../../utils/colorUtils";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 const tabList = [
   { key: "rekening", label: "Rekening" },
-  { key: "hp_email", label: "No. HP/Email" },
-];
-
-const newFriends = [
-  {
-    id: 1936537497,
-    name: "MANALU FERNANDO PERMADI",
-    bank: "BNI",
-    hp: "081234567890",
-  },
-  {
-    id: 1925412859,
-    name: "JUICY BRIAN AL-MUAFI",
-    bank: "BNI",
-    hp: "082345678901",
-  },
+  { key: "handphone", label: "No. HP" },
 ];
 
 export default function NewUser() {
   const [activeTab, setActiveTab] = useState("rekening");
-  const [rekening, setRekening] = useState(null);
+  const [rekening, setRekening] = useState("");
   const [isRekeningInvalid, setIsRekeningInvalid] = useState(false);
   const [hpEmail, setHpEmail] = useState("");
   const [isHpEmailInvalid, setIsHpEmailInvalid] = useState(false);
 
-  const { setNewFriend } = usePocketStore();
+  const { sendFriendRequest, isSendingRequest, sendRequestError } =
+    useFriendshipStore();
 
-  const handleSearchFriend = () => {
+  const handleAddFriend = async () => {
     if (activeTab === "rekening") {
-      const found = newFriends.find((f) => String(f.id) === String(rekening));
-      if (found) {
-        setNewFriend(found);
-        setIsRekeningInvalid(false);
-        router.push("/pocket/create/NewUserConfirmation");
-      } else {
-        setIsRekeningInvalid(true);
-      }
-    } else if (activeTab === "hp_email") {
-      const found = newFriends.find((f) => String(f.hp) === String(hpEmail));
-      if (found) {
-        setNewFriend(found);
-        setIsHpEmailInvalid(false);
-        router.push("/pocket/create/NewUserConfirmation");
-      } else {
+      console.log(
+        "Adding by account number is not yet implemented with the new API.",
+      );
+      setIsRekeningInvalid(true);
+    } else if (activeTab === "handphone") {
+      if (!hpEmail || isSendingRequest) return;
+      try {
+        const response = await sendFriendRequest([hpEmail]);
+        // --- CHANGE: Navigate to confirmation screen on success ---
+        if (response && response.ok && response.data?.added?.length > 0) {
+          const addedPhoneNumber = response.data.added[0];
+          router.replace({
+            pathname: "/pocket/create/NewUserConfirmation",
+            params: { addedPhoneNumber },
+          });
+        } else {
+          // This handles cases where the API returns ok:false or skipped the number
+          setIsHpEmailInvalid(true);
+          Alert.alert(
+            "Gagal",
+            "Nomor HP tidak ditemukan atau sudah menjadi teman.",
+          );
+        }
+      } catch (error) {
         setIsHpEmailInvalid(true);
+        Alert.alert(
+          "Gagal",
+          sendRequestError || "Terjadi kesalahan. Silakan coba lagi.",
+        );
       }
     }
   };
@@ -148,9 +153,10 @@ export default function NewUser() {
                   className="h-16 border rounded-xl mt-5 mb-2 px-3 py-3 border-gray-wondr-border data-[focus=true]:border-green-select"
                 >
                   <InputField
-                    placeholder="Nomor HP/Email"
+                    placeholder="Nomor HP"
                     type="text"
                     className="text-lg"
+                    keyboardType="phone-pad"
                     value={hpEmail}
                     onChangeText={(text) => {
                       setHpEmail(text);
@@ -161,7 +167,7 @@ export default function NewUser() {
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    No. HP harus terisi dengan valid dan benar!
+                    No. HP tidak ditemukan atau sudah menjadi teman.
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
@@ -169,14 +175,16 @@ export default function NewUser() {
           </Box>
 
           <PrimaryButton
-            buttonAction={handleSearchFriend}
+            buttonAction={handleAddFriend}
             buttonTitle="Lanjut"
             className={"my-5"}
             disabled={
               (activeTab === "rekening" &&
-                (rekening === null || isRekeningInvalid)) ||
-              (activeTab === "hp_email" && (isHpEmailInvalid || hpEmail === ""))
+                (rekening === "" || isRekeningInvalid)) ||
+              (activeTab === "handphone" &&
+                (isHpEmailInvalid || hpEmail === ""))
             }
+            isLoading={isSendingRequest}
           />
         </ScrollView>
       </KeyboardAvoidingView>

@@ -5,46 +5,33 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { router } from "expo-router";
-import { usePocketStore } from "@/stores/pocketStore";
-import { friendsList } from "@/utils/mockData/friendsListData";
-import { useTransactionStore } from "@/stores/transactionStore";
+import { router, useLocalSearchParams } from "expo-router";
+import { useMemo } from "react";
+import { useFriendshipStore } from "@/stores/friendshipStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
 export default function NewUserConfirmation() {
-  const { newFriend, selectedFriends, setSelectedFriends } = usePocketStore();
-  const { type, setDestination } = useTransactionStore();
+  // --- CHANGE: Get data from route params and friendship store ---
+  const { addedPhoneNumber } = useLocalSearchParams();
+  const friends = useFriendshipStore((state) => state.friends);
+
+  // Find the full friend object from the store using the phone number
+  const newFriend = useMemo(() => {
+    if (!addedPhoneNumber || !friends) return null;
+    return friends.find((friend) => friend.phone_number === addedPhoneNumber);
+  }, [addedPhoneNumber, friends]);
 
   if (!newFriend) {
     return (
       <Box className="flex-1 items-center justify-center">
-        <Text>Data tidak ditemukan.</Text>
+        <Text>Data teman tidak ditemukan.</Text>
       </Box>
     );
   }
 
-  const GoToNext = () => {
-    if (type && type.id === "transfer") {
-      setDestination({
-        id: newFriend.id,
-        name: newFriend.name,
-        category: {
-          bank: {
-            name: newFriend.bank,
-            type: "TAPLUS PEGAWAI BNI",
-          },
-        },
-      });
-      router.push("/pocket/transaction/Detail");
-    } else {
-      friendsList.push(newFriend);
-
-      if (!selectedFriends.includes(newFriend.name)) {
-        setSelectedFriends([...selectedFriends, newFriend.name]);
-      }
-
-      router.push("/pocket/create/SelectFriend");
-    }
+  // --- CHANGE: This function now just goes back to the friend selection screen ---
+  const handleGoBack = () => {
+    router.back();
   };
 
   return (
@@ -63,8 +50,9 @@ export default function NewUserConfirmation() {
             <Text size="lg" className="font-bold text-black">
               Sdr {newFriend.name || ""}
             </Text>
+            {/* Display account number from the friend object */}
             <Text size="sm" className="text-[#848688]">
-              {newFriend.bank || ""} - {newFriend.id || ""}
+              Wondr Account - {newFriend.account_number || ""}
             </Text>
           </Box>
         </HStack>
@@ -95,13 +83,13 @@ export default function NewUserConfirmation() {
         >
           <Text size={"sm"}>Nomor rekening</Text>
           <Heading size={"md"} className="font-normal">
-            {newFriend.id || ""}
+            {newFriend.account_number || ""}
           </Heading>
         </VStack>
       </VStack>
 
       <PrimaryButton
-        buttonAction={GoToNext}
+        buttonAction={handleGoBack}
         buttonTitle="Lanjut"
         className={"my-5"}
       />

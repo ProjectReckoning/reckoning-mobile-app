@@ -56,7 +56,8 @@ export default function PressableCircle({
   return (
     <Pressable
       onPress={handlePress}
-      className="justify-center items-center rounded-full bg-white"
+      // --- CHANGE: Added mb-2 for consistent spacing ---
+      className="justify-center items-center rounded-full bg-white mb-2"
       style={{
         width: circleSize,
         height: circleSize,
@@ -72,8 +73,8 @@ export default function PressableCircle({
         <Box
           className="justify-center items-center rounded-full elevation-5 bg-white p-2"
           style={{
-            width: circleSize - 65,
-            height: circleSize - 65,
+            width: circleSize - 70,
+            height: circleSize - 70,
           }}
         >
           <AppText variant="body" className="font-light text-black">
