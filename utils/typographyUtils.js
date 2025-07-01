@@ -10,6 +10,10 @@ export const TEXT_VARIANTS = {
     size: 16,
     className: "font-extrabold text-black",
   },
+  title: {
+    size: 16,
+    className: "font-bold text-black",
+  },
   cardTitle: {
     size: 14,
     className: "font-bold text-black",

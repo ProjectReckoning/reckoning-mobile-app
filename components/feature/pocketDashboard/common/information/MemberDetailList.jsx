@@ -12,7 +12,9 @@ import AppText from "@/components/common/typography/AppText";
  */
 export default function MemberDetailList() {
   const { id: pocketId } = useLocalSearchParams();
+
   const members = usePocketStore((state) => state.currentPocket?.members);
+  const pocketType = usePocketStore((state) => state.currentPocket?.type);
 
   // --- FIX: State to control the actionsheet and selected member ---
   const [showActionsheet, setShowActionsheet] = useState(false);
@@ -72,6 +74,7 @@ export default function MemberDetailList() {
           onClose={() => setShowActionsheet(false)}
           memberData={selectedMember}
           pocketId={pocketId}
+          pocketType={pocketType}
         />
       )}
     </>
