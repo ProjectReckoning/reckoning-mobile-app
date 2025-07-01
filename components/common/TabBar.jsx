@@ -72,7 +72,7 @@ export default function TabBar({
         >
           <Text
             style={{
-              fontWeight: "bold",
+              fontWeight: activeTab === tab.key ? "bold" : "light",
               fontSize: size,
               color: activeTab === tab.key ? "#000" : "#22223A",
             }}

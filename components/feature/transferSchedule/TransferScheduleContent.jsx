@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FlatList, Image, Text } from "react-native";
 import { Box } from "@/components/ui/box";
 import ScheduleTopBar from "./ScheduleTopBar.jsx";
+import TabBar from "@/components/common/TabBar";
 import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent.jsx";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
@@ -37,9 +38,11 @@ const dataSelesai = [
     amount: "Rp1.500.000",
   },
 ];
-// const dataTerjadwal = [];
 
-// const dataSelesai = [];
+const tabList = [
+  { key: "terjadwal", label: "Terjadwal" },
+  { key: "selesai", label: "Selesai" },
+];
 
 const EmptyState = ({ imageSource, title, subtitle }) => (
   <Box className="flex-1 items-center justify-start">
@@ -116,9 +119,14 @@ bisa lihat detailnya di sini."
   };
 
   return (
-    <Box className=" bg-white px-8 py-6">
-      {/* Tab bar tetap berada di atas */}
-      <ScheduleTopBar initialTab={activeTab} onTabChange={handleTabChange} />
+    <Box className=" bg-white px-8 pt-3 pb-6">
+      <TabBar
+        tabList={tabList}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        size={16}
+        marginVertical={16}
+      />
 
       {/* --- PENGGUNAAN FLATLIST DENGAN KONDISI KOSONG --- */}
       <FlatList
