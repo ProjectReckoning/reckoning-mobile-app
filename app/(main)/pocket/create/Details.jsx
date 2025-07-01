@@ -33,7 +33,6 @@ export default function Details() {
     pocketBalanceTarget,
     setPocketBalanceTarget,
     targetDuration,
-    setTargetDuration,
     deadline,
     setDeadline,
     goalTitle,
@@ -43,15 +42,15 @@ export default function Details() {
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [isBalanceInvalid, setBalanceIsInvalid] = useState(false);
   const [isDateInvalid, setDateIsInvalid] = useState(false);
+
   const [open, setOpen] = useState(false);
-
-  const [balanceTouched, setBalanceTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
+  const [balanceTouched, setBalanceTouched] = useState(false);
 
+  const [errors, setErrors] = useState({});
+  const [pickerMode, setPickerMode] = useState("date");
   const [displayDate, setDisplayDate] = useState(new Date());
   const [tempSelectedDay, setTempSelectedDay] = useState(null);
-  const [pickerMode, setPickerMode] = useState("date");
-  const [errors, setErrors] = useState({});
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -79,14 +78,6 @@ export default function Details() {
   const onDismiss = useCallback(() => {
     setOpen(false);
   }, []);
-
-  // const onConfirm = useCallback(
-  //   ({ startDate, endDate }) => {
-  //     setOpen(false);
-  //     setTargetDuration({ startDate, endDate });
-  //   },
-  //   [setTargetDuration],
-  // );
 
   const onConfirm = () => {
     if (tempSelectedDay) {
@@ -122,8 +113,7 @@ export default function Details() {
         pocketBalanceTarget < 10000 ||
         !Number.isInteger(pocketBalanceTarget);
 
-      // Duration: required, both start and end date
-      // const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+      // The deadline is required for Saving type
       const dateInvalid = !deadline;
 
       setBalanceIsInvalid(balanceInvalid);
@@ -163,7 +153,6 @@ export default function Details() {
 
   useEffect(() => {
     if (dateTouched) {
-      // setDateIsInvalid(!targetDuration.startDate || !targetDuration.endDate);
       setDateIsInvalid(!deadline);
     }
   }, [deadline, dateTouched]);
@@ -206,11 +195,10 @@ export default function Details() {
                 pocketType={pocketType}
                 pocketBalanceTarget={pocketBalanceTarget}
                 setPocketBalanceTarget={(value) => {
-                  setBalanceTouched(true); // Mark as touched on first change
+                  setBalanceTouched(true);
                   setPocketBalanceTarget(value);
                 }}
                 isBalanceInvalid={isBalanceInvalid}
-                targetDuration={targetDuration}
                 deadline={deadline}
                 isDateInvalid={isDateInvalid}
                 open={open}
@@ -249,7 +237,7 @@ export default function Details() {
                               }
                             >
                               <AvatarFallbackText className="text-[#58ABA1]">
-                                {friend}
+                                {friend.name}
                               </AvatarFallbackText>
                             </Avatar>
                           );
@@ -284,7 +272,8 @@ export default function Details() {
                     pocketName.length > 20 ||
                     pocketBalanceTarget === null ||
                     targetDuration.startDate === null ||
-                    targetDuration.endDate === null
+                    targetDuration.endDate === null ||
+                    deadline === null
                   : pocketName.length === 0 || pocketName.length > 20
               }
             />

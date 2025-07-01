@@ -1,16 +1,16 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+import { Center } from "@/components/ui/center";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { Badge, BadgeText } from "@/components/ui/badge";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
 import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView, ActivityIndicator } from "react-native";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import FriendList from "@/components/common/FriendList";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -108,22 +108,22 @@ export default function SelectFriendScreen() {
                   <Pressable
                     key={friend.id}
                     onPress={() => {
-                      setSelection((prev) =>
-                        prev.filter((f) => f.id !== friend.id),
-                      );
+                      // setSelection((prev) =>
+                      //   prev.filter((f) => f.id !== friend.id),
+                      // );
+                      console.log("belum bisa di press", friend);
                     }}
                   >
+                    <Center className="w-5 h-5 z-10 self-end bg-red-wondr rounded-full absolute right-3 top-0">
+                      <Text className="text-white font-bold text-center -mt-1">
+                        -
+                      </Text>
+                    </Center>
                     <Avatar
                       size="lg"
-                      className="border-2 border-outline-0 bg-[#F2F2F2] items-center justify-center mr-3"
+                      className="bg-[#F2F2F2] items-center justify-center mr-4"
                     >
-                      <Badge
-                        className="z-10 self-end w-5 h-5 bg-red-wondr rounded-full -mr-1 items-center justify-center"
-                        variant="solid"
-                      >
-                        <BadgeText className="text-white text-xs">-</BadgeText>
-                      </Badge>
-                      <AvatarFallbackText className="text-[#58ABA1]">
+                      <AvatarFallbackText className="text-[#58ABA1] text-center item-center justify-center">
                         {friend.name}
                       </AvatarFallbackText>
                     </Avatar>

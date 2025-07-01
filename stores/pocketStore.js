@@ -105,10 +105,6 @@ export const usePocketStore = create((set, get) => ({
     set({
       pocketName: pocket.name,
       pocketBalanceTarget: parseInt(pocket.target_nominal, 10),
-      targetDuration: {
-        startDate: new Date(),
-        endDate: new Date(pocket.deadline),
-      },
       deadline: new Date(pocket.deadline),
       pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
       pocketIcon: pocket.icon_name,
@@ -281,7 +277,6 @@ export const usePocketStore = create((set, get) => ({
       pocketName,
       pocketType,
       pocketBalanceTarget,
-      targetDuration,
       deadline,
       pocketColor,
       pocketIcon,
@@ -307,10 +302,7 @@ export const usePocketStore = create((set, get) => ({
     // Conditionally add target and deadline
     if (pocketType === "Saving" || pocketType === "Business Fund") {
       requestBody.target_nominal = pocketBalanceTarget;
-      // requestBody.deadline = deadline ? new Date(deadline).toISOString() : null;
-      requestBody.deadline = targetDuration?.endDate
-        ? new Date(targetDuration.endDate).toISOString()
-        : null;
+      requestBody.deadline = deadline ? new Date(deadline).toISOString() : null;
     }
 
     try {
@@ -344,7 +336,6 @@ export const usePocketStore = create((set, get) => ({
     const {
       pocketName,
       pocketBalanceTarget,
-      targetDuration,
       deadline,
       pocketColor,
       pocketIcon,
@@ -353,8 +344,7 @@ export const usePocketStore = create((set, get) => ({
     const requestBody = {
       name: pocketName,
       target_nominal: pocketBalanceTarget,
-      deadline: targetDuration.endDate,
-      // deadline: deadline,
+      deadline: deadline,
       color_hex: colorClassToHex[pocketColor] || "#58ABA1",
       icon_name: pocketIcon,
     };

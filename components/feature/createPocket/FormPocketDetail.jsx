@@ -3,7 +3,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { AlertCircleIcon } from "@/components/ui/icon";
-import { DatePickerModal } from "react-native-paper-dates";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import {
   FormControl,
@@ -24,7 +23,6 @@ export default function FormPocketDetail({
   pocketBalanceTarget,
   setPocketBalanceTarget,
   isBalanceInvalid,
-  targetDuration,
   deadline,
   isDateInvalid,
   open,
@@ -162,14 +160,6 @@ export default function FormPocketDetail({
             >
               <Box className="flex flex-row gap-3 items-center">
                 <CalendarClock size={16} color={"#848688"} />
-                {/* {targetDuration.startDate && targetDuration.endDate ? (
-                  <Text className="text-black text-lg">
-                    {targetDuration.startDate.toLocaleDateString("id-ID")} -{" "}
-                    {targetDuration.endDate.toLocaleDateString("id-ID")}
-                  </Text>
-                ) : (
-                  <Text className="text-gray-400 text-lg">Pilih tanggal</Text>
-                )} */}
                 {deadline ? (
                   <Text className="text-black text-lg">
                     {deadline.toLocaleDateString("id-ID")}
@@ -186,16 +176,6 @@ export default function FormPocketDetail({
               </FormControlErrorText>
             </FormControlError>
 
-            {/* <DatePickerModal
-              locale="id"
-              mode="range"
-              visible={open}
-              startDate={targetDuration.startDate}
-              endDate={targetDuration.endDate}
-              onDismiss={onDismiss}
-              onConfirm={onConfirm}
-              presentationStyle="pageSheet"
-            /> */}
             <CustomDatePicker
               isOpen={open}
               onClose={onDismiss}
