@@ -1,15 +1,16 @@
+// app/(main)/pocket/[id]/transaction/PinCode.jsx
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { ActivityIndicator } from "react-native";
 
 import { useState, useEffect } from "react";
+import { Delete } from "lucide-react-native";
+import { ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
-import { Delete } from "lucide-react-native";
 
 const PIN_LENGTH = 6;
 
@@ -34,7 +35,6 @@ export default function PinCode() {
     transactionError,
     executeTopUp,
     executeWithdraw,
-    // --- NEW: Get the transfer action from the store ---
     executeTransfer,
     executeScheduleTransfer,
   } = useTransactionStore();
@@ -56,26 +56,35 @@ export default function PinCode() {
 
     if (newPin.length === PIN_LENGTH) {
       try {
-        // --- KEY CHANGE: Check the transaction type and call the correct action ---
+        let result;
+        // --- KEY CHANGE: Await the result from the store function ---
         if (type.id === "topup") {
-          await executeTopUp(id);
+          result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
-          await executeWithdraw(id);
+          result = await executeWithdraw(id);
         } else if (type.id === "transfer") {
-          await executeTransfer(id);
+          result = await executeTransfer(id);
         } else if (type.id === "transfer_bulanan") {
           console.log("Scheduled");
-          await executeScheduleTransfer(id);
+          result = await executeScheduleTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
-        // On success, navigate to the statement screen
-        router.replace(`/(main)/pocket/${id}/transaction/Statement`);
+        // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
+        if (result) {
+          router.push(`/(main)/pocket/${id}/transaction/Statement`);
+        } else {
+          // This case might occur if the API returns success but no data
+          alert(`Transaction Failed: Could not retrieve transaction details.`);
+          setPin("");
+        }
       } catch (error) {
         console.error(`PIN Screen: ${type.name} failed.`, error);
         alert(
-          `Transaction Failed: ${transactionError || "An unknown error occurred."}`,
+          `Transaction Failed: ${
+            transactionError || "An unknown error occurred."
+          }`,
         );
         setPin("");
       }

@@ -22,7 +22,7 @@ export default function TransactionHistoryTableCell({ data }) {
         </Box>
         <Box className="flex-shrink">
           <VStack>
-            <AppText variant="bodyBold">{data.type}</AppText>
+            <AppText variant="bodyBold">{data.category}</AppText>
             <AppText variant="body" numberOfLines={1} ellipsizeMode="tail">
               {data.description}
             </AppText>

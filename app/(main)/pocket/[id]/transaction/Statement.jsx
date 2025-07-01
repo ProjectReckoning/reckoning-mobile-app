@@ -18,12 +18,11 @@ import TransactionCard from "@/components/common/cards/TransactionCard";
 import StatementDecorator from "@/assets/images/decorators/statementlDecorator.png";
 
 export default function Statement() {
-  // --- NEW: Get state and actions from the store ---
   const {
     type,
     source,
     destination,
-    transactionResult, // The result from the API call
+    transactionResult,
     resetTransactionState,
   } = useTransactionStore();
   const { resetPocketData } = usePocketStore();
@@ -35,7 +34,6 @@ export default function Statement() {
     router.replace("(main)/home");
   };
 
-  // --- NEW: Display a loading or error state if the transaction is not complete ---
   if (!transactionResult) {
     return (
       <Box className="flex-1 justify-center items-center p-8">
@@ -52,7 +50,6 @@ export default function Statement() {
     );
   }
 
-  // Format the date from the API response
   const createdAt = new Date(transactionResult.createdAt).toLocaleDateString(
     "en-GB",
     {
@@ -85,14 +82,11 @@ export default function Statement() {
             <Heading size="md" className="text-black font-semibold">
               {type.name} Berhasil
             </Heading>
-            {/* Use amount from the transaction result */}
             <Heading size="4xl" className="font-black text-black">
               {formatRupiah(transactionResult.amount)}
             </Heading>
             <VStack space="xs" className="items-center">
-              {/* Use date from the transaction result */}
               <Text>{createdAt}</Text>
-              {/* Use ID from the transaction result */}
               <Text>{`RefID: ${transactionResult.id}`}</Text>
             </VStack>
           </VStack>

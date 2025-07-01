@@ -27,6 +27,7 @@ const typeToDisplayType = {
   business: "Business",
 };
 
+// Maps UI display types back to API-friendly values
 const typeMapping = {
   Spending: "spending",
   Saving: "saving",
@@ -53,6 +54,8 @@ export const usePocketStore = create((set, get) => ({
     }),
   targetDuration: { startDate: undefined, endDate: undefined },
   setTargetDuration: (duration) => set({ targetDuration: duration }),
+  deadline: undefined,
+  setDeadline: (date) => set({ deadline: date }),
   selectedFriends: [],
   setSelectedFriends: (friends) => set({ selectedFriends: friends }),
   pocketColor: null,
@@ -89,6 +92,7 @@ export const usePocketStore = create((set, get) => ({
       pocketName: "",
       pocketBalanceTarget: null,
       targetDuration: { startDate: undefined, endDate: undefined },
+      deadline: undefined,
       selectedFriends: [],
       pocketColor: null,
       pocketIcon: "pocket",
@@ -101,10 +105,7 @@ export const usePocketStore = create((set, get) => ({
     set({
       pocketName: pocket.name,
       pocketBalanceTarget: parseInt(pocket.target_nominal, 10),
-      targetDuration: {
-        startDate: new Date(),
-        endDate: new Date(pocket.deadline),
-      },
+      deadline: new Date(pocket.deadline),
       pocketColor: hexToColorClass[pocket.color_hex?.toUpperCase()],
       pocketIcon: pocket.icon_name,
     });
@@ -162,7 +163,7 @@ export const usePocketStore = create((set, get) => ({
     set({ isUpdating: true, updateError: null });
 
     const requestBody = {
-      type: newType,
+      type: newType, // e.g., "saving"
     };
 
     try {
@@ -276,7 +277,7 @@ export const usePocketStore = create((set, get) => ({
       pocketName,
       pocketType,
       pocketBalanceTarget,
-      targetDuration,
+      deadline,
       pocketColor,
       pocketIcon,
       selectedFriends,
@@ -287,6 +288,7 @@ export const usePocketStore = create((set, get) => ({
       role: "viewer",
     }));
 
+    // Use the typeMapping to convert the display name to the API value
     const apiPocketType = typeMapping[pocketType] || pocketType?.toLowerCase();
 
     const requestBody = {
@@ -297,11 +299,10 @@ export const usePocketStore = create((set, get) => ({
       members: membersWithRoles,
     };
 
+    // Conditionally add target and deadline
     if (pocketType === "Saving" || pocketType === "Business Fund") {
       requestBody.target_nominal = pocketBalanceTarget;
-      requestBody.deadline = targetDuration?.endDate
-        ? new Date(targetDuration.endDate).toISOString()
-        : null;
+      requestBody.deadline = deadline ? new Date(deadline).toISOString() : null;
     }
 
     try {
@@ -335,7 +336,7 @@ export const usePocketStore = create((set, get) => ({
     const {
       pocketName,
       pocketBalanceTarget,
-      targetDuration,
+      deadline,
       pocketColor,
       pocketIcon,
     } = get();
@@ -343,7 +344,7 @@ export const usePocketStore = create((set, get) => ({
     const requestBody = {
       name: pocketName,
       target_nominal: pocketBalanceTarget,
-      deadline: targetDuration.endDate,
+      deadline: deadline,
       color_hex: colorClassToHex[pocketColor] || "#58ABA1",
       icon_name: pocketIcon,
     };
@@ -454,6 +455,234 @@ export const usePocketStore = create((set, get) => ({
         transactionHistory: [],
         businessHistorySummary: null,
       });
+      throw error;
+    }
+  },
+
+  // --- Member Management Actions ---
+  fetchPocketMembers: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: GET /pocket/${pocketId}/members`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMembersLoading: true, membersError: null });
+    try {
+      const response = await api.get(`/pocket/${pocketId}/members`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({
+          pocketMembers: response.data.data || [],
+          isMembersLoading: false,
+        });
+      } else {
+        throw new Error(
+          response.data.message || "Failed to fetch pocket members.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({
+        membersError: errorMessage,
+        isMembersLoading: false,
+        pocketMembers: [],
+      });
+      throw error;
+    }
+  },
+
+  invitePocketMembers: async (pocketId, friends) => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: POST /pocket/invite");
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const membersToInvite = friends.map((friend) => ({
+      user_id: friend.id,
+      role: "viewer",
+    }));
+    const requestBody = {
+      pocket_id: parseInt(pocketId, 10),
+      members: membersToInvite,
+    };
+
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/pocket/invite", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        get().fetchPocketMembers(pocketId);
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to invite members.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  respondToPocketInvite: async (inviteId, responseAction) => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: POST /pocket/respond-invite");
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { inviteId: inviteId, response: responseAction };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/pocket/respond-invite", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        if (responseAction === "accepted") {
+          get().fetchAllPockets();
+        }
+        return response.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to respond to invite.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  removePocketMembers: async (pocketId, memberUserIds) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: DELETE /pocket/${pocketId}/members`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    try {
+      console.log("Request Body (in data):", { members: memberUserIds });
+      const response = await api.delete(`/pocket/${pocketId}/members`, {
+        data: { members: memberUserIds },
+      });
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to remove members.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  updateMemberRole: async (pocketId, userId, role) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId}/members/role`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { user_id: userId, role: role };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(
+        `/pocket/${pocketId}/members/role`,
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to update member role.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  changePocketOwner: async (pocketId, newOwnerId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: PATCH /pocket/${pocketId}/members/change-owner`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { new_owner_id: newOwnerId };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(
+        `/pocket/${pocketId}/members/change-owner`,
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        await get().fetchPocketById(pocketId);
+        set({ isMemberActionLoading: false });
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to change owner.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
+      throw error;
+    }
+  },
+
+  leavePocket: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: DELETE /pocket/${pocketId}/leave`);
+    console.log(
+      "================================================================",
+    );
+    set({ isMemberActionLoading: true, memberActionError: null });
+    try {
+      const response = await api.delete(`/pocket/${pocketId}/leave`);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isMemberActionLoading: false });
+        get().fetchAllPockets();
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to leave pocket.");
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ memberActionError: errorMessage, isMemberActionLoading: false });
       throw error;
     }
   },

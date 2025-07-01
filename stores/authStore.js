@@ -38,7 +38,11 @@ const useAuthStore = create((set, get) => ({
         throw new Error(response.data.message || "Failed to fetch user data.");
       }
     } catch (error) {
-      console.error("API Error fetching user:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error fetching user:", errorMessage);
       set({ isFetchingUser: false, user: null });
       throw error;
     }

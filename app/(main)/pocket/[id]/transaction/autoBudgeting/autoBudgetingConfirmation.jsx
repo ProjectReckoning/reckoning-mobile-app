@@ -20,6 +20,12 @@ export default function AutoBudgetingConfirmation() {
   const { deleteAutoBudget, isProcessing } = useTransactionStore();
   const { user, fetchUser } = useAuthStore();
 
+  // --- NEW: Map for displaying schedule type ---
+  const scheduleTypeDisplayMap = {
+    weekly: "Mingguan",
+    monthly: "Bulanan",
+  };
+
   useEffect(() => {
     // Fetch the main user account details to show as "sumber dana"
     fetchUser();
@@ -52,9 +58,8 @@ export default function AutoBudgetingConfirmation() {
       detailTanggalText = `Setiap hari ${weekdays[scheduleValue]}`;
     } else if (scheduleType === "monthly") {
       detailTanggalText = `Setiap tanggal ${scheduleValue}`;
-    } else if (scheduleType === "daily") {
-      detailTanggalText = "Setiap hari";
     }
+    // --- REMOVED: 'daily' frequency logic ---
   }
 
   const nextRunDateText = nextRunDate
@@ -160,8 +165,9 @@ export default function AutoBudgetingConfirmation() {
             <Text size="md" color="$text-black-600">
               Frekuensi
             </Text>
+            {/* --- CHANGE: Use the display map for translation --- */}
             <Text size="md" color="$text-black-600" className="capitalize">
-              {scheduleType}
+              {scheduleTypeDisplayMap[scheduleType] || scheduleType}
             </Text>
           </Box>
           <Box className="flex-row justify-between mb-2">

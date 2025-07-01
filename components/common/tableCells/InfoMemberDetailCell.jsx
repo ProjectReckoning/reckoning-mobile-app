@@ -3,12 +3,10 @@ import { Box } from "@/components/ui/box";
 import { Avatar } from "@/components/ui/avatar";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
-import {
-  WondrColors,
-  COLOR_PALETTE_LIGHT_TRANSLUCENT,
-} from "@/utils/colorUtils";
+import { Badge, BadgeText } from "@/components/ui/badge"; // Import Badge components
 import { Crown, EllipsisVertical } from "lucide-react-native";
 import AppText from "@/components/common/typography/AppText";
+import { WondrColors } from "@/utils/colorUtils";
 
 const getConsistentInitials = (name) => {
   if (!name) return "";
@@ -24,11 +22,28 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-// --- FIX: Add onManagePress prop to handle button clicks ---
+// Helper function to get badge color based on role and pocket type
+const getBadgeColorForRole = (role, pocketType) => {
+  const upperCaseRole = role.toUpperCase();
+
+  if (upperCaseRole === "ADMIN") return "bg-tosca-wondr";
+
+  if (pocketType === "business") {
+    if (upperCaseRole === "MEMBER") return "bg-lime-wondr";
+  } else {
+    // for 'saving' and 'spending'
+    if (upperCaseRole === "SPENDER") return "bg-purple-wondr";
+    if (upperCaseRole === "VIEWER") return "bg-pink-wondr";
+  }
+
+  // Fallback default
+  return "bg-lime-wondr";
+};
+
 export default function InfoMemberDetailCell({
   member,
-  index = 0,
   onManagePress,
+  pocketType, // Add pocketType to props
 }) {
   if (!member || !member.PocketMember) {
     return null;
@@ -39,17 +54,16 @@ export default function InfoMemberDetailCell({
   const isOwner = memberRoleRaw.toLowerCase() === "owner";
   const displayRole = isOwner ? "ADMIN" : memberRoleRaw.toUpperCase();
   const displayInitials = getConsistentInitials(memberName);
-  const selectedColor =
-    COLOR_PALETTE_LIGHT_TRANSLUCENT[
-      index % COLOR_PALETTE_LIGHT_TRANSLUCENT.length
-    ];
-  const avatarBgColor = WondrColors["light-gray-wondr"];
+  const avatarBgColor = WondrColors["translucent-gray-wondr"];
   const avatarTextColor = WondrColors["tosca-wondr"];
+
+  // Get badge color class using the helper function
+  const badgeColorClass = getBadgeColorForRole(displayRole, pocketType);
 
   return (
     <Box
-      className="flex-row rounded-2xl p-2 border-2 items-center"
-      style={{ borderColor: WondrColors["light-gray-wondr"] }}
+      className="flex-row rounded-2xl p-4 border items-center"
+      style={{ borderColor: WondrColors["gray-wondr-border"] }} // Example color
     >
       <Avatar
         size="md"
@@ -64,13 +78,17 @@ export default function InfoMemberDetailCell({
       <Box className="flex-1">
         <VStack>
           <Box className="flex-row justify-start items-center gap-1">
-            <Box
-              className="py-1 px-2 rounded-full"
-              style={{ backgroundColor: selectedColor }}
+            {/* --- FIX: Use Badge component for role display --- */}
+            <Badge
+              size="sm"
+              variant="solid"
+              className={`${badgeColorClass} rounded-full`}
             >
-              <AppText variant="small">{displayRole}</AppText>
-            </Box>
-            {isOwner ? <Crown size={12} /> : null}
+              <BadgeText className="font-bold text-black">
+                {displayRole}
+              </BadgeText>
+            </Badge>
+            {isOwner ? <Crown size={12} color="black" /> : null}
           </Box>
           <AppText variant="cardTitle" className="uppercase">
             {memberName}
@@ -78,10 +96,9 @@ export default function InfoMemberDetailCell({
         </VStack>
       </Box>
 
-      {/* --- FIX: Only show the button for non-owners and make it pressable --- */}
       {!isOwner ? (
         <Pressable
-          className="justify-center items-center p-4 active:bg-gray-100 rounded-full"
+          className="justify-center items-center active:bg-gray-100 rounded-full"
           onPress={onManagePress}
         >
           <EllipsisVertical />

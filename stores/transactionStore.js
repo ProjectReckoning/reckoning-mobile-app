@@ -60,6 +60,8 @@ export const useTransactionStore = create((set, get) => ({
           ? parseInt(amount.replace(/\D/g, ""), 10) || 0
           : amount,
     }),
+  setSource: (source) => set({ source }),
+  setDestination: (destination) => set({ destination }),
   setDescription: (description) => set({ description }),
   setCategory: (category) => set({ category }),
   setSelectedDate: (date) => set({ selectedDate: date }),
@@ -69,7 +71,7 @@ export const useTransactionStore = create((set, get) => ({
     set(initialState);
   },
 
-  // --- STANDARD TRANSACTION APIS ---
+  // --- STANDARD TRANSACTION API FUNCTIONS ---
 
   executeTopUp: async (pocketId) => {
     console.log(
@@ -139,6 +141,49 @@ export const useTransactionStore = create((set, get) => ({
         return response.data.data;
       } else {
         throw new Error(response.data.message || "Withdrawal failed.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ isProcessing: false, transactionError: errorMessage });
+      throw error;
+    }
+  },
+
+  executeTransfer: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(
+      `API Call: POST /transaction/transfer for pocket ID: ${pocketId}`,
+    );
+    console.log(
+      "================================================================",
+    );
+    set({
+      isProcessing: true,
+      transactionError: null,
+      transactionResult: null,
+    });
+    const { amount, destination, description } = get();
+    const requestBody = {
+      balance: amount,
+      pocket_id: parseInt(pocketId, 10),
+      destination: destination.name,
+      description: description || `Transfer to ${destination.name}`,
+    };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post("/transaction/transfer", requestBody);
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isProcessing: false, transactionResult: response.data.data });
+        return response.data.data;
+      } else {
+        throw new Error(response.data.message || "Transfer failed.");
       }
     } catch (error) {
       const errorMessage =
@@ -281,6 +326,7 @@ export const useTransactionStore = create((set, get) => ({
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         set({ isProcessing: false, transactionResult: response.data.data });
+        // The API for set-auto-budget returns the transaction result directly
         return response.data.data;
       } else {
         throw new Error(response.data.message || "Failed to set auto-budget.");
