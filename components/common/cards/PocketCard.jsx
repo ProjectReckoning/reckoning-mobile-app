@@ -22,9 +22,11 @@ export default function PocketCard({
   editButton = false,
   onEdit = () => {},
 }) {
+  const isBusiness = pocketType?.toLowerCase().includes("business");
+
   const IconComponent =
     typeof icon === "string"
-      ? pocketType === "Business Fund"
+      ? isBusiness
         ? businessIconMap[icon.toLowerCase()] || businessIconMap.pocket
         : personalIconMap[icon.toLowerCase()] || personalIconMap.pocket
       : personalIconMap.pocket;
@@ -37,8 +39,7 @@ export default function PocketCard({
     }).format(value);
 
   const baseColor =
-    color ||
-    (pocketType === "Business Fund" ? "bg-purple-wondr" : "bg-orange-wondr");
+    color || (isBusiness ? "bg-purple-wondr" : "bg-orange-wondr");
 
   const lightColor = `${baseColor}-light-translucent`;
 

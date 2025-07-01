@@ -1,6 +1,5 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
@@ -34,7 +33,8 @@ export default function Details() {
     pocketBalanceTarget,
     setPocketBalanceTarget,
     targetDuration,
-    setTargetDuration,
+    deadline,
+    setDeadline,
     goalTitle,
     selectedFriends,
   } = usePocketStore();
@@ -42,10 +42,17 @@ export default function Details() {
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [isBalanceInvalid, setBalanceIsInvalid] = useState(false);
   const [isDateInvalid, setDateIsInvalid] = useState(false);
-  const [open, setOpen] = useState(false);
 
-  const [balanceTouched, setBalanceTouched] = useState(false);
+  const [open, setOpen] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
+  const [balanceTouched, setBalanceTouched] = useState(false);
+
+  const [errors, setErrors] = useState({});
+  const [pickerMode, setPickerMode] = useState("date");
+  const [displayDate, setDisplayDate] = useState(new Date());
+  const [tempSelectedDay, setTempSelectedDay] = useState(null);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const goals =
     pocketType === "Business Fund"
@@ -60,6 +67,10 @@ export default function Details() {
   const remainingCount = extraAvatars.length;
 
   const handleOpenDatePicker = () => {
+    const initialDate = deadline || new Date();
+    setDisplayDate(initialDate);
+    setTempSelectedDay(deadline ? deadline.getDate() : null);
+    setPickerMode("date");
     setOpen(true);
     setDateTouched(true);
   };
@@ -68,13 +79,23 @@ export default function Details() {
     setOpen(false);
   }, []);
 
-  const onConfirm = useCallback(
-    ({ startDate, endDate }) => {
-      setOpen(false);
-      setTargetDuration({ startDate, endDate });
-    },
-    [setTargetDuration],
-  );
+  const onConfirm = () => {
+    if (tempSelectedDay) {
+      const newSelectedDate = new Date(
+        displayDate.getFullYear(),
+        displayDate.getMonth(),
+        tempSelectedDay,
+      );
+      setDeadline(newSelectedDate);
+      if (errors.tanggal) {
+        setErrors((prevErrors) => ({ ...prevErrors, tanggal: null }));
+      }
+    }
+    onDismiss();
+  };
+
+  const handleDaySelect = (day) => setTempSelectedDay(day);
+  const onReset = () => setTempSelectedDay(null);
 
   const validateForm = () => {
     // Name: required, max 20 chars, not only whitespace
@@ -92,8 +113,8 @@ export default function Details() {
         pocketBalanceTarget < 10000 ||
         !Number.isInteger(pocketBalanceTarget);
 
-      // Duration: required, both start and end date
-      const dateInvalid = !targetDuration.startDate || !targetDuration.endDate;
+      // The deadline is required for Saving type
+      const dateInvalid = !deadline;
 
       setBalanceIsInvalid(balanceInvalid);
       setDateIsInvalid(dateInvalid);
@@ -132,9 +153,9 @@ export default function Details() {
 
   useEffect(() => {
     if (dateTouched) {
-      setDateIsInvalid(!targetDuration.startDate || !targetDuration.endDate);
+      setDateIsInvalid(!deadline);
     }
-  }, [targetDuration, dateTouched]);
+  }, [deadline, dateTouched]);
 
   return (
     <Box className="flex-1 bg-white">
@@ -154,7 +175,7 @@ export default function Details() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={50}
+        keyboardVerticalOffset={90}
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -174,18 +195,24 @@ export default function Details() {
                 pocketType={pocketType}
                 pocketBalanceTarget={pocketBalanceTarget}
                 setPocketBalanceTarget={(value) => {
-                  setBalanceTouched(true); // Mark as touched on first change
+                  setBalanceTouched(true);
                   setPocketBalanceTarget(value);
                 }}
                 isBalanceInvalid={isBalanceInvalid}
-                targetDuration={targetDuration}
-                setTargetDuration={setTargetDuration}
+                deadline={deadline}
                 isDateInvalid={isDateInvalid}
                 open={open}
-                setOpen={setOpen}
                 handleOpenDatePicker={handleOpenDatePicker}
                 onDismiss={onDismiss}
                 onConfirm={onConfirm}
+                onReset={onReset}
+                displayDate={displayDate}
+                setDisplayDate={setDisplayDate}
+                tempSelectedDay={tempSelectedDay}
+                handleDaySelect={handleDaySelect}
+                pickerMode={pickerMode}
+                setPickerMode={setPickerMode}
+                today={today}
               />
 
               <Pressable
@@ -210,7 +237,7 @@ export default function Details() {
                               }
                             >
                               <AvatarFallbackText className="text-[#58ABA1]">
-                                {friend}
+                                {friend.name}
                               </AvatarFallbackText>
                             </Avatar>
                           );
@@ -245,7 +272,8 @@ export default function Details() {
                     pocketName.length > 20 ||
                     pocketBalanceTarget === null ||
                     targetDuration.startDate === null ||
-                    targetDuration.endDate === null
+                    targetDuration.endDate === null ||
+                    deadline === null
                   : pocketName.length === 0 || pocketName.length > 20
               }
             />

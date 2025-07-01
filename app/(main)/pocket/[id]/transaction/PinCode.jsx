@@ -73,7 +73,13 @@ export default function PinCode() {
 
         // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
         if (result) {
-          router.push(`/(main)/pocket/${id}/transaction/Statement`);
+          router.push({
+            pathname: "/(main)/pocket/[id]/transaction/Statement",
+            params: {
+              id,
+              isSchedule,
+            },
+          });
         } else {
           // This case might occur if the API returns success but no data
           alert(`Transaction Failed: Could not retrieve transaction details.`);

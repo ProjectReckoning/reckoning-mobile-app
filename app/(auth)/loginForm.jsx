@@ -6,19 +6,19 @@ import {
   FormControlErrorIcon,
   FormControlLabel,
   FormControlLabelText,
-  FormControlHelper, // Keeping if you have helper texts, otherwise can remove
-  FormControlHelperText, // Keeping if you have helper texts, otherwise can remove
 } from "@/components/ui/form-control";
-// Import InputSlot along with Input and InputField
+
+import { Eye, EyeOff } from "lucide-react-native";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { VStack } from "@/components/ui/vstack";
 import { AlertCircleIcon } from "@/components/ui/icon";
 import { Box } from "@/components/ui/box";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import api from "@/lib/api";
@@ -60,6 +60,7 @@ const containsSpecialCharacters = (str) => {
 
 export default function LoginFormScreen() {
   const insets = useSafeAreaInsets();
+  const [showPassword, setShowPassword] = useState(false);
   const [phoneNumberValue, setPhoneNumberValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -164,100 +165,130 @@ export default function LoginFormScreen() {
   return (
     <>
       <Box
-        className="w-full h-full items-center bg-white"
+        className="w-full h-full bg-white"
         style={{
           paddingBottom: insets.bottom,
         }}
       >
-        <VStack className="w-full flex-1 justify-between">
-          <VStack className="rounded-md mx-8">
-            <FormControl
-              isInvalid={!!phoneNumberError || !!passwordError || !!loginError}
-              size="md"
-              isDisabled={false}
-              isReadOnly={false}
-              isRequired={false}
-            >
-              {/* Phone number form */}
-              <FormControlLabel>
-                <FormControlLabelText>
-                  Masukkan nomor telepon kamu
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input className="my-1">
-                {/* InputSlot for the "+62" prefix */}
-                <InputSlot pl="$3">
-                  <Text className="text-gray-500 font-bold">+62 </Text>
-                </InputSlot>
-                <InputField
-                  type="text"
-                  // Placeholder now only for the digits after +62
-                  placeholder="87xxxx-xxxx-xxxx"
-                  value={phoneNumberValue} // This state only holds the numbers user types
-                  onChangeText={(text) => {
-                    // Only allow digits for phoneNumberValue state
-                    setPhoneNumberValue(text.replace(/\D/g, ""));
-                    setPhoneNumberError(""); // Clear error on change
-                    setLoginError(""); // Clear general login error on change
-                  }}
-                  keyboardType="phone-pad"
-                />
-              </Input>
-              {phoneNumberError ? (
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {phoneNumberError}
-                  </FormControlErrorText>
-                </FormControlError>
-              ) : null}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={90}
+          style={{ flex: 1 }}
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
+            <VStack className="w-full h-full flex-1 justify-between">
+              <VStack className="rounded-md mx-8 my-5">
+                <FormControl
+                  isInvalid={
+                    !!phoneNumberError || !!passwordError || !!loginError
+                  }
+                  size="md"
+                  isDisabled={false}
+                  isReadOnly={false}
+                  isRequired={false}
+                >
+                  {/* Phone number form */}
+                  <FormControlLabel>
+                    <FormControlLabelText className="font-light">
+                      Masukkan nomor telepon kamu
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-14 pl-3 my-1 rounded-xl border-gray-300 data-[focus=true]:border-green-select">
+                    {/* InputSlot for the "+62" prefix */}
+                    <InputSlot pl="$3">
+                      <Text className="text-gray-500 font-normal -mr-1">
+                        +62
+                      </Text>
+                    </InputSlot>
+                    <InputField
+                      type="text"
+                      // Placeholder now only for the digits after +62
+                      placeholder="87xxxx-xxxx-xxxx"
+                      value={phoneNumberValue} // This state only holds the numbers user types
+                      onChangeText={(text) => {
+                        // Only allow digits for phoneNumberValue state
+                        setPhoneNumberValue(text.replace(/\D/g, ""));
+                        setPhoneNumberError(""); // Clear error on change
+                        setLoginError(""); // Clear general login error on change
+                      }}
+                      keyboardType="phone-pad"
+                    />
+                  </Input>
+                  {phoneNumberError ? (
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {phoneNumberError}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  ) : null}
 
-              {/* Password form */}
-              <FormControlLabel>
-                <FormControlLabelText>Masukkan password</FormControlLabelText>
-              </FormControlLabel>
-              <Input className="my-1">
-                <InputField
-                  type="password"
-                  placeholder="password"
-                  value={passwordValue}
-                  onChangeText={(text) => {
-                    setPasswordValue(text);
-                    setPasswordError(""); // Clear error on change
-                    setLoginError(""); // Clear general login error on change
-                  }}
-                  secureTextEntry
-                />
-              </Input>
-              {passwordError ? ( // Display password-specific error
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>{passwordError}</FormControlErrorText>
-                </FormControlError>
-              ) : null}
+                  {/* Password form */}
+                  <FormControlLabel>
+                    <FormControlLabelText className="font-light mt-5">
+                      Masukkan password
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="h-14 my-1 p-1 pr-3 rounded-xl border-gray-300 data-[focus=true]:border-green-select">
+                    <InputField
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={passwordValue}
+                      onChangeText={(text) => {
+                        setPasswordValue(text);
+                        setPasswordError(""); // Clear error on change
+                        setLoginError(""); // Clear general login error on change
+                      }}
+                      secureTextEntry={!showPassword}
+                    />
+                    <InputSlot pr="$3">
+                      <Pressable
+                        onPress={() => setShowPassword((prev) => !prev)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} color="#848688" />
+                        ) : (
+                          <Eye size={20} color="#848688" />
+                        )}
+                      </Pressable>
+                    </InputSlot>
+                  </Input>
+                  {passwordError ? ( // Display password-specific error
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        {passwordError}
+                      </FormControlErrorText>
+                    </FormControlError>
+                  ) : null}
 
-              {/* General login error message */}
-              {loginError ? (
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>{loginError}</FormControlErrorText>
-                </FormControlError>
-              ) : null}
-            </FormControl>
-          </VStack>
-          <VStack className="mx-8 mb-6 items-center">
-            <PrimaryButton
-              buttonAction={handleSubmit}
-              buttonTitle={loading ? "Logging In..." : "Login"}
-              disabled={loading}
-            />
-            <Pressable>
-              <Text className="text-orange-wondr font-bold underline underline-offset-1 py-4">
-                Lupa password
-              </Text>
-            </Pressable>
-          </VStack>
-        </VStack>
+                  {/* General login error message */}
+                  {loginError ? (
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>{loginError}</FormControlErrorText>
+                    </FormControlError>
+                  ) : null}
+                </FormControl>
+              </VStack>
+              <VStack className="mx-8 mb-6 items-center">
+                <PrimaryButton
+                  buttonAction={handleSubmit}
+                  buttonTitle={loading ? "Logging In..." : "Login"}
+                  disabled={loading}
+                />
+                <Pressable>
+                  <Text className="text-orange-wondr font-bold underline underline-offset-1 py-4">
+                    Lupa password
+                  </Text>
+                </Pressable>
+              </VStack>
+            </VStack>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </Box>
     </>
   );
