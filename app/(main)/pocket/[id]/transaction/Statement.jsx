@@ -7,7 +7,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
 import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView } from "react-native";
+import { ScrollView, StyleSheet, Platform } from "react-native";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 import {
@@ -95,14 +95,14 @@ export default function Statement() {
   };
 
   return (
-    <Box className="w-full flex-1 flex-col bg-white justify-between items-center px-6 py-5 mb-3">
+    <Box className="w-full flex-1 flex-col bg-white justify-between items-center">
       <ScrollView
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{
           paddingRight: 10,
           justifyContent: "space-between",
         }}
-        style={{ marginRight: -10 }}
+        style={{ marginRight: -10, paddingHorizontal: 24, paddingTop: 20 }}
       >
         <VStack className="my-5">
           <Image
@@ -160,12 +160,33 @@ export default function Statement() {
           </VStack>
         </VStack>
       </ScrollView>
-
-      <PrimaryButton
-        buttonTitle="Kembali ke beranda"
-        buttonAction={handleFinish}
-        className="my-3"
-      />
+      <Box className="w-full px-6 py-4 bg-white" style={styles.shadowAbove}>
+        <PrimaryButton
+          buttonTitle="Kembali ke beranda"
+          buttonAction={handleFinish}
+        />
+      </Box>
     </Box>
   );
 }
+
+const styles = StyleSheet.create({
+  shadowAbove: {
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: -5,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        borderTopWidth: 1,
+        borderTopColor: "rgba(0,0,0,0.1)",
+        elevation: 3,
+      },
+    }),
+  },
+});

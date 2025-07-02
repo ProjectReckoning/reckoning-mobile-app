@@ -26,13 +26,13 @@ export default function MemberDetail() {
   };
 
   return (
-    <Box className="mb-4">
-      <AppText variant="pageTitle" className="mb-2">
+    <Box>
+      <AppText variant="title" className="mb-4">
         Member Detail
       </AppText>
       <Pressable
         onPress={handleInvitePress}
-        className="flex flex-row gap-5 items-center mb-6 active:bg-gray-100 rounded-xl"
+        className="flex flex-row gap-5 items-center active:bg-gray-100 rounded-xl"
       >
         <Box className="flex-row gap-2 items-center">
           <Box className="rounded-xl border-2 border-light-gray-wondr w-16 h-16 justify-center items-center">
