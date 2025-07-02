@@ -6,6 +6,7 @@ import PocketDetail from "@/components/feature/pocketDashboard/common/informatio
 import OwnerDetail from "@/components/feature/pocketDashboard/common/information/OwnerDetail";
 import MemberDetail from "@/components/feature/pocketDashboard/common/information/MemberDetail";
 import MemberDetailList from "@/components/feature/pocketDashboard/common/information/MemberDetailList";
+import { ScrollView } from "react-native";
 
 /**
  * Renders the 'Info' tab, displaying details about the pocket,
@@ -21,17 +22,16 @@ export default function SpendingInfoScreen() {
   return (
     <Box className="flex-1 bg-white">
       {/* --- Static Header Content --- */}
-      <PocketDetail />
-      <OwnerDetail />
-      <MemberDetail />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <PocketDetail />
+        <OwnerDetail />
+        <MemberDetail />
 
-      {/* --- Scrollable List Section --- */}
-      <Box className="flex-1 mt-4">
-        <AppText variant="pageTitle" className="mb-4">
-          Member List
-        </AppText>
-        <MemberDetailList />
-      </Box>
+        {/* --- Scrollable List Section --- */}
+        <Box className="flex-1 mt-4">
+          <MemberDetailList />
+        </Box>
+      </ScrollView>
     </Box>
   );
 }

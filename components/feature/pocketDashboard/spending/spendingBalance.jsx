@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, ScrollView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
 import AccountNumber from "@/components/feature/pocketDashboard/common/balance/AccountNumber";
@@ -30,29 +30,31 @@ export default function SpendingBalanceScreen() {
   return (
     <Box className="flex-1 bg-white">
       {/* --- Static Header Content --- */}
-      <AccountNumber />
-      <PaymentDateInfo />
-      <Box
-        className="items-center"
-        style={{ marginTop: -overlapAmount, zIndex: 1 }}
-      >
-        <PressableCircle
-          calculatedCircleDimension={calculatedCircleDimension}
-          pocketType={currentPocket.type}
-          currentBalance={currentPocket.current_balance}
-        />
-      </Box>
-      <TransactionButtonGroup />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <AccountNumber />
+        <PaymentDateInfo />
+        <Box
+          className="items-center"
+          style={{ marginTop: -overlapAmount, zIndex: 1 }}
+        >
+          <PressableCircle
+            calculatedCircleDimension={calculatedCircleDimension}
+            pocketType={currentPocket.type}
+            currentBalance={currentPocket.current_balance}
+          />
+        </Box>
+        <TransactionButtonGroup />
 
-      <SharedPocketButtonGroup />
+        <SharedPocketButtonGroup />
 
-      {/* --- Scrollable List Section --- */}
-      <Box className="flex-1 mt-4">
-        <AppText variant="pageTitle" className="mb-4">
-          Target Detail
-        </AppText>
-        <BalanceMemberList />
-      </Box>
+        {/* --- Scrollable List Section --- */}
+        <Box className="flex-1 mt-4">
+          <AppText variant="pageTitle" className="mb-4">
+            Target Detail
+          </AppText>
+          <BalanceMemberList />
+        </Box>
+      </ScrollView>
     </Box>
   );
 }

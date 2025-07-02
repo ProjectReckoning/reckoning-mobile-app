@@ -1,16 +1,27 @@
+// components/common/tableCells/BalanceMemberListCell.jsx
 import React from "react";
 import { View } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Avatar } from "@/components/ui/avatar";
 import * as Progress from "react-native-progress";
-import { WondrColors, COLOR_PALETTE } from "@/utils/colorUtils";
+import { WondrColors } from "@/utils/colorUtils";
 import { formatCurrency } from "@/utils/helperFunction";
 import AppText from "@/components/common/typography/AppText";
+
+// Definisikan roleStyles di sini agar komponen mandiri
+// Pastikan nama warna (e.g., "tosca-wondr") ada di WondrColors Anda
+const roleStyles = {
+  admin: { color: WondrColors["tosca-wondr"] },
+  member: { color: WondrColors["lime-wondr"] },
+  spender: { color: WondrColors["purple-wondr"] },
+  viewer: { color: WondrColors["pink-wondr"] },
+  // Fallback jika role tidak terdefinisi
+  default: { color: WondrColors["light-gray-wondr"] },
+};
 
 const getConsistentInitials = (name) => {
   if (!name) return "";
   const words = name.split(" ").filter(Boolean);
-
   if (words.length > 1) {
     return (
       words[0].charAt(0).toUpperCase() +
@@ -26,20 +37,20 @@ export default function BalanceMemberListCell({
   name,
   currentAmount,
   targetAmount,
-  index,
+  role, // Prop 'role' diterima di sini
 }) {
-  // --- CHANGE: Calculate the raw progress first ---
   const rawProgress =
     targetAmount > 0 ? Number(currentAmount) / Number(targetAmount) : 0;
-
-  // --- CHANGE: Clamp the visual progress to a maximum of 1 (100%) ---
   const visualProgress = Math.min(1, rawProgress);
-
-  // The percentage is now calculated from the capped visual progress
   const percentage = (visualProgress * 100).toFixed(0);
 
   const displayInitials = getConsistentInitials(name);
-  const selectedColor = COLOR_PALETTE[index % COLOR_PALETTE.length];
+
+  // --- LOGIKA WARNA BERDASARKAN ROLE ---
+  // Gunakan role yang diterima untuk memilih style, dengan fallback ke 'default'
+  const selectedStyle = roleStyles[role] || roleStyles.default;
+  const selectedColor = selectedStyle.color;
+
   const avatarBgColor = WondrColors["light-gray-wondr"];
   const avatarTextColor = WondrColors["tosca-wondr"];
 
@@ -62,7 +73,7 @@ export default function BalanceMemberListCell({
           </AppText>
           <Box
             style={{
-              backgroundColor: selectedColor,
+              backgroundColor: selectedColor, // Warna dari role
               borderRadius: 15,
               paddingVertical: 4,
               paddingHorizontal: 8,
@@ -71,18 +82,16 @@ export default function BalanceMemberListCell({
             }}
           >
             <AppText variant="caption" className="font-bold text-white">
-              {/* This will now be capped at 100% */}
               {percentage}%
             </AppText>
           </Box>
         </Box>
 
         <Progress.Bar
-          // Use the capped visual progress for the progress bar
           progress={visualProgress}
           width={null}
           height={8}
-          color={selectedColor}
+          color={selectedColor} // Warna dari role
           unfilledColor={WondrColors["light-gray-wondr"]}
           borderWidth={0}
           borderRadius={4}
@@ -90,7 +99,6 @@ export default function BalanceMemberListCell({
         />
 
         <AppText variant="caption">
-          {/* The raw amounts are still displayed correctly */}
           {formatCurrency(currentAmount)} / {formatCurrency(targetAmount)}
         </AppText>
       </View>
