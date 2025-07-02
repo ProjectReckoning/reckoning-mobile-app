@@ -1,51 +1,59 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { Box } from "@/components/ui/box";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, ActivityIndicator } from "react-native";
 
-import { router } from "expo-router";
-import {
-  notificationData,
-  getUnreadCount,
-} from "@/utils/notification/notification";
+import { router, useFocusEffect } from "expo-router";
 import { useNotificationStore } from "@/stores/notificationStore";
 import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
 import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
+import { WondrColors } from "@/utils/colorUtils";
 
 export default function NotificationList() {
   const {
-    setSelectedNotification,
+    notifications,
+    isLoading,
+    error,
+    fetchAllNotifications,
     readIds,
     markAsRead,
     loadReadIds,
-    resetReadIds,
   } = useNotificationStore();
-  const unreadCount = getUnreadCount(readIds, notificationData);
 
-  // for testing purposes only
-  // useEffect(() => {
-  //   resetReadIds();
-  // }, []);
+  // Fetch notifications every time the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllNotifications();
+    }, [fetchAllNotifications]),
+  );
 
-  const handleNotificationPress = (id, type) => {
-    markAsRead(id);
-    setSelectedNotification(id);
+  // Load read status from local storage once on initial mount
+  useEffect(() => {
+    loadReadIds();
+  }, [loadReadIds]);
 
-    if (type !== "information") {
-      router.push(`/home/notification/${id}`);
+  // Calculate unread count dynamically from the fetched notifications
+  const unreadCount = useMemo(() => {
+    if (!notifications) return 0;
+    return notifications.filter((item) => !readIds.includes(item._id)).length;
+  }, [notifications, readIds]);
+
+  const handleNotificationPress = (notifId, notifType) => {
+    markAsRead(notifId);
+    // The detail screen will fetch its own data using the ID
+    // Do not navigate for purely informational notifications
+    if (notifType !== "information") {
+      router.push(`/home/notification/${notifId}`);
     }
   };
 
-  useEffect(() => {
-    loadReadIds();
-  }, []);
-
   const renderNotificationItem = ({ item }) => {
+    // Default icon, can be made dynamic later if needed
     const IconComponent = personalIconMap.pocket;
     const notificationIcon = (
       <IconComponent width="40%" height="40%" color="#848688" />
     );
 
-    const notificationId = item.data._id;
+    const notificationId = item._id; // Use the top-level _id from the API response
     const notificationType = item.data.type;
     const isRead = readIds.includes(notificationId);
     const formattedDate = new Date(item.data.date).toLocaleDateString("id-ID", {
@@ -68,10 +76,8 @@ export default function NotificationList() {
     );
   };
 
-  // separator or spacing between items
   const renderSeparator = () => <Box className="h-5" />;
 
-  // Header for the notification list
   const renderListHeader = () => (
     <View className="flex flex-row gap-3 mb-7 pb-3 items-center border-b border-gray-300">
       <Text className="text-lg font-bold text-black">Pesan lainnya</Text>
@@ -81,19 +87,46 @@ export default function NotificationList() {
     </View>
   );
 
-  return (
-    <FlatList
-      data={notificationData}
-      renderItem={renderNotificationItem}
-      keyExtractor={(item) => item.data._id}
-      className="flex-1 bg-white text-black"
-      ItemSeparatorComponent={renderSeparator}
-      ListHeaderComponent={renderListHeader}
-      contentContainerStyle={{
-        paddingHorizontal: 24,
-        paddingVertical: 16,
-      }}
-      extraData={readIds}
-    />
-  );
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <Box className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color={WondrColors["tosca-wondr"]} />
+        </Box>
+      );
+    }
+    if (error) {
+      return (
+        <Box className="flex-1 justify-center items-center p-4">
+          <Text className="text-center text-red-500">
+            Error fetching notifications: {error}
+          </Text>
+        </Box>
+      );
+    }
+    if (notifications.length === 0) {
+      return (
+        <Box className="flex-1 justify-center items-center p-4">
+          <Text className="text-center">Tidak ada notifikasi.</Text>
+        </Box>
+      );
+    }
+    return (
+      <FlatList
+        data={notifications}
+        renderItem={renderNotificationItem}
+        keyExtractor={(item) => item._id} // Use the correct top-level _id
+        className="flex-1 bg-white text-black"
+        ItemSeparatorComponent={renderSeparator}
+        ListHeaderComponent={renderListHeader}
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingVertical: 16,
+        }}
+        extraData={readIds} // Re-render list when readIds changes
+      />
+    );
+  };
+
+  return <Box className="flex-1 bg-white">{renderContent()}</Box>;
 }
