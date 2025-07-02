@@ -25,7 +25,7 @@ export default function OwnerDetail() {
 
   return (
     <Box className="mb-4">
-      <AppText variant="pageTitle" className="mb-2">
+      <AppText variant="title" className="mb-4">
         Owner
       </AppText>
       <InfoMemberDetailCell member={ownerData} />

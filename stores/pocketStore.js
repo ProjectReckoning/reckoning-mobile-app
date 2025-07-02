@@ -506,10 +506,12 @@ export const usePocketStore = create((set, get) => ({
     set({ isMemberActionLoading: true, memberActionError: null });
     const membersToInvite = friends.map((friend) => ({
       user_id: friend.id,
-      role: "viewer",
+      role: "viewer", // Role is set to viewer as instructed
     }));
+
+    // --- CHANGE: The key is now "pocketId" as per the new API spec ---
     const requestBody = {
-      pocket_id: parseInt(pocketId, 10),
+      pocketId: parseInt(pocketId, 10),
       members: membersToInvite,
     };
 

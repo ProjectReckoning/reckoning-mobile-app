@@ -1,9 +1,7 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -16,16 +14,70 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { ChevronRight, Calendar, Info } from "lucide-react-native";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { WondrColors } from "@/utils/colorUtils"; // Pastikan path ini benar
-import CustomMonthPicker from "@/components/common/CustomMonthPicker"; // Pastikan path ini benar
+import { WondrColors } from "@/utils/colorUtils";
+import CustomMonthPicker from "@/components/common/CustomMonthPicker";
+
+// --- Isolated Date Picker Component ---
+// By moving the Actionsheet and Picker into their own component, we isolate its state.
+// Now, only this small component will re-render when scrolling, not the entire screen.
+const DatePickerActionsheet = ({
+  isVisible,
+  onClose,
+  onConfirm,
+  initialDate,
+}) => {
+  const [currentDate, setCurrentDate] = useState(initialDate);
+  const dateOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  // This effect syncs the picker's internal state with the global state
+  // only when the actionsheet is opened.
+  useEffect(() => {
+    if (isVisible) {
+      setCurrentDate(initialDate);
+    }
+  }, [isVisible, initialDate]);
+
+  const handleConfirmPress = () => {
+    onConfirm(currentDate);
+    onClose(); // Close the sheet after confirming.
+  };
+
+  return (
+    <Actionsheet isOpen={isVisible} onClose={onClose} zIndex={999}>
+      <ActionsheetBackdrop />
+      <ActionsheetContent zIndex={999}>
+        <ActionsheetDragIndicatorWrapper>
+          <ActionsheetDragIndicator />
+        </ActionsheetDragIndicatorWrapper>
+        <Box className="w-full flex-row justify-between items-center px-4 pb-2">
+          <Text className="font-bold text-lg text-black">Pilih tanggal</Text>
+        </Box>
+        <Picker
+          selectedValue={currentDate}
+          onValueChange={(itemValue) => setCurrentDate(itemValue)}
+          style={{ width: "100%", height: 215 }}
+          itemStyle={{ height: 215 }}
+        >
+          {dateOptions.map((day) => (
+            <Picker.Item key={day} label={String(day)} value={day} />
+          ))}
+        </Picker>
+        <Box className="w-full px-4 pt-2 pb-6">
+          <PrimaryButton
+            buttonAction={handleConfirmPress}
+            buttonTitle="Simpan"
+            textClassName="text-black text-base text-center font-bold"
+          />
+        </Box>
+      </ActionsheetContent>
+    </Actionsheet>
+  );
+};
 
 export default function ScheduleTransferContent() {
   const { id } = useLocalSearchParams();
 
-  // State untuk pemilih TANGGAL
-  const [isPickerVisible, setPickerVisible] = useState(false);
-  const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
-  const [activePicker, setActivePicker] = useState(null); // 'start' atau 'end'
+  // State from Zustand store
   const {
     selectedDate,
     selectedStartDate,
@@ -35,10 +87,16 @@ export default function ScheduleTransferContent() {
     setSelectedEndDate,
   } = useTransactionStore();
 
-  // Fungsi untuk memformat tanggal ke "Bln YYYY", contoh: "Ags 2025"
+  // State for month picker visibility and type ('start' or 'end')
+  const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
+  const [activePicker, setActivePicker] = useState(null);
+
+  // State for date picker visibility
+  const [isPickerVisible, setPickerVisible] = useState(false);
+
+  // --- Date Formatting ---
   const formatMonthYear = (date) => {
     if (!date) return null;
-
     const monthNames = [
       "Jan",
       "Feb",
@@ -53,24 +111,29 @@ export default function ScheduleTransferContent() {
       "Nov",
       "Des",
     ];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${month} ${year}`;
+    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  // Fungsi untuk membuka pemilih bulan
+  // --- Date Picker Logic (Simplified) ---
+  const handleOpenDatePicker = () => setPickerVisible(true);
+  const handleCloseDatePicker = () => setPickerVisible(false);
+
+  const handleConfirmDate = (newDate) => {
+    setSelectedDate(newDate);
+    // Closing is handled by the DatePickerActionsheet component itself
+  };
+
+  // --- Month Picker Logic ---
   const handleOpenMonthPicker = (type) => {
     setActivePicker(type);
     setMonthPickerVisible(true);
   };
 
-  // Fungsi untuk menutup pemilih bulan
   const handleCloseMonthPicker = () => {
     setMonthPickerVisible(false);
     setActivePicker(null);
   };
 
-  // Fungsi untuk mengonfirmasi pilihan bulan.
   const handleConfirmMonth = (newDate) => {
     if (activePicker === "start") {
       setSelectedStartDate(newDate);
@@ -80,22 +143,13 @@ export default function ScheduleTransferContent() {
     handleCloseMonthPicker();
   };
 
-  // Fungsi untuk mendapatkan tanggal awal untuk picker
   const getInitialDateForPicker = () => {
-    if (activePicker === "start" && selectedStartDate) {
-      return selectedStartDate;
-    }
-    if (activePicker === "end" && selectedEndDate) {
-      return selectedEndDate;
-    }
-    return new Date(); // Default ke tanggal hari ini
+    if (activePicker === "start" && selectedStartDate) return selectedStartDate;
+    if (activePicker === "end" && selectedEndDate) return selectedEndDate;
+    return new Date();
   };
 
-  // Logika untuk pemilih TANGGAL
-  const handleOpenPicker = () => setPickerVisible(true);
-  const handleClosePicker = () => setPickerVisible(false);
-  const dateOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-
+  // --- Navigation ---
   const handleNext = () => {
     if (id) {
       router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
@@ -106,8 +160,8 @@ export default function ScheduleTransferContent() {
     <>
       <Box className="flex-1 justify-between py-6 px-8 bg-white" gap={25}>
         <Box className="flex-1 gap-4">
-          {/* Komponen pemilih tanggal */}
-          <Pressable onPress={handleOpenPicker}>
+          {/* Date Picker Component */}
+          <Pressable onPress={handleOpenDatePicker}>
             <Box className="flex-row justify-between items-center border p-4 rounded-xl border-gray-wondr-border">
               <Text className="text-black text-base">
                 {selectedDate ? `Setiap tanggal ${selectedDate}` : "Tanggal"}
@@ -116,7 +170,7 @@ export default function ScheduleTransferContent() {
             </Box>
           </Pressable>
 
-          {/* Pemilih Bulan Mulai dan Selesai */}
+          {/* Start and End Month Pickers */}
           <Box className="flex-row justify-between">
             <Pressable
               onPress={() => handleOpenMonthPicker("start")}
@@ -235,7 +289,7 @@ export default function ScheduleTransferContent() {
         </Box>
       </Box>
 
-      {/* Area Tombol Lanjut */}
+      {/* Continue Button Area */}
       <Box className="px-8 py-4 gap-4 bg-white">
         <PrimaryButton
           buttonAction={handleNext}
@@ -245,41 +299,15 @@ export default function ScheduleTransferContent() {
         />
       </Box>
 
-      {/* Actionsheet untuk pemilih TANGGAL */}
-      <Actionsheet
-        isOpen={isPickerVisible}
-        onClose={handleClosePicker}
-        zIndex={999}
-      >
-        <ActionsheetBackdrop />
-        <ActionsheetContent zIndex={999}>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          <Box className="w-full flex-row justify-between items-center px-4 pb-2">
-            <Text className="font-bold text-lg text-black">Pilih tanggal</Text>
-          </Box>
-          <Picker
-            selectedValue={selectedDate || 1}
-            onValueChange={(itemValue) => setSelectedDate(itemValue)}
-            style={{ width: "100%", height: 215 }}
-            itemStyle={{ height: 215 }}
-          >
-            {dateOptions.map((day) => (
-              <Picker.Item key={day} label={String(day)} value={day} />
-            ))}
-          </Picker>
-          <Box className="w-full px-4 pt-2 pb-6">
-            <PrimaryButton
-              buttonAction={handleClosePicker}
-              buttonTitle="Simpan"
-              textClassName="text-black text-base text-center font-bold"
-            />
-          </Box>
-        </ActionsheetContent>
-      </Actionsheet>
+      {/* Actionsheet for DATE picker is now the new component */}
+      <DatePickerActionsheet
+        isVisible={isPickerVisible}
+        onClose={handleCloseDatePicker}
+        onConfirm={handleConfirmDate}
+        initialDate={selectedDate || 1}
+      />
 
-      {/* Actionsheet untuk pemilih BULAN & TAHUN */}
+      {/* Actionsheet for MONTH & YEAR picker */}
       <CustomMonthPicker
         isVisible={isMonthPickerVisible}
         onClose={handleCloseMonthPicker}

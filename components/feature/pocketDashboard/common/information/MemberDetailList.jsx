@@ -16,18 +16,38 @@ export default function MemberDetailList() {
   const members = usePocketStore((state) => state.currentPocket?.members);
   const pocketType = usePocketStore((state) => state.currentPocket?.type);
 
-  // --- FIX: State to control the actionsheet and selected member ---
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
 
   const processedMembers = useMemo(() => {
     if (!Array.isArray(members)) return [];
-    return members.filter(
-      (item) => item.PocketMember?.role?.toLowerCase() !== "owner",
-    );
-  }, [members]);
 
-  // --- FIX: Handler to open the actionsheet with the correct member data ---
+    // --- PENYESUAIAN DIMULAI DI SINI ---
+
+    return members
+      .filter((item) => item.PocketMember?.role?.toLowerCase() !== "owner")
+      .map((member) => {
+        // Jika pocketType adalah "Business" dan role adalah "Spender", ubah menjadi "Member"
+        if (
+          pocketType === "Business" &&
+          member.PocketMember?.role?.toLowerCase() === "spender"
+        ) {
+          // Buat salinan member untuk menjaga immutability (tidak mengubah state asli)
+          return {
+            ...member,
+            PocketMember: {
+              ...member.PocketMember,
+              role: "member", // Ganti role menjadi "Member"
+            },
+          };
+        }
+        // Jika tidak, kembalikan data member seperti aslinya
+        return member;
+      });
+
+    // --- PENYESUAIAN SELESAI ---
+  }, [members, pocketType]); // <-- Tambahkan pocketType sebagai dependency
+
   const handleManagePress = (member) => {
     setSelectedMember(member);
     setShowActionsheet(true);
@@ -41,7 +61,7 @@ export default function MemberDetailList() {
     <InfoMemberDetailCell
       member={item}
       index={index}
-      onManagePress={() => handleManagePress(item)} // Pass the handler to each cell
+      onManagePress={() => handleManagePress(item)}
     />
   );
 
@@ -67,7 +87,6 @@ export default function MemberDetailList() {
         }}
       />
 
-      {/* --- FIX: Render the actionsheet and pass it the required data --- */}
       {selectedMember && (
         <InfoBalanceContent
           isOpen={showActionsheet}

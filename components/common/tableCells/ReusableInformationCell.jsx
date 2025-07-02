@@ -23,7 +23,9 @@ export default function ReusableInformationCell({
   return (
     <Box gap={10}>
       <Text className="font-semibold text-black">{cellTitle}</Text>
-      <Box className={`border px-4 py-3 rounded-xl border-gray-wondr-border ${className}`}>
+      <Box
+        className={`border px-4 py-3 rounded-xl border-gray-wondr-border ${className}`}
+      >
         {value.map((item, index) => (
           <Text className={`${textClassName}`} numberOfLines={1} key={index}>
             {item}

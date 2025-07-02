@@ -28,9 +28,16 @@ export default function BalanceMemberListCell({
   targetAmount,
   index,
 }) {
-  const progress =
+  // --- CHANGE: Calculate the raw progress first ---
+  const rawProgress =
     targetAmount > 0 ? Number(currentAmount) / Number(targetAmount) : 0;
-  const percentage = (progress * 100).toFixed(0);
+
+  // --- CHANGE: Clamp the visual progress to a maximum of 1 (100%) ---
+  const visualProgress = Math.min(1, rawProgress);
+
+  // The percentage is now calculated from the capped visual progress
+  const percentage = (visualProgress * 100).toFixed(0);
+
   const displayInitials = getConsistentInitials(name);
   const selectedColor = COLOR_PALETTE[index % COLOR_PALETTE.length];
   const avatarBgColor = WondrColors["light-gray-wondr"];
@@ -64,13 +71,15 @@ export default function BalanceMemberListCell({
             }}
           >
             <AppText variant="caption" className="font-bold text-white">
+              {/* This will now be capped at 100% */}
               {percentage}%
             </AppText>
           </Box>
         </Box>
 
         <Progress.Bar
-          progress={progress}
+          // Use the capped visual progress for the progress bar
+          progress={visualProgress}
           width={null}
           height={8}
           color={selectedColor}
@@ -81,6 +90,7 @@ export default function BalanceMemberListCell({
         />
 
         <AppText variant="caption">
+          {/* The raw amounts are still displayed correctly */}
           {formatCurrency(currentAmount)} / {formatCurrency(targetAmount)}
         </AppText>
       </View>

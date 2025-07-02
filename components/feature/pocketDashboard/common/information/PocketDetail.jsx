@@ -36,10 +36,8 @@ export default function PocketDetail() {
     : "N/A";
 
   return (
-    <Box className="mb-4">
-      <AppText variant="pageTitle" className="mb-2">
-        Pocket Detail
-      </AppText>
+    <Box>
+      <AppText variant="title">Pocket Detail</AppText>
       <HStack
         className="rounded-2xl justify-center items-center"
         style={{

@@ -7,16 +7,16 @@ export const useFriendshipStore = create((set, get) => ({
   friends: [],
   isLoadingFriends: false,
   friendsError: null,
-  friendRequests: { sent: [], received: [] },
-  isLoadingRequests: false,
-  requestsError: null,
+
+  // State for the simplified "add friend" action
   isSendingRequest: false,
   sendRequestError: null,
-  isHandlingRequest: false,
-  handleRequestError: null,
 
   // --- Actions ---
 
+  /**
+   * Fetches the user's current list of friends.
+   */
   fetchAllFriends: async () => {
     console.log(
       "================================================================",
@@ -54,44 +54,12 @@ export const useFriendshipStore = create((set, get) => ({
     }
   },
 
-  fetchFriendRequests: async () => {
-    console.log(
-      "================================================================",
-    );
-    console.log("API Call: GET /friendship/request");
-    console.log(
-      "================================================================",
-    );
-    set({ isLoadingRequests: true, requestsError: null });
-    try {
-      const response = await api.get("/friendship/request");
-      console.log("Response Received:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.ok) {
-        set({
-          friendRequests: response.data.data || { sent: [], received: [] },
-          isLoadingRequests: false,
-        });
-      } else {
-        throw new Error(
-          response.data.message || "Failed to fetch friendship requests.",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      console.error("API Error:", errorMessage);
-      set({
-        requestsError: errorMessage,
-        isLoadingRequests: false,
-        friendRequests: { sent: [], received: [] },
-      });
-      throw error;
-    }
-  },
-
-  sendFriendRequest: async (userIds) => {
+  /**
+   * Sends a request to add new friends via their phone numbers.
+   * On success, it automatically re-fetches the main friends list.
+   * @param {string[]} phoneNumbers - An array of phone numbers to add.
+   */
+  sendFriendRequest: async (phoneNumbers) => {
     console.log(
       "================================================================",
     );
@@ -100,14 +68,15 @@ export const useFriendshipStore = create((set, get) => ({
       "================================================================",
     );
     set({ isSendingRequest: true, sendRequestError: null });
-    const requestBody = { user_ids: userIds };
+    const requestBody = { phone_numbers: phoneNumbers };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
       const response = await api.post("/friendship/request", requestBody);
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         set({ isSendingRequest: false });
-        get().fetchFriendRequests();
+        // --- On success, refresh the main friends list ---
+        get().fetchAllFriends();
         return response.data;
       } else {
         throw new Error(
@@ -128,57 +97,5 @@ export const useFriendshipStore = create((set, get) => ({
     }
   },
 
-  handleFriendRequest: async (requestId, action) => {
-    console.log(
-      "================================================================",
-    );
-    console.log(`API Call: PATCH /friendship/request/${requestId}`);
-    console.log(
-      "================================================================",
-    );
-    set({ isHandlingRequest: true, handleRequestError: null });
-    const requestBody = { action };
-    try {
-      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
-      const response = await api.patch(
-        `/friendship/request/${requestId}`,
-        requestBody,
-      );
-      console.log("Response Received:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.ok) {
-        set({ isHandlingRequest: false });
-        get()._removeReceivedRequest(requestId);
-        if (action === "accept") {
-          get().fetchAllFriends();
-        }
-        return response.data;
-      } else {
-        throw new Error(
-          response.data.message || "Failed to handle friendship request.",
-        );
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred.";
-      console.error("API Error:", errorMessage);
-      set({
-        handleRequestError: errorMessage,
-        isHandlingRequest: false,
-      });
-      throw error;
-    }
-  },
-
-  _removeReceivedRequest: (requestId) => {
-    set((state) => ({
-      friendRequests: {
-        ...state.friendRequests,
-        received: state.friendRequests.received.filter(
-          (req) => req.id !== requestId,
-        ),
-      },
-    }));
-  },
+  // --- Obsolete functions for handling requests have been removed ---
 }));
