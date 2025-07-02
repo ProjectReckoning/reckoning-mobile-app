@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { FlatList } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
 import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   HandCoins,
   BanknoteArrowUp,
@@ -120,18 +119,6 @@ const processTransactionsForDisplay = (transactions, activeType) => {
 export default function BalanceCategory() {
   const [activeTab, setActiveTab] = useState("pemasukan");
 
-  // --- Logika untuk Kontrol Gradasi ---
-  const [listDimensions, setListDimensions] = useState({
-    layoutHeight: 0,
-    contentHeight: 0,
-  });
-  const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
-
-  const isScrollable =
-    listDimensions.contentHeight > listDimensions.layoutHeight;
-  const showGradient = isScrollable && !isScrolledToEnd;
-  // ---
-
   const filteredTransactions = allTransactions.filter(
     (t) => t.type === activeTab,
   );
@@ -147,36 +134,7 @@ export default function BalanceCategory() {
 
   const handleTabChange = (newTabName) => {
     setActiveTab(newTabName);
-    setListDimensions({ layoutHeight: 0, contentHeight: 0 });
-    setIsScrolledToEnd(false);
   };
-
-  const handleScroll = useCallback((event) => {
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToEnd = 20;
-    const isEnd =
-      layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToEnd;
-    setIsScrolledToEnd(isEnd);
-  }, []);
-
-  const handleLayout = useCallback((event) => {
-    const layoutHeight = event.nativeEvent.layout.height;
-    setListDimensions((prev) => {
-      const contentHeight = prev.contentHeight;
-      setIsScrolledToEnd(contentHeight <= layoutHeight);
-      return { ...prev, layoutHeight };
-    });
-  }, []);
-
-  const handleContentSizeChange = useCallback((width, height) => {
-    const contentHeight = height;
-    setListDimensions((prev) => {
-      const layoutHeight = prev.layoutHeight;
-      setIsScrolledToEnd(contentHeight <= layoutHeight);
-      return { ...prev, contentHeight };
-    });
-  }, []);
 
   const renderTransactionItem = ({ item }) => {
     const categoryKey = item.category.toLowerCase();
@@ -243,9 +201,11 @@ export default function BalanceCategory() {
   );
 
   return (
-    <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border gap-5 flex-1">
+    // >>> PERUBAHAN DI SINI: `flex-1` dihapus agar tinggi container tidak meregang <<<
+    <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border gap-5">
       <ListHeader />
-      <Box className="flex-1">
+      {/* >>> PERUBAHAN DI SINI: `flex-1` pada Box pembungkus juga dihapus <<< */}
+      <Box>
         {displayData && displayData.length > 0 ? (
           <FlatList
             data={displayData}
@@ -253,35 +213,14 @@ export default function BalanceCategory() {
             keyExtractor={(item) => item.id.toString()}
             ItemSeparatorComponent={renderSeparator}
             showsVerticalScrollIndicator={false}
-            onLayout={handleLayout}
-            onContentSizeChange={handleContentSizeChange}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            contentContainerStyle={{ paddingBottom: 25 }}
+            scrollEnabled={false}
+            // `paddingBottom` di sini memberikan sedikit ruang di bawah item terakhir
+            contentContainerStyle={{ paddingBottom: 5 }}
           />
         ) : (
           <Text textAlign="center" py="$4">
             Tidak ada data untuk kategori ini.
           </Text>
-        )}
-
-        {showGradient && (
-          <LinearGradient
-            colors={[
-              "rgba(255, 255, 255, 0.0)",
-              "rgba(255, 255, 255, 0.7)",
-              "rgba(255, 255, 255, 1.0)",
-            ]}
-            locations={[0, 0.5, 1]}
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 50,
-              pointerEvents: "none",
-            }}
-          />
         )}
       </Box>
     </Box>

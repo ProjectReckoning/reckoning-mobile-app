@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, ScrollView } from "react-native";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
 import AccountNumber from "@/components/feature/pocketDashboard/common/balance/AccountNumber";
@@ -8,6 +8,7 @@ import PressableCircle from "@/components/feature/pocketDashboard/common/balance
 import TransactionButtonGroup from "@/components/feature/pocketDashboard/common/balance/TransactionButtonGroup";
 import AppText from "@/components/common/typography/AppText";
 import BalanceCategory from "@/components/feature/pocketDashboard/common/BalanceCategory";
+import { Scroll } from "lucide-react-native";
 
 /**
  * Renders the 'Balance' tab for a Business pocket, passing the correct
@@ -30,29 +31,31 @@ export default function BusinessBalanceScreen() {
   return (
     <Box className="flex-1 bg-white">
       {/* --- Static Header Content --- */}
-      <AccountNumber />
-      <BusinessDashboardButtonGroup />
-      <Box
-        className="items-center"
-        style={{ marginTop: -overlapAmount, zIndex: 1 }}
-      >
-        <PressableCircle
-          calculatedCircleDimension={calculatedCircleDimension}
-          pocketType={currentPocket.type}
-          currentBalance={currentPocket.current_balance}
-          income={summary?.pemasukan}
-          expense={summary?.pengeluaran}
-        />
-      </Box>
-      <TransactionButtonGroup />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <AccountNumber />
+        <BusinessDashboardButtonGroup />
+        <Box
+          className="items-center"
+          style={{ marginTop: -overlapAmount, zIndex: 1 }}
+        >
+          <PressableCircle
+            calculatedCircleDimension={calculatedCircleDimension}
+            pocketType={currentPocket.type}
+            currentBalance={currentPocket.current_balance}
+            income={summary?.pemasukan}
+            expense={summary?.pengeluaran}
+          />
+        </Box>
+        <TransactionButtonGroup />
 
-      {/* --- Scrollable List Section --- */}
-      <Box className="flex-1 mt-4">
-        <AppText variant="pageTitle" className="mb-4">
-          Rekap Keuangan
-        </AppText>
-        <BalanceCategory />
-      </Box>
+        {/* --- Scrollable List Section --- */}
+        <Box className="mt-4">
+          <AppText variant="pageTitle" className="mb-4">
+            Rekap Keuangan
+          </AppText>
+          <BalanceCategory />
+        </Box>
+      </ScrollView>
     </Box>
   );
 }

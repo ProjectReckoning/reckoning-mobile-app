@@ -22,7 +22,6 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-
 export default function InfoMemberDetailCell({
   member,
   onManagePress,
@@ -73,7 +72,10 @@ export default function InfoMemberDetailCell({
           className="justify-center items-center active:bg-gray-100 rounded-full"
           onPress={onManagePress}
         >
-          <EllipsisVertical />
+          <EllipsisVertical
+            style={{ zIndex: 99 }}
+            color={WondrColors["dark-gray-wondr-deactive"]}
+          />
         </Pressable>
       ) : null}
     </Box>

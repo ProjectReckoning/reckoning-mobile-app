@@ -1,20 +1,19 @@
 // components/feature/pocketDashboard/common/balance/BalanceMemberList.jsx
-import React, { useMemo } from "react";
-import { FlatList, View } from "react-native";
+import React, { useState, useMemo } from "react";
+import { FlatList, View, TouchableOpacity } from "react-native";
 import { usePocketStore } from "@/stores/pocketStore";
 import BalanceMemberListCell from "@/components/common/tableCells/BalanceMemberListCell";
 import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { formatCurrency } from "@/utils/helperFunction";
 import { Crown } from "lucide-react-native";
 import { WondrColors } from "@/utils/colorUtils";
 import AppText from "@/components/common/typography/AppText";
 
-// Using the same consistent initials logic
+// ... (getConsistentInitials dan MemberInfoCard tetap sama)
 const getConsistentInitials = (name) => {
   if (!name) return "";
   const words = name.split(" ").filter(Boolean);
@@ -29,10 +28,10 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-// --- Helper Component for Spending & Business Pockets ---
 const MemberInfoCard = ({ name, role, contributionAmount, pocketType }) => {
   const isOwner = role.toLowerCase() === "owner";
-  const displayRoleKey = isOwner ? "admin" : role;
+  // Jika rolenya 'owner', kita akan gunakan style untuk 'admin'
+  const displayRoleKey = isOwner ? "admin" : role.toLowerCase();
 
   const roleStyles = {
     admin: { text: "ADMIN", className: "bg-tosca-wondr" },
@@ -41,8 +40,9 @@ const MemberInfoCard = ({ name, role, contributionAmount, pocketType }) => {
     viewer: { text: "VIEWER", className: "bg-pink-wondr" },
   };
 
+  // Penyesuaian role untuk tipe pocket Business
   let currentRole;
-  if (pocketType === "Business") {
+  if (pocketType === "business") {
     currentRole = roleStyles.member;
   } else {
     currentRole = roleStyles[displayRoleKey];
@@ -57,7 +57,6 @@ const MemberInfoCard = ({ name, role, contributionAmount, pocketType }) => {
   const avatarTextColor = WondrColors["tosca-wondr"];
 
   return (
-    // --- CHANGE: Removed border and padding from the cell itself ---
     <HStack className="items-center">
       <Avatar
         size="md"
@@ -92,38 +91,51 @@ const MemberInfoCard = ({ name, role, contributionAmount, pocketType }) => {
   );
 };
 
-/**
- * Renders the scrollable list of members, now encapsulated in a bordered container.
- */
 export default function BalanceMemberList() {
   const members = usePocketStore((state) => state.currentPocket?.members);
   const pocketType = usePocketStore((state) => state.currentPocket?.type);
+  const [showAll, setShowAll] = useState(false);
 
   const memberData = useMemo(() => {
     if (!Array.isArray(members)) return [];
-    return [...members];
-  }, [members]);
+    const sortedMembers = [...members].sort(
+      (a, b) =>
+        b.PocketMember.contribution_amount - a.PocketMember.contribution_amount,
+    );
+    if (showAll || sortedMembers.length <= 5) {
+      return sortedMembers;
+    }
+    return sortedMembers.slice(0, 5);
+  }, [members, showAll]);
 
-  if (!members) {
+  if (!members || members.length === 0) {
     return null;
   }
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item }) => {
+    // index dihapus karena tidak lagi dipakai untuk warna
+    // Jika role adalah 'owner', kita anggap sebagai 'admin' untuk styling
+    const memberRole =
+      item.PocketMember.role.toLowerCase() === "owner"
+        ? "admin"
+        : item.PocketMember.role.toLowerCase();
+
     if (pocketType === "Saving") {
       return (
         <BalanceMemberListCell
           name={item.name}
           currentAmount={item.PocketMember.contribution_amount}
           targetAmount={item.PocketMember.target_amount}
-          index={index}
+          // --- PERUBAHAN DI SINI ---
+          // Mengoper role anggota ke komponen cell
+          role={memberRole}
         />
       );
     } else {
-      // For 'Spending' or 'Business' pockets
       return (
         <MemberInfoCard
           name={item.name}
-          role={item.PocketMember.role}
+          role={item.PocketMember.role} // MemberInfoCard sudah handle 'owner'
           contributionAmount={item.PocketMember.contribution_amount}
           pocketType={pocketType?.toLowerCase()}
         />
@@ -134,7 +146,6 @@ export default function BalanceMemberList() {
   const ItemSeparator = () => <View style={{ height: 16 }} />;
 
   return (
-    // --- CHANGE: Wrapped the FlatList in a bordered Box, following your example ---
     <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border flex-1">
       <FlatList
         data={memberData}
@@ -142,8 +153,18 @@ export default function BalanceMemberList() {
         keyExtractor={(item) => item.id.toString()}
         ItemSeparatorComponent={ItemSeparator}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        scrollEnabled={false}
       />
+      {members.length > 5 && (
+        <TouchableOpacity
+          onPress={() => setShowAll(!showAll)}
+          className="items-center mt-4"
+        >
+          <AppText variant="button" className="text-tosca-wondr font-bold">
+            {showAll ? "Lihat lebih sedikit" : "Lihat semua"}
+          </AppText>
+        </TouchableOpacity>
+      )}
     </Box>
   );
 }

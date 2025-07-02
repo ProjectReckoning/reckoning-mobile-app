@@ -64,7 +64,7 @@ export default function Home() {
   const firstName = user?.name?.split(" ")[0] || "";
 
   return (
-    <Box className="bg-white">
+    <Box className="bg-white flex-1">
       {/* Header */}
       <Box className="flex flex-column pt-5 pb-3 px-6 bg-[#F9F9F9]">
         {/* Row 1: wondr icon and logout */}
