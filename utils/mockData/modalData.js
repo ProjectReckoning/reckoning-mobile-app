@@ -34,7 +34,7 @@ export const modalData = [
     title: "Ganti ke Saving Pocket",
     subTitle:
       "Untuk dapat menetapkan target tabunganmu, kamu perlu mengganti tipe pocket ini dari 'Spending' menjadi 'Saving'.",
-    image: require("@/assets/images/approval.png"), // Using fallback image
+    image: require("@/assets/images/targetchange.png"), // Using fallback image
     buttons: [
       {
         text: "Ganti ke Saving",
