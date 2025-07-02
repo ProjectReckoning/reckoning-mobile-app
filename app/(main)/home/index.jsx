@@ -171,7 +171,7 @@ export default function Home() {
       >
         <AccountCard user={user} />
         <SelectedFeature />
-        {/* <DashboardPocketCard />       */}
+        {/* <DashboardPocketCard /> */}
       </ScrollView>
     </Box>
   );
