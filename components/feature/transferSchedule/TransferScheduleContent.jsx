@@ -1,11 +1,14 @@
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+
+import { useState, useCallback, useMemo } from "react";
+import { FlatList, Image, Text, ActivityIndicator } from "react-native";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+
 import { Box } from "@/components/ui/box";
 import TabBar from "@/components/common/TabBar";
-import { FlatList, Image, Text } from "react-native";
+import { WondrColors } from "@/utils/colorUtils";
 import { formatRupiah } from "@/utils/helperFunction";
-import { useState, useCallback, useMemo } from "react";
 import { useTransactionStore } from "@/stores/transactionStore";
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent.jsx";
 
 const tabList = [
@@ -56,6 +59,14 @@ export default function TransferScheduleContent() {
     }
   }, [activeTab, scheduleTransferConfig]);
 
+  if (isFetchingScheduleTransfer) {
+    return (
+      <Box className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color={WondrColors["tosca-wondr"]} />
+      </Box>
+    );
+  }
+
   const renderItem = ({ item }) => {
     const avatarIcon = (
       <Avatar size="md" className="bg-[#F2F2F2]">
@@ -89,6 +100,16 @@ export default function TransferScheduleContent() {
       return `Selanjutnya ${day} ${month} ${year}`;
     };
 
+    const GoToDetail = () => {
+      router.push({
+        pathname: `/(main)/pocket/${id}/transferSchedule/${item.id}`,
+        params: {
+          pocketId: id,
+          scheduleId: item.id,
+        },
+      });
+    };
+
     return (
       <ReusableCellContent
         icon={avatarIcon}
@@ -99,6 +120,7 @@ export default function TransferScheduleContent() {
         descriptionClassName="text-sm text-gray-500"
         dateClassName="text-base font-semibold"
         isRead={true}
+        onPress={GoToDetail}
       />
     );
   };
@@ -136,7 +158,6 @@ export default function TransferScheduleContent() {
       />
 
       <FlatList
-        // data={activeTab === "terjadwal" ? dataTerjadwal : dataSelesai}
         data={filteredData}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}

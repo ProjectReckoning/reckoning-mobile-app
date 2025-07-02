@@ -3,7 +3,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Divider } from "@/components/ui/divider";
 
-import { formatRupiah } from "../../../utils/helperFunction";
+import { formatRupiah } from "@/utils/helperFunction";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 export default function DetailConfirmation({ isSchedule = false }) {
