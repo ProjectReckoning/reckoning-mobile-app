@@ -1,7 +1,5 @@
-import React from "react";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
-import AppText from "@/components/common/typography/AppText";
 import PocketDetail from "@/components/feature/pocketDashboard/common/information/PocketDetail";
 import OwnerDetail from "@/components/feature/pocketDashboard/common/information/OwnerDetail";
 import MemberDetail from "@/components/feature/pocketDashboard/common/information/MemberDetail";
@@ -28,7 +26,7 @@ export default function BusinessInfoScreen() {
         <MemberDetail />
 
         {/* --- Scrollable List Section --- */}
-        <Box className="flex-1 mt-4">
+        <Box className="flex-1">
           <MemberDetailList />
         </Box>
       </ScrollView>

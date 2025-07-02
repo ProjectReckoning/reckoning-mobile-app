@@ -25,6 +25,9 @@ export default function PocketActionSheet({
   color,
   userRole = "owner",
 }) {
+  const isOwner = userRole === "owner";
+  const isOwnerAdmin = userRole === "owner" || userRole === "admin";
+
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop />
@@ -61,6 +64,7 @@ export default function PocketActionSheet({
           }}
           buttonTitle="Ubah pocket"
           className="bg-yellow-wondr mb-4 active:bg-yellow-wondr-dark"
+          disabled={!isOwnerAdmin}
         />
 
         {/* Delete */}
@@ -69,7 +73,7 @@ export default function PocketActionSheet({
             onDeleteLeave();
             onClose();
           }}
-          buttonTitle={`${userRole === "owner" ? "Hapus pocket" : "Keluar dari pocket"}`}
+          buttonTitle={`${isOwner ? "Hapus pocket" : "Keluar dari pocket"}`}
           className="bg-white border-2 border-red-wondr mb-4 active:bg-red-wondr"
           textClassName="text-red-wondr"
           textPressed="text-white"

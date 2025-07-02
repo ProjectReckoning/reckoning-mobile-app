@@ -1,15 +1,16 @@
-import React from "react";
-import { Dimensions } from "react-native";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
+import { Pressable } from "@/components/ui/pressable";
+
+import { Dimensions } from "react-native";
 import { ChevronRight } from "lucide-react-native";
+
+import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
-import TravelIconWithBar from "@/components/common/icons/TravelIconWithBar";
-import { WondrColors } from "@/utils/colorUtils";
-import { formatToLocalizedDate } from "@/utils/helperFunction";
 import PocketCard from "@/components/common/cards/PocketCard";
+import { formatToLocalizedDate } from "@/utils/helperFunction";
 
 export default function PocketDetail() {
   // Get data directly from the Zustand store
@@ -35,44 +36,54 @@ export default function PocketDetail() {
     ? formatToLocalizedDate(creationDate)
     : "N/A";
 
+  const isOwnerAdmin =
+    currentPocket?.user_role === "admin" ||
+    currentPocket?.user_role === "owner";
+
   return (
     <Box>
       <AppText variant="title">Pocket Detail</AppText>
-      <HStack
-        className="rounded-2xl justify-center items-center"
-        style={{
-          borderColor: WondrColors["gray-wondr-border"],
-          overflow: "hidden",
-          // maxHeight: maxHStackHeight,
-        }}
+      <Pressable
+        disabled={!isOwnerAdmin}
+        className="w-full active:bg-slate-50 data-[disabled=true]:opacity-100 data-[disabled=true]:bg-transparent"
       >
-        <PocketCard
-          mode="icon"
-          color="bg-orange-wondr"
-          icon="Airplane"
-          iconSize="10"
-          whiteSpace="mb-5"
-          cardWidth="w-fit"
-        />
-        <VStack
-          className="ml-4 flex-1"
+        <HStack
+          className="rounded-2xl justify-center items-center"
           style={{
-            paddingRight: 8,
-            paddingVertical: 20,
+            borderColor: WondrColors["gray-wondr-border"],
+            overflow: "hidden",
           }}
         >
-          <AppText variant="title">{currentPocket.name}</AppText>
-          <AppText variant="bodyMuted" className="capitalize">
-            {currentPocket.type} Pocket
-          </AppText>
-          <AppText variant="caption" truncate={true}>
-            Pocket ini dibuat tanggal {formattedDate}
-          </AppText>
-        </VStack>
-        <Box className="p-4">
-          <ChevronRight color={WondrColors["dark-gray-wondr-deactive"]} />
-        </Box>
-      </HStack>
+          <PocketCard
+            mode="icon"
+            color={currentPocket.color}
+            icon={currentPocket.icon_name}
+            iconSize="10"
+            whiteSpace="mb-5"
+            cardWidth="w-fit"
+          />
+          <VStack
+            className="ml-4 flex-1"
+            style={{
+              paddingRight: 8,
+              paddingVertical: 20,
+            }}
+          >
+            <AppText variant="title">{currentPocket.name}</AppText>
+            <AppText variant="bodyMuted" className="capitalize">
+              {currentPocket.type} Pocket
+            </AppText>
+            <AppText variant="caption" truncate={true}>
+              Pocket ini dibuat tanggal {formattedDate}
+            </AppText>
+          </VStack>
+          {isOwnerAdmin && (
+            <Box className="p-4">
+              <ChevronRight color={WondrColors["dark-gray-wondr-deactive"]} />
+            </Box>
+          )}
+        </HStack>
+      </Pressable>
     </Box>
   );
 }

@@ -16,6 +16,11 @@ export default function MemberDetailList() {
 
   const members = usePocketStore((state) => state.currentPocket?.members);
   const pocketType = usePocketStore((state) => state.currentPocket?.type);
+  const currentPocket = usePocketStore((state) => state.currentPocket);
+
+  const isOwnerAdmin =
+    currentPocket?.user_role === "owner" ||
+    currentPocket?.user_role === "admin";
 
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -75,6 +80,7 @@ export default function MemberDetailList() {
       member={item}
       index={index}
       onManagePress={() => handleManagePress(item)}
+      isOwnerAdmin={isOwnerAdmin}
     />
   );
 

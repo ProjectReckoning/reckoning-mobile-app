@@ -1,7 +1,17 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
+
+import { Alert } from "react-native";
 import { useState, useEffect } from "react";
+import { Picker } from "@react-native-picker/picker";
+import { router, useLocalSearchParams } from "expo-router";
+import { ChevronRight, Calendar, Info } from "lucide-react-native";
+
+import { WondrColors } from "@/utils/colorUtils";
+import { useTransactionStore } from "@/stores/transactionStore";
+import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import CustomMonthPicker from "@/components/common/CustomMonthPicker";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -9,13 +19,6 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
-import { Picker } from "@react-native-picker/picker";
-import { router, useLocalSearchParams } from "expo-router";
-import { useTransactionStore } from "@/stores/transactionStore";
-import { ChevronRight, Calendar, Info } from "lucide-react-native";
-import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import { WondrColors } from "@/utils/colorUtils";
-import CustomMonthPicker from "@/components/common/CustomMonthPicker";
 
 // --- Isolated Date Picker Component ---
 // By moving the Actionsheet and Picker into their own component, we isolate its state.
@@ -93,6 +96,58 @@ export default function ScheduleTransferContent() {
 
   // State for date picker visibility
   const [isPickerVisible, setPickerVisible] = useState(false);
+
+  const [validationError, setValidationError] = useState("");
+
+  useEffect(() => {
+    let error = "";
+
+    // Helper: get month/year as number for comparison
+    const getMonthYear = (date) =>
+      date ? date.getFullYear() * 100 + date.getMonth() : null;
+
+    // Range: now to 1 year after now
+    const now = new Date();
+    const minMonth = getMonthYear(now);
+    const maxMonth = getMonthYear(
+      new Date(now.getFullYear() + 1, now.getMonth()),
+    );
+
+    // Validate Bulan Mulai
+    if (selectedStartDate) {
+      const startMonth = getMonthYear(selectedStartDate);
+      if (startMonth < minMonth || startMonth > maxMonth) {
+        error =
+          "Bulan Mulai hanya bisa dipilih dari bulan ini sampai 1 tahun ke depan.";
+      }
+    }
+
+    // Validate Bulan Selesai
+    if (!error && selectedEndDate) {
+      const endMonth = getMonthYear(selectedEndDate);
+      if (endMonth < minMonth || endMonth > maxMonth) {
+        error =
+          "Bulan Selesai hanya bisa dipilih dari bulan ini sampai 1 tahun ke depan.";
+      }
+    }
+
+    // Validate Bulan Selesai >= Bulan Mulai
+    if (
+      !error &&
+      selectedStartDate &&
+      selectedEndDate &&
+      getMonthYear(selectedEndDate) < getMonthYear(selectedStartDate)
+    ) {
+      error = "Bulan Selesai tidak boleh lebih awal dari Bulan Mulai.";
+    }
+
+    setValidationError(error);
+
+    // Optional: show alert (or use your own error UI)
+    if (error) {
+      Alert.alert("Validasi Jadwal", error);
+    }
+  }, [selectedStartDate, selectedEndDate]);
 
   // --- Date Formatting ---
   const formatMonthYear = (date) => {
@@ -244,6 +299,12 @@ export default function ScheduleTransferContent() {
               </Box>
             </Pressable>
           </Box>
+
+          {validationError ? (
+            <Box className="px-2 py-2">
+              <Text className="text-red-500 text-sm">{validationError}</Text>
+            </Box>
+          ) : null}
         </Box>
 
         {/* Info Box */}
@@ -295,7 +356,12 @@ export default function ScheduleTransferContent() {
           buttonAction={handleNext}
           buttonTitle="Lanjut"
           textClassName="text-black text-base text-center font-bold"
-          disabled={!selectedDate || !selectedStartDate || !selectedEndDate}
+          disabled={
+            !selectedDate ||
+            !selectedStartDate ||
+            !selectedEndDate ||
+            validationError !== ""
+          }
         />
       </Box>
 

@@ -24,6 +24,7 @@ import {
   getUnreadCount,
 } from "@/utils/notification/notification";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
+import DashboardPocketCard from "@/components/feature/home/DashboardPocketCard";
 
 const tabList = [
   { key: "insight", label: "Insight" },
@@ -163,9 +164,14 @@ export default function Home() {
         />
       </Box>
 
-      <ScrollView className="px-6">
+      <ScrollView
+        className="px-6"
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={{ paddingRight: 10 }}
+      >
         <AccountCard user={user} />
         <SelectedFeature />
+        {/* <DashboardPocketCard /> */}
       </ScrollView>
     </Box>
   );

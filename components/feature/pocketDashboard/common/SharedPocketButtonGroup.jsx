@@ -72,6 +72,9 @@ export default function SharedPocketButtonGroup() {
   };
 
   const isSavingPocket = currentPocket?.type === "Saving";
+  const isOwnerAdmin =
+    currentPocket?.user_role === "admin" ||
+    currentPocket?.user_role === "owner";
 
   return (
     <>
@@ -80,7 +83,7 @@ export default function SharedPocketButtonGroup() {
           <Pressable
             className="flex-row items-center justify-between"
             onPress={isSavingPocket ? handleChangeTarget : handleSetTarget}
-            disabled={!currentPocket}
+            disabled={!currentPocket || !isOwnerAdmin}
           >
             <Box className="flex-row items-center gap-2">
               <Target size={24} color={WondrColors["orange-wondr"]} />
