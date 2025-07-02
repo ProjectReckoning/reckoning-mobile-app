@@ -7,14 +7,7 @@ import { Circle } from "lucide-react-native";
 import { VStack } from "@/components/ui/vstack";
 import { ActivityIndicator } from "react-native";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-import { Badge, BadgeText } from "@/components/ui/badge";
-import {
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from "@/components/ui/modal";
+import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
 import {
   RadioGroup,
   Radio,
@@ -30,27 +23,10 @@ import {
 } from "@/components/ui/actionsheet";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import { usePocketStore } from "@/stores/pocketStore";
+import BadgeRole from "@/components/common/BadgeRole"; // -> (Step 1) Impor komponen BadgeRole yang baru
 
-// Helper functions (getBadgeColorForRole, MemberInfoCard) remain the same...
-
-const getBadgeColorForRole = (role, pocketType) => {
-  const upperCaseRole = role.toUpperCase();
-
-  if (upperCaseRole === "ADMIN") return "bg-tosca-wondr";
-
-  if (pocketType === "business") {
-    if (upperCaseRole === "MEMBER") return "bg-lime-wondr";
-  } else {
-    // untuk 'saving' dan 'spending'
-    if (upperCaseRole === "SPENDER") return "bg-purple-wondr";
-    if (upperCaseRole === "VIEWER") return "bg-pink-wondr";
-  }
-
-  // Fallback default
-  return "bg-lime-wondr";
-};
-
-const MemberInfoCard = ({ name, role, badgeClassName }) => (
+// The MemberInfoCard now uses the new BadgeRole component.
+const MemberInfoCard = ({ name, role, pocketType }) => (
   <HStack className="p-4 border border-gray-wondr-border rounded-2xl items-center">
     <Avatar className="bg-translucent-gray-wondr w-12 h-12 rounded-full mr-3 items-center justify-center">
       <AvatarFallbackText className="text-tosca-wondr font-bold">
@@ -60,13 +36,7 @@ const MemberInfoCard = ({ name, role, badgeClassName }) => (
     <VStack className="flex-1">
       <Text className="font-bold text-black">{name.toUpperCase()}</Text>
     </VStack>
-    <Badge
-      size="sm"
-      variant="solid"
-      className={`${badgeClassName} rounded-full`}
-    >
-      <BadgeText className="font-bold text-black">{role}</BadgeText>
-    </Badge>
+    <BadgeRole role={role} pocketType={pocketType} />
   </HStack>
 );
 
@@ -85,7 +55,7 @@ export default function InfoBalanceContent({
   const [selectedRole, setSelectedRole] = useState("viewer");
 
   const availableRoles =
-    pocketType === "business"
+    pocketType === "Business"
       ? [
           { value: "admin", label: "Admin" },
           { value: "member", label: "Member" },
@@ -141,7 +111,6 @@ export default function InfoBalanceContent({
   };
 
   const displayRole = (memberData.PocketMember?.role || "viewer").toUpperCase();
-  const badgeColorClass = getBadgeColorForRole(displayRole, pocketType);
 
   return (
     <>
@@ -156,7 +125,7 @@ export default function InfoBalanceContent({
             <MemberInfoCard
               name={memberData.name}
               role={displayRole}
-              badgeClassName={badgeColorClass}
+              pocketType={pocketType}
             />
             <PrimaryButton
               buttonAction={handleOpenChangeRole}
@@ -195,7 +164,7 @@ export default function InfoBalanceContent({
             <MemberInfoCard
               name={memberData.name}
               role={selectedRole.toUpperCase()}
-              badgeClassName={getBadgeColorForRole(selectedRole, pocketType)}
+              pocketType={pocketType}
             />
             <RadioGroup value={selectedRole} onChange={setSelectedRole}>
               <VStack space="md">
@@ -240,7 +209,6 @@ export default function InfoBalanceContent({
       {/* --- Modal 3: Delete Confirmation --- */}
       <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
         <ModalBackdrop />
-        {/* --- FIX: Added scrollEnabled={false} to disable scrolling --- */}
         <ModalContent
           style={{
             paddingBottom: 20,
@@ -269,7 +237,7 @@ export default function InfoBalanceContent({
               <MemberInfoCard
                 name={memberData.name}
                 role={displayRole}
-                badgeClassName={badgeColorClass}
+                pocketType={pocketType}
               />
             </Box>
             <PrimaryButton

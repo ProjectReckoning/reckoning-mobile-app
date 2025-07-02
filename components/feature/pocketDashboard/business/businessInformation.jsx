@@ -27,7 +27,7 @@ export default function BusinessInfoScreen() {
 
       {/* --- Scrollable List Section --- */}
       <Box className="flex-1 mt-4">
-        <AppText variant="pageTitle" className="mb-4">
+        <AppText variant="title" className="mb-4">
           Member List
         </AppText>
         <MemberDetailList />

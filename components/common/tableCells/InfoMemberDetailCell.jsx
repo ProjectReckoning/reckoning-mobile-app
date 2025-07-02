@@ -3,10 +3,10 @@ import { Box } from "@/components/ui/box";
 import { Avatar } from "@/components/ui/avatar";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
-import { Badge, BadgeText } from "@/components/ui/badge"; // Import Badge components
 import { Crown, EllipsisVertical } from "lucide-react-native";
 import AppText from "@/components/common/typography/AppText";
 import { WondrColors } from "@/utils/colorUtils";
+import BadgeRole from "@/components/common/BadgeRole"; // -> (Step 1) Impor komponen BadgeRole yang baru
 
 const getConsistentInitials = (name) => {
   if (!name) return "";
@@ -22,28 +22,11 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-// Helper function to get badge color based on role and pocket type
-const getBadgeColorForRole = (role, pocketType) => {
-  const upperCaseRole = role.toUpperCase();
-
-  if (upperCaseRole === "ADMIN") return "bg-tosca-wondr";
-
-  if (pocketType === "business") {
-    if (upperCaseRole === "MEMBER") return "bg-lime-wondr";
-  } else {
-    // for 'saving' and 'spending'
-    if (upperCaseRole === "SPENDER") return "bg-purple-wondr";
-    if (upperCaseRole === "VIEWER") return "bg-pink-wondr";
-  }
-
-  // Fallback default
-  return "bg-lime-wondr";
-};
 
 export default function InfoMemberDetailCell({
   member,
   onManagePress,
-  pocketType, // Add pocketType to props
+  pocketType,
 }) {
   if (!member || !member.PocketMember) {
     return null;
@@ -57,13 +40,10 @@ export default function InfoMemberDetailCell({
   const avatarBgColor = WondrColors["translucent-gray-wondr"];
   const avatarTextColor = WondrColors["tosca-wondr"];
 
-  // Get badge color class using the helper function
-  const badgeColorClass = getBadgeColorForRole(displayRole, pocketType);
-
   return (
     <Box
       className="flex-row rounded-2xl p-4 border items-center"
-      style={{ borderColor: WondrColors["gray-wondr-border"] }} // Example color
+      style={{ borderColor: WondrColors["gray-wondr-border"] }}
     >
       <Avatar
         size="md"
@@ -78,16 +58,8 @@ export default function InfoMemberDetailCell({
       <Box className="flex-1">
         <VStack>
           <Box className="flex-row justify-start items-center gap-1">
-            {/* --- FIX: Use Badge component for role display --- */}
-            <Badge
-              size="sm"
-              variant="solid"
-              className={`${badgeColorClass} rounded-full`}
-            >
-              <BadgeText className="font-bold text-black">
-                {displayRole}
-              </BadgeText>
-            </Badge>
+            {/* --- (Step 4) Gunakan komponen BadgeRole yang baru --- */}
+            <BadgeRole role={displayRole} pocketType={pocketType} />
             {isOwner ? <Crown size={12} color="black" /> : null}
           </Box>
           <AppText variant="cardTitle" className="uppercase">

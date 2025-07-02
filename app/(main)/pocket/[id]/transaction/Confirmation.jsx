@@ -3,12 +3,12 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
-import { Divider } from "@/components/ui/divider";
 
 import { useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { usePocketStore } from "@/stores/pocketStore";
+import { StyleSheet, Platform } from "react-native";
 
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -36,8 +36,8 @@ export default function Confirmation() {
   };
 
   return (
-    <Box className="flex-1 bg-white justify-between px-6 py-5">
-      <VStack space="xs" className="justify-start">
+    <Box className="flex-1 bg-white justify-between">
+      <VStack space="xs" className="justify-start px-6 pt-5">
         {destination.category.pocket && destination.category.pocket.type ? (
           <HStack space="xl" className="w-full justify-start items-center mb-5">
             <PocketCard
@@ -72,22 +72,42 @@ export default function Confirmation() {
         <DetailConfirmation isSchedule={isSchedule} />
       </VStack>
 
-      <VStack className="gap-8">
-        <Divider className="w-screen h-0.5 border-light-gray-wondr shadow-md my-2 relative -left-8" />
+      <Box style={styles.shadowAbove} className="bg-white px-6 py-4">
+        <VStack className="gap-4 mt-3">
+          <HStack className="justify-between">
+            <Text className="text=-lg text-black font-semibold">Total</Text>
+            <Text className="text-xl text-black font-extrabold">
+              {formatRupiah(amount)}
+            </Text>
+          </HStack>
 
-        <HStack className="justify-between">
-          <Text className="text-sm text-black font-light">Total</Text>
-          <Text className="text-lg text-black font-extrabold">
-            {formatRupiah(amount)}
-          </Text>
-        </HStack>
-
-        <PrimaryButton
-          buttonAction={handleNext}
-          buttonTitle={`${isSchedule ? "Jadwalin Transfer" : `${type.name} sekarang`}`}
-          className={"mb-3"}
-        />
-      </VStack>
+          <PrimaryButton
+            buttonAction={handleNext}
+            buttonTitle={`${isSchedule ? "Jadwalin Transfer" : `${type.name} sekarang`}`}
+          />
+        </VStack>
+      </Box>
     </Box>
   );
 }
+
+const styles = StyleSheet.create({
+  shadowAbove: {
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: -5,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        borderTopWidth: 1,
+        borderTopColor: "rgba(0,0,0,0.1)",
+        elevation: 20,
+      },
+    }),
+  },
+});
