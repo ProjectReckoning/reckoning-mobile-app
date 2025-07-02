@@ -231,6 +231,10 @@ export default function MainLayout() {
         name="pocket/[id]/transferSchedule/index"
         options={{ title: "Transfer bulanan" }}
       />
+      <Stack.Screen
+        name="pocket/[id]/transferSchedule/[_id]/index"
+        options={{ title: "Transfer bulanan" }}
+      />
     </Stack>
   );
 }
