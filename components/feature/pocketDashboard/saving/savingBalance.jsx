@@ -1,5 +1,4 @@
-import React from "react";
-import { Dimensions, Share } from "react-native";
+import { Dimensions } from "react-native";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
 import AccountNumber from "@/components/feature/pocketDashboard/common/balance/AccountNumber";

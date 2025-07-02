@@ -39,13 +39,16 @@ export default function TransactionDetail() {
     setDescription,
     setType,
   } = useTransactionStore();
-  const { pocketType } = usePocketStore();
+  const { currentPocket, pocketType } = usePocketStore();
 
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
   const isBusiness = pocketType?.toLowerCase().includes("business");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const isOwnerAdmin =
+    currentPocket?.user_role === "owner" ||
+    currentPocket?.user_role === "admin";
 
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
@@ -163,7 +166,7 @@ export default function TransactionDetail() {
           </VStack>
 
           <HStack space="sm" className="w-full justify-between items-center">
-            {isBusiness && (
+            {isBusiness && isOwnerAdmin && (
               <Popover
                 isOpen={isPopoverOpen}
                 onClose={() => setIsPopoverOpen(false)}

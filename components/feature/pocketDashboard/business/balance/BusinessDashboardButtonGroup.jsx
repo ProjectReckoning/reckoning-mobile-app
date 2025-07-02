@@ -1,17 +1,24 @@
-import React, { useState } from "react";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import AppText from "@/components/common/typography/AppText";
-import { Pressable } from "@/components/ui/pressable";
+
+import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { CalendarClock, ChartLine } from "lucide-react-native";
 import { Linking, Alert, ActivityIndicator } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+
+import { usePocketStore } from "@/stores/pocketStore";
+import { Pressable } from "@/components/ui/pressable";
+import AppText from "@/components/common/typography/AppText";
 
 export default function BusinessDashboardButtonGroup() {
   const { id: pocketId } = useLocalSearchParams();
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+
+  const { currentPocket } = usePocketStore();
+  const isMember = currentPocket?.user_role === "spender";
+  const isBusiness = currentPocket?.type.toLowerCase().includes("business");
 
   const handleOpenUrl = async () => {
     setIsLoadingAnalytics(true);
@@ -65,7 +72,7 @@ export default function BusinessDashboardButtonGroup() {
           <Pressable
             className="items-center justify-center h-12 w-20"
             onPress={handleNavigateToSchedule}
-            disabled={isLoadingSchedule}
+            disabled={isLoadingSchedule || (isBusiness && isMember)}
             style={{ zIndex: 99 }}
           >
             {isLoadingSchedule ? (

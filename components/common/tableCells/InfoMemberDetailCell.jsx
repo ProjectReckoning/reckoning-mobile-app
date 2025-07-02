@@ -1,12 +1,13 @@
-import React from "react";
 import { Box } from "@/components/ui/box";
 import { Avatar } from "@/components/ui/avatar";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
+
 import { Crown, EllipsisVertical } from "lucide-react-native";
-import AppText from "@/components/common/typography/AppText";
+
 import { WondrColors } from "@/utils/colorUtils";
-import BadgeRole from "@/components/common/BadgeRole"; // -> (Step 1) Impor komponen BadgeRole yang baru
+import BadgeRole from "@/components/common/BadgeRole";
+import AppText from "@/components/common/typography/AppText";
 
 const getConsistentInitials = (name) => {
   if (!name) return "";
@@ -22,11 +23,11 @@ const getConsistentInitials = (name) => {
   return "";
 };
 
-
 export default function InfoMemberDetailCell({
   member,
   onManagePress,
   pocketType,
+  isOwnerAdmin = false,
 }) {
   if (!member || !member.PocketMember) {
     return null;
@@ -68,14 +69,14 @@ export default function InfoMemberDetailCell({
         </VStack>
       </Box>
 
-      {!isOwner ? (
+      {isOwnerAdmin && (
         <Pressable
-          className="justify-center items-center active:bg-gray-100 rounded-full"
+          className="justify-center items-center"
           onPress={onManagePress}
         >
-          <EllipsisVertical />
+          <EllipsisVertical color="gray" />
         </Pressable>
-      ) : null}
+      )}
     </Box>
   );
 }

@@ -26,10 +26,7 @@ export default function SpendingInfoScreen() {
       <MemberDetail />
 
       {/* --- Scrollable List Section --- */}
-      <Box className="flex-1 mt-4">
-        <AppText variant="pageTitle" className="mb-4">
-          Member List
-        </AppText>
+      <Box className="flex-1">
         <MemberDetailList />
       </Box>
     </Box>

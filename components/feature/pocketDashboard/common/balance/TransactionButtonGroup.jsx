@@ -1,15 +1,20 @@
-import React from "react";
 import { Box } from "@/components/ui/box";
-import { Send, Plus, ArrowDown } from "lucide-react-native";
-import SquaredButton from "@/components/common/buttons/SquaredButton";
-// --- NEW: Import router and hooks from expo-router ---
+
+import { Send, Plus } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
+
+import { usePocketStore } from "@/stores/pocketStore";
 import WithdrawIcon from "@/assets/images/icon/withdraw.svg";
+import SquaredButton from "@/components/common/buttons/SquaredButton";
 
 export default function TransactionButtonGroup() {
   // --- NEW: Get the pocket ID from the URL ---
   // Since this component is a child of the `pocket/[id]` route, it has access to the `id`.
   const { id } = useLocalSearchParams();
+  const { currentPocket } = usePocketStore();
+  const isViewer = currentPocket?.user_role === "viewer";
+  const isMember = currentPocket?.user_role === "spender";
+  const isBusiness = currentPocket?.type.toLowerCase().includes("business");
 
   // --- NEW: Navigation handlers for each button ---
   const handleTopUp = () => {
@@ -36,6 +41,7 @@ export default function TransactionButtonGroup() {
         activeBg="bg-orange-wondr-dark"
         // --- NEW: Add onPress handler ---
         onPress={handleTopUp}
+        disabled={isBusiness && isMember}
       />
       <SquaredButton
         icon={<Send color="white" size={25} />}
@@ -44,6 +50,7 @@ export default function TransactionButtonGroup() {
         activeBg="bg-pink-wondr-dark"
         // --- NEW: Add onPress handler ---
         onPress={handleTransfer}
+        disabled={isViewer}
       />
       <SquaredButton
         icon={<WithdrawIcon color="white" weight={20} height={20} />}

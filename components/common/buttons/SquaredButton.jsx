@@ -10,6 +10,7 @@ export default function SquaredButton({
   activeBg = "",
   onPress = () => {},
   size = 16,
+  disabled = false,
 }) {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -37,6 +38,7 @@ export default function SquaredButton({
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
         className={finalClasses} // Pass the properly joined string
+        disabled={disabled}
       >
         {icon}
       </Pressable>
