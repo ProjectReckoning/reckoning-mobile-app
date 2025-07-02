@@ -74,7 +74,7 @@ export default function InfoMemberDetailCell({
           className="justify-center items-center"
           onPress={onManagePress}
         >
-          <EllipsisVertical color="gray" />
+          <EllipsisVertical style={{ zIndex: 99 }} color="gray" />
         </Pressable>
       )}
     </Box>

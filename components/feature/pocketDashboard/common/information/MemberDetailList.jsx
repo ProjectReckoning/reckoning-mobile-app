@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+// Impor TouchableOpacity untuk tombol "Lihat semua"
+import { FlatList, View, TouchableOpacity } from "react-native";
 import { Box } from "@/components/ui/box";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useLocalSearchParams } from "expo-router";
@@ -23,35 +24,47 @@ export default function MemberDetailList() {
 
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  // --- PENYESUAIAN 1: Tambahkan state untuk kontrol "Lihat semua" ---
+  const [showAll, setShowAll] = useState(false);
 
+  // --- PENYESUAIAN 2: Perbarui logika untuk memproses dan membatasi anggota ---
   const processedMembers = useMemo(() => {
     if (!Array.isArray(members)) return [];
 
-    // --- PENYESUAIAN DIMULAI DI SINI ---
-
-    return members
+    const allMembers = members
       .filter((item) => item.PocketMember?.role?.toLowerCase() !== "owner")
       .map((member) => {
-        // Jika pocketType adalah "Business" dan role adalah "Spender", ubah menjadi "Member"
         if (
           pocketType === "Business" &&
           member.PocketMember?.role?.toLowerCase() === "spender"
         ) {
-          // Buat salinan member untuk menjaga immutability (tidak mengubah state asli)
           return {
             ...member,
             PocketMember: {
               ...member.PocketMember,
-              role: "member", // Ganti role menjadi "Member"
+              role: "member",
             },
           };
         }
-        // Jika tidak, kembalikan data member seperti aslinya
         return member;
       });
 
-    // --- PENYESUAIAN SELESAI ---
-  }, [members, pocketType]); // <-- Tambahkan pocketType sebagai dependency
+    // Jika showAll true atau anggota kurang dari/sama dengan 5, tampilkan semua
+    if (showAll || allMembers.length <= 3) {
+      return allMembers;
+    }
+
+    // Jika tidak, hanya tampilkan 5 anggota pertama
+    return allMembers.slice(0, 3);
+  }, [members, pocketType, showAll]); // Tambahkan showAll sebagai dependency
+
+  // Buat variabel terpisah untuk mengecek jumlah total anggota (sebelum dipotong)
+  const totalMemberCount = useMemo(() => {
+    if (!Array.isArray(members)) return 0;
+    return members.filter(
+      (item) => item.PocketMember?.role?.toLowerCase() !== "owner",
+    ).length;
+  }, [members]);
 
   const handleManagePress = (member) => {
     setSelectedMember(member);
@@ -73,12 +86,6 @@ export default function MemberDetailList() {
 
   const ItemSeparator = () => <View style={{ height: 12 }} />;
 
-  const ListEmptyComponent = () => (
-    <Box className="flex-1 justify-center items-center py-10">
-      <AppText variant="bodyMuted">No other members to display.</AppText>
-    </Box>
-  );
-
   return (
     <>
       <FlatList
@@ -86,12 +93,25 @@ export default function MemberDetailList() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
+        // Jika Anda ingin list bisa di-scroll terpisah, hapus properti di bawah
+        scrollEnabled={false}
         contentContainerStyle={{
           paddingBottom: 20,
         }}
       />
+
+      {/* --- PENYESUAIAN 3: Tambahkan tombol "Lihat semua" --- */}
+      {totalMemberCount > 3 && (
+        <TouchableOpacity
+          onPress={() => setShowAll(!showAll)}
+          style={{ alignItems: "center", paddingVertical: 10 }}
+        >
+          <AppText variant="button" className="text-tosca-wondr font-bold">
+            {showAll ? "Lihat lebih sedikit" : "Lihat semua member"}
+          </AppText>
+        </TouchableOpacity>
+      )}
 
       {selectedMember && (
         <InfoBalanceContent

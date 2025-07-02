@@ -27,7 +27,7 @@ export default function PaymentDateInfo() {
       <HStack className="justify-between items-center">
         <VStack>
           {/* --- CHANGE: Updated text label --- */}
-          <AppText variant="small" className="text-white font-light">
+          <AppText variant="medium" className="text-white font-light">
             Terakhir Topup
           </AppText>
           <AppText variant="caption" className="text-white font-semibold">
