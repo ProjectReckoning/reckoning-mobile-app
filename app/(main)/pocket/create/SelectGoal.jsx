@@ -48,7 +48,7 @@ export default function SelectGoal() {
         <Box className="flex-1 justify-between mt-8">
           <ScrollView
             showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingRight: 10 }}
+            contentContainerStyle={{ paddingRight: 10, paddingBottom: 30 }}
             style={{ marginRight: -10 }}
           >
             <Box className="flex flex-row flex-wrap justify-between">
