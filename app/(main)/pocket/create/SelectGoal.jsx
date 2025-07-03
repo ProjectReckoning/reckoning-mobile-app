@@ -52,20 +52,40 @@ export default function SelectGoal() {
             style={{ marginRight: -10 }}
           >
             <Box className="flex flex-row flex-wrap justify-between">
-              {goals.map((goalProps, i) => (
-                <Box key={i} className="w-[48%] mb-5">
-                  <GoalCard
-                    {...goalProps}
-                    selected={selectedIndex === i}
-                    onPress={() => {
-                      setSelectedIndex(selectedIndex === i ? null : i);
-                      setGoalTitle(
-                        selectedIndex === i ? null : goalProps.title,
-                      );
-                    }}
-                  />
-                </Box>
-              ))}
+              {goals.map((goalProps, i) => {
+                if (goalProps.isCustom) {
+                  // Render Custom Goal as a button
+                  return (
+                    <Box key={i} className="w-[48%] mb-5">
+                      <GoalCard
+                        {...goalProps}
+                        selected={selectedIndex === i}
+                        onPress={() => {
+                          setSelectedIndex(i);
+                          setGoalTitle(goalProps.title);
+                          GoToDetails();
+                        }}
+                        isCustom
+                      />
+                    </Box>
+                  );
+                }
+                // Regular goal card
+                return (
+                  <Box key={i} className="w-[48%] mb-5">
+                    <GoalCard
+                      {...goalProps}
+                      selected={selectedIndex === i}
+                      onPress={() => {
+                        setSelectedIndex(selectedIndex === i ? null : i);
+                        setGoalTitle(
+                          selectedIndex === i ? null : goalProps.title,
+                        );
+                      }}
+                    />
+                  </Box>
+                );
+              })}
             </Box>
           </ScrollView>
           <PrimaryButton
