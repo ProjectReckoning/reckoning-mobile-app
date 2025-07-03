@@ -21,6 +21,11 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 
+// --- Core Changes: Import authStore and modal components ---
+import useAuthStore from "@/stores/authStore";
+import { modalData } from "@/utils/mockData/modalData";
+import ErrorModal from "@/components/common/ErrorModal";
+
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
@@ -40,6 +45,10 @@ export default function TransactionDetail() {
     setType,
   } = useTransactionStore();
   const { currentPocket, pocketType } = usePocketStore();
+
+  // --- Get the logged-in user from your authStore ---
+  const { user } = useAuthStore();
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
 
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
@@ -61,6 +70,34 @@ export default function TransactionDetail() {
   );
 
   const handleNext = () => {
+    // --- Validation Logic using user from authStore ---
+    if (!currentPocket || !user) {
+      console.error("Pocket data or user data is not available.");
+      return;
+    }
+
+    let userContribution = 0;
+    // Find the current user's contribution by matching user.id
+    if (currentPocket.owner.id === user.id) {
+      userContribution = parseFloat(
+        currentPocket.owner.PocketMember.contribution_amount,
+      );
+    } else {
+      const memberData = currentPocket.members.find((m) => m.id === user.id);
+      if (memberData) {
+        userContribution = parseFloat(
+          memberData.PocketMember.contribution_amount,
+        );
+      }
+    }
+
+    // Show modal if the transfer amount exceeds the user's contribution
+    if (amount > userContribution) {
+      setShowApprovalModal(true);
+      return;
+    }
+
+    // Proceed to confirmation if validation passes
     if (id) {
       router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
     }
@@ -77,6 +114,19 @@ export default function TransactionDetail() {
       setIsPopoverOpen(true);
     } else {
       handleScheduleTransfer();
+    }
+  };
+
+  // --- Modal Logic ---
+  const approvalModalContent = modalData.find(
+    (m) => m.id === "APPROVAL_REQUIRED",
+  );
+
+  const handleRequestApproval = () => {
+    setShowApprovalModal(false);
+    // On approval, navigate to the PinCode screen
+    if (id) {
+      router.push(`/(main)/pocket/${id}/transaction/PinCode`);
     }
   };
 
@@ -212,6 +262,22 @@ export default function TransactionDetail() {
           />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* --- Renders the modal when validation fails --- */}
+      {approvalModalContent && (
+        <ErrorModal
+          isOpen={showApprovalModal}
+          onClose={() => setShowApprovalModal(false)}
+          imageSource={approvalModalContent.image}
+          title={approvalModalContent.title}
+          subtitle={approvalModalContent.subTitle}
+          showSpecialActions={true}
+          specialButton1Title={approvalModalContent.buttons[0].text}
+          specialButton1Action={() => setShowApprovalModal(false)}
+          specialButton2Title={approvalModalContent.buttons[1].text}
+          specialButton2Action={handleRequestApproval}
+        />
+      )}
     </Box>
   );
 }

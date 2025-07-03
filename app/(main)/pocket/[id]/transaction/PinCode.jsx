@@ -25,10 +25,6 @@ export default function PinCode() {
   const { id, isSchedule } = useLocalSearchParams();
   const [pin, setPin] = useState("");
 
-  useEffect(() => {
-    console.log("is schedule? ", id, isSchedule, typeof isSchedule);
-  }, []);
-
   const {
     type,
     isProcessing,
@@ -57,7 +53,7 @@ export default function PinCode() {
     if (newPin.length === PIN_LENGTH) {
       try {
         let result;
-        // --- KEY CHANGE: Await the result from the store function ---
+        // Await the result from the store's execution function
         if (type.id === "topup") {
           result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
@@ -65,21 +61,27 @@ export default function PinCode() {
         } else if (type.id === "transfer") {
           result = await executeTransfer(id);
         } else if (type.id === "transfer_bulanan") {
-          console.log("Scheduled");
           result = await executeScheduleTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
-        // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
+        // --- NEW: Conditional navigation based on transaction status ---
         if (result) {
-          router.push({
-            pathname: "/(main)/pocket/[id]/transaction/Statement",
-            params: {
-              id,
-              isSchedule,
-            },
-          });
+          if (result.status === "pending") {
+            // For transfers needing approval, go back to the pocket dashboard.
+            // A toast can be added here later.
+            router.replace(`/(main)/pocket/${id}`);
+          } else {
+            // For completed transactions, go to the statement page.
+            router.push({
+              pathname: "/(main)/pocket/[id]/transaction/Statement",
+              params: {
+                id,
+                isSchedule,
+              },
+            });
+          }
         } else {
           // This case might occur if the API returns success but no data
           alert(`Transaction Failed: Could not retrieve transaction details.`);
