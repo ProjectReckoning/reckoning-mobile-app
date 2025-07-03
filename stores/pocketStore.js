@@ -4,12 +4,12 @@ import api from "@/lib/api";
 
 // --- Helper Objects ---
 const colorClassToHex = {
-  "bg-orange-wondr": "#FF7A00" || "#FF8500",
-  "bg-yellow-wondr": "#FFC700" || "#FFC533",
-  "bg-lime-wondr": "#A8E05F" || "#D9F634",
-  "bg-tosca-wondr": "#58ABA1" || "#3FD8D4",
-  "bg-purple-wondr": "#8A2BE2" || "#A471E1",
-  "bg-pink-wondr": "#FF69B4" || "#FDA9FF",
+  "bg-orange-wondr": "#FF8500",
+  "bg-yellow-wondr": "#FFC533",
+  "bg-lime-wondr": "#D9F634",
+  "bg-tosca-wondr": "#3FD8D4",
+  "bg-purple-wondr": "#A471E1",
+  "bg-pink-wondr": "#FDA9FF",
 };
 
 const hexToColorClass = {
