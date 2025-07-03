@@ -11,12 +11,14 @@ import "@/global.css";
 import ErrorModal from "@/components/common/ErrorModal";
 import useErrorStore from "@/stores/errorStore";
 import ErrorImage from "@/assets/images/ErrorImage.png";
+import { Platform } from "react-native";
 
 export { ErrorBoundary } from "expo-router";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const { visible, status, message, hideError } = useErrorStore();
+  const isAndroidPlatform = Platform.OS === "android";
 
   console.log(`[RootLayout] Rendering. Error modal visibility is: ${visible}`);
 
@@ -41,7 +43,11 @@ export default function RootLayout() {
           imageSource={ErrorImage}
         />
       </GluestackUIProvider>
-      <StatusBar translucent backgroundColor="transparent" style="dark" />
+      <StatusBar
+        translucent={!isAndroidPlatform}
+        backgroundColor={isAndroidPlatform ? "black" : "transparent"}
+        style="dark"
+      />
 
       {/* --- The ErrorModal was previously here, which was incorrect --- */}
     </SafeAreaProvider>
