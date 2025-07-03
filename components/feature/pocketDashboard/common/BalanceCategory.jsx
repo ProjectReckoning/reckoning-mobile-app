@@ -62,7 +62,7 @@ const CATEGORY_DETAILS = {
   },
 };
 
-const MAIN_INCOME_CATEGORIES = ["penjualan", "top up"];
+const MAIN_INCOME_CATEGORIES = ["penjualan", "topup"];
 const MAIN_EXPENSE_CATEGORIES = ["gaji", "withdraw", "transfer", "pembelian"];
 
 // --- DATA TRANSAKSI (CONTOH) ---
@@ -90,7 +90,9 @@ const processTransactionsForDisplay = (transactions, activeType) => {
   const otherItemsToAggregate = [];
 
   transactions.forEach((transaction) => {
-    const categoryKey = transaction.category.toLowerCase();
+    const categoryKey = transaction.category
+      .toLowerCase()
+      .replace(/[\s-_]/g, "");
     if (mainCategoriesForType.includes(categoryKey)) {
       mainItems.push(transaction);
     } else {
