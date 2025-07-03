@@ -17,13 +17,12 @@ import { maskId, formatRupiah } from "@/utils/helperFunction";
 import DetailConfirmation from "@/components/feature/transaction/DetailConfirmation";
 
 export default function Confirmation() {
-  const { id } = useLocalSearchParams();
+  const { id, approvalRequired } = useLocalSearchParams();
   const { type, source, amount, destination } = useTransactionStore();
   const { currentPocket } = usePocketStore();
   const isSchedule = type.id === "transfer_bulanan";
 
   const handleNext = () => {
-    // Navigate to the nested PinCode screen for the current pocket
     if (id) {
       router.push({
         pathname: "/(main)/pocket/[id]/transaction/PinCode",
@@ -34,6 +33,14 @@ export default function Confirmation() {
       });
     }
   };
+
+  // Conditionally set the button title based on the navigation parameter
+  const buttonTitle =
+    approvalRequired === "true"
+      ? "Kirim Permintaan Persetujuan"
+      : isSchedule
+        ? "Jadwalin Transfer"
+        : `${type.name} sekarang`;
 
   return (
     <Box className="flex-1 bg-white justify-between">
@@ -81,10 +88,7 @@ export default function Confirmation() {
             </Text>
           </HStack>
 
-          <PrimaryButton
-            buttonAction={handleNext}
-            buttonTitle={`${isSchedule ? "Jadwalin Transfer" : `${type.name} sekarang`}`}
-          />
+          <PrimaryButton buttonAction={handleNext} buttonTitle={buttonTitle} />
         </VStack>
       </Box>
     </Box>

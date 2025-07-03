@@ -31,7 +31,7 @@ export default function ReusableCellContent({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row gap-5 items-center flex-1 pr-2 active:bg-gray-50"
+      className="flex-row gap-5 items-center pr-2 active:bg-gray-50"
     >
       <VStack>
         {/* Logika ini akan menyembunyikan Badge jika isRead adalah true */}

@@ -6,10 +6,11 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Delete } from "lucide-react-native";
 import { ActivityIndicator } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { CommonActions } from "@react-navigation/native";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 const PIN_LENGTH = 6;
@@ -23,11 +24,8 @@ const keypad = [
 
 export default function PinCode() {
   const { id, isSchedule } = useLocalSearchParams();
+  const navigation = useNavigation(); // Get navigation object for advanced actions
   const [pin, setPin] = useState("");
-
-  useEffect(() => {
-    console.log("is schedule? ", id, isSchedule, typeof isSchedule);
-  }, []);
 
   const {
     type,
@@ -57,7 +55,6 @@ export default function PinCode() {
     if (newPin.length === PIN_LENGTH) {
       try {
         let result;
-        // --- KEY CHANGE: Await the result from the store function ---
         if (type.id === "topup") {
           result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
@@ -65,23 +62,35 @@ export default function PinCode() {
         } else if (type.id === "transfer") {
           result = await executeTransfer(id);
         } else if (type.id === "transfer_bulanan") {
-          console.log("Scheduled");
           result = await executeScheduleTransfer(id);
         } else {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
-        // --- KEY CHANGE: Navigate only AFTER a successful result is received ---
         if (result) {
-          router.push({
-            pathname: "/(main)/pocket/[id]/transaction/Statement",
-            params: {
-              id,
-              isSchedule,
-            },
-          });
+          if (result.status === "pending") {
+            // For pending transactions, reset the navigation stack to the pocket dashboard
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 2, // The active screen will be the last one in the routes array
+                routes: [
+                  { name: "home/index" },
+                  { name: "pocket/all/index" },
+                  { name: "pocket/[id]/index", params: { id } },
+                ],
+              }),
+            );
+          } else {
+            // For completed transactions, go to the statement page
+            router.push({
+              pathname: "/(main)/pocket/[id]/transaction/Statement",
+              params: {
+                id,
+                isSchedule,
+              },
+            });
+          }
         } else {
-          // This case might occur if the API returns success but no data
           alert(`Transaction Failed: Could not retrieve transaction details.`);
           setPin("");
         }

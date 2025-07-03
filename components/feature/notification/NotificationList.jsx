@@ -8,6 +8,10 @@ import ReusableCellContent from "@/components/common/tableCells/ReusableCellCont
 import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
 import { WondrColors } from "@/utils/colorUtils";
 
+// Define constants for item and separator heights for getItemLayout
+const ITEM_HEIGHT = 88; // Estimated height of your ReusableCellContent
+const SEPARATOR_HEIGHT = 20; // Corresponds to h-5
+
 export default function NotificationList() {
   const {
     notifications,
@@ -46,7 +50,19 @@ export default function NotificationList() {
     }
   };
 
+  // getItemLayout function to optimize FlatList rendering
+  const getItemLayout = (data, index) => ({
+    length: ITEM_HEIGHT,
+    offset: (ITEM_HEIGHT + SEPARATOR_HEIGHT) * index,
+    index,
+  });
+
   const renderNotificationItem = ({ item }) => {
+    // Add a defensive check in case an item is malformed
+    if (!item || !item.data) {
+      return null;
+    }
+
     // Default icon, can be made dynamic later if needed
     const IconComponent = personalIconMap.pocket;
     const notificationIcon = (
@@ -124,6 +140,9 @@ export default function NotificationList() {
           paddingVertical: 16,
         }}
         extraData={readIds} // Re-render list when readIds changes
+        // --- ADD THIS PROP ---
+        getItemLayout={getItemLayout}
+        // --- END ---
       />
     );
   };
