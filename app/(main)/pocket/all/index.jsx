@@ -149,6 +149,7 @@ export default function AllPocket() {
                   cardWidth={`${pressed ? "bg-gray-50" : ""}`}
                   editButton={true}
                   onEdit={() => handleEditButton(pocket)}
+                  userRole={pocket.user_role}
                 />
               )}
             </Pressable>

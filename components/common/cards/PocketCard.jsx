@@ -4,7 +4,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { EllipsisVertical } from "lucide-react-native";
+import { Crown, EllipsisVertical } from "lucide-react-native";
 import { personalIconMap } from "@/utils/pocketCustomization/personalPocketIconUtils";
 import { businessIconMap } from "@/utils/pocketCustomization/businessPocketIconUtils";
 
@@ -21,8 +21,10 @@ export default function PocketCard({
   cardWidth = "w-fit",
   editButton = false,
   onEdit = () => {},
+  userRole = "viewer",
 }) {
   const isBusiness = pocketType?.toLowerCase().includes("business");
+  const isOwner = userRole === "owner";
 
   const IconComponent =
     typeof icon === "string"
@@ -81,9 +83,12 @@ export default function PocketCard({
             {mode === "type" && <Text size={"md"}>{pocketType} pocket</Text>}
             {mode === "balance" && (
               <VStack space={"2xs"} className="mt-1">
-                <Text size={"sm"} className="text-black font-light">
-                  Saldo terkumpul:
-                </Text>
+                <HStack space="xs" className="items-center">
+                  <Text size={"sm"} className="text-black font-light">
+                    {pocketType} pocket
+                  </Text>
+                  {isOwner && <Crown size={12} color="black" />}
+                </HStack>
                 <Text
                   size={"md"}
                   className="text-black font-bold"
