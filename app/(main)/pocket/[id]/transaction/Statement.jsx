@@ -100,6 +100,7 @@ export default function Statement() {
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{
           paddingRight: 10,
+          paddingBottom: 30,
           justifyContent: "space-between",
         }}
         style={{ marginRight: -10, paddingHorizontal: 24, paddingTop: 20 }}

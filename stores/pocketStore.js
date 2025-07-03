@@ -79,6 +79,10 @@ export const usePocketStore = create((set, get) => ({
   businessHistorySummary: null,
   isHistoryLoading: false,
   historyError: null,
+  transactionHistoryRecap: [],
+  businessHistoryRecapSummary: null,
+  isHistoryRecapLoading: false,
+  historyRecapError: null,
   allPockets: [],
   isAllPocketsLoading: false,
   allPocketsError: null,
@@ -461,6 +465,65 @@ export const usePocketStore = create((set, get) => ({
         isHistoryLoading: false,
         transactionHistory: [],
         businessHistorySummary: null,
+      });
+      throw error;
+    }
+  },
+
+  fetchTransactionHistoryRecap: async (pocketId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(`API Call: GET /pocket/business/${pocketId}/history`);
+    console.log(
+      "================================================================",
+    );
+    set({ isHistoryRecapLoading: true, historyRecapError: null });
+    const { currentPocket } = get();
+
+    try {
+      const response = await api.get(`/pocket/business/${pocketId}/history`, {
+        params: { duration: "1y" },
+      });
+      console.log(
+        "Response Recap Received:",
+        JSON.stringify(response.data, null, 2),
+      );
+
+      if (response.data && response.data.ok) {
+        if (
+          currentPocket?.type === "Business" &&
+          typeof response.data.data === "object" &&
+          response.data.data.transactions
+        ) {
+          const { transactions, ...summary } = response.data.data;
+          set({
+            transactionHistoryRecap: transactions || [],
+            businessHistoryRecapSummary: summary,
+            isHistoryRecapLoading: false,
+          });
+        } else {
+          set({
+            transactionHistoryRecap: Array.isArray(response.data.data)
+              ? response.data.data
+              : [],
+            businessHistoryRecapSummary: null,
+            isHistoryRecapLoading: false,
+          });
+        }
+      } else {
+        throw new Error(
+          response.data.message || "Failed to fetch transaction history.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Recap Error:", errorMessage);
+      set({
+        historyRecapError: errorMessage,
+        isHistoryRecapLoading: false,
+        transactionHistoryRecap: [],
+        businessHistoryRecapSummary: null,
       });
       throw error;
     }

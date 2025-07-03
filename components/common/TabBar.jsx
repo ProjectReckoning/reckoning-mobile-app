@@ -6,9 +6,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const TAB_BAR_HEIGHT = 56;
-const TAB_BAR_PADDING = 6;
-
 export default function TabBar({
   tabList,
   activeTab,
@@ -16,6 +13,9 @@ export default function TabBar({
   size = 18,
   marginVertical = 28,
   backgroundColor = "#F9F9F9",
+  TAB_BAR_HEIGHT = 56,
+  TAB_BAR_PADDING = 6,
+  TAB_WIDTH,
 }) {
   const tabWidth =
     (Dimensions.get("window").width - 2 * 24 - 2 * TAB_BAR_PADDING) /
@@ -24,7 +24,18 @@ export default function TabBar({
 
   useEffect(() => {
     const idx = tabList.findIndex((tab) => tab.key === activeTab);
-    indicatorX.value = withTiming(idx * tabWidth, { duration: 250 });
+    let width = TAB_WIDTH;
+    if (typeof TAB_WIDTH === "string" && TAB_WIDTH.endsWith("%")) {
+      const percent = parseFloat(TAB_WIDTH) / 100;
+      width =
+        (Dimensions.get("window").width - 2 * 24 - 2 * TAB_BAR_PADDING) *
+        percent;
+    } else if (!TAB_WIDTH) {
+      width = tabWidth;
+    }
+    indicatorX.value = withTiming(idx * width, {
+      duration: 250,
+    });
   }, [activeTab, tabList, tabWidth, indicatorX]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
@@ -41,7 +52,6 @@ export default function TabBar({
         padding: TAB_BAR_PADDING,
         height: TAB_BAR_HEIGHT,
         position: "relative",
-        overflow: "hidden",
       }}
     >
       <Animated.View
@@ -50,9 +60,9 @@ export default function TabBar({
             position: "absolute",
             top: TAB_BAR_PADDING,
             left: TAB_BAR_PADDING,
-            width: tabWidth,
+            width: TAB_WIDTH ? TAB_WIDTH : tabWidth,
             height: TAB_BAR_HEIGHT - 2 * TAB_BAR_PADDING,
-            backgroundColor: "#D9F634", // lime-wondr
+            backgroundColor: "#D9F634",
             borderRadius: 999,
             zIndex: 0,
           },
