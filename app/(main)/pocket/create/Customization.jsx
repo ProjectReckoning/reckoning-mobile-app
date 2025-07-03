@@ -20,6 +20,8 @@ import PocketNameInput from "@/components/feature/pocketCustomization/PocketName
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 
 const colors = [
   "bg-orange-wondr",
@@ -68,6 +70,8 @@ export default function Customization() {
     allPockets,
     resetPocketData,
   } = usePocketStore();
+
+  const toast = useToast();
 
   // --- Effects ---
 
@@ -188,13 +192,35 @@ export default function Customization() {
       return;
     }
     try {
-      await updatePocket(pocketId);
-      resetPocketData();
-      router.back();
+      const result = await updatePocket(pocketId);
+
+      if (result) {
+        toast.show({
+          placement: "top",
+          duration: 2000,
+          render: ({ id }) => {
+            return <CustomToast id={id} title="Pocket telah diperbarui" />;
+          },
+        });
+        router.back();
+
+        setTimeout(() => {
+          resetPocketData();
+        }, 1500);
+      }
     } catch (error) {
       const latestError = usePocketStore.getState().updateError;
-      setAlertMessages([latestError || "Failed to save changes."]);
-      setShowAlertDialog(true);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          return (
+            <CustomToast
+              id={id}
+              title={latestError || "Gagal menyimpan perubahan"}
+            />
+          );
+        },
+      });
     }
   };
 

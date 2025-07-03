@@ -32,7 +32,7 @@ const CustomToast = React.forwardRef(function CustomToast(props, ref) {
         </Box>
         {/* 4. Styled the ToastTitle to have black, medium-weight text. */}
         <ToastTitle className="text-black font-medium">
-          Nomor rekening pocket berhasil disalin
+          Nomor Rekening berhasil disalin
         </ToastTitle>
       </Box>
     </Toast>

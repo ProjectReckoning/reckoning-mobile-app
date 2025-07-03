@@ -19,9 +19,12 @@ import PocketCard from "@/components/common/cards/PocketCard";
 import NominalInput from "@/components/common/forms/NominalInput";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 import { usePocketStore } from "@/stores/pocketStore";
 
 export default function SetTargetScreen() {
+  const toast = useToast();
   const { id: pocketId } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -83,19 +86,24 @@ export default function SetTargetScreen() {
         targetAmount: amountValue,
         deadline: deadline.toISOString(),
       });
-
-      // --- UPDATED NAVIGATION LOGIC ---
-      // Reset the navigation stack to go to the pocket dashboard
+      toast.show({
+        placement: "top",
+        duration: 2000,
+        render: ({ id }) => {
+          return <CustomToast id={id} title="Target berhasil diperbarui" />;
+        },
+      });
       navigation.dispatch(
         CommonActions.reset({
-          index: 2, // The active route is the 3rd one (index 2)
+          index: 2,
           routes: [
             { name: "home/index" },
             { name: "pocket/all/index" },
-            { name: "pocket/[id]/index", params: { id: pocketId } }, // Go to the dashboard
+            { name: "pocket/[id]/index", params: { id: pocketId } },
           ],
         }),
       );
+      setTimeout(() => {}, 1500);
     } catch (e) {
       console.error("Failed to update target:", e);
       Alert.alert(
@@ -152,7 +160,7 @@ export default function SetTargetScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 90}
+      keyboardVerticalOffset={60}
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -215,7 +223,7 @@ export default function SetTargetScreen() {
 
           <PrimaryButton
             buttonAction={handleUpdate}
-            buttonTitle="Ubah target"
+            buttonTitle="Set target"
             className="mb-8"
             textClassName="text-black font-bold text-base"
             disabled={
