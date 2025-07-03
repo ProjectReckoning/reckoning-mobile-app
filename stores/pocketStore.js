@@ -571,16 +571,18 @@ export const usePocketStore = create((set, get) => ({
     console.log(
       "================================================================",
     );
-    console.log(`API Call: DELETE /pocket/${pocketId}/members`);
+    console.log(`API Call: POST /pocket/${pocketId}/members/kick`);
     console.log(
       "================================================================",
     );
     set({ isMemberActionLoading: true, memberActionError: null });
+    const requestBody = { members: memberUserIds };
     try {
-      console.log("Request Body (in data):", { members: memberUserIds });
-      const response = await api.delete(`/pocket/${pocketId}/members`, {
-        data: { members: memberUserIds },
-      });
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.post(
+        `/pocket/${pocketId}/members/kick`,
+        requestBody,
+      );
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         await get().fetchPocketById(pocketId);
