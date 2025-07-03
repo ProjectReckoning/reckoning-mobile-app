@@ -1,6 +1,4 @@
 // src/components/common/tableCells/ReusableCellContent.js
-
-import React from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Badge } from "@/components/ui/badge";
@@ -19,9 +17,6 @@ export default function ReusableCellContent({
   isRead = false, // Prop ini dikontrol dari BalanceCategory
   onPress = () => {},
 }) {
-  // Tambahkan console.log untuk debugging
-  console.log(`[ReusableCellContent] Rendering "${title}". isRead:`, isRead);
-
   const finalTitleClass = `text-lg text-black font-bold ${!isRead ? "" : "font-normal"} ${titleClassName || ""}`;
   const finalDescriptionClass = `${descriptionClassName || "text-black font-normal text-base"}`;
   const finalDateClass = `font-base text-sm text-black ${dateClassName || ""}`;

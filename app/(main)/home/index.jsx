@@ -167,7 +167,7 @@ export default function Home() {
       <ScrollView
         className="px-6"
         showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ paddingRight: 10 }}
+        contentContainerStyle={{ paddingRight: 10, paddingBottom: 30 }}
       >
         <AccountCard user={user} />
         <SelectedFeature />

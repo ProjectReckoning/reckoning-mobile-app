@@ -35,28 +35,28 @@ export default function Withdraw() {
         },
       },
     },
-    {
-      id: 1826096195,
-      name: "AMIRA FERIAL",
-      balance: 8546250,
-      category: {
-        bank: {
-          name: "BNI",
-          type: "TAPLUS MUDA",
-        },
-      },
-    },
-    {
-      id: 1922276179,
-      name: "AMIRA FERIAL",
-      balance: 26546250,
-      category: {
-        bank: {
-          name: "BNI",
-          type: "BNI RDN",
-        },
-      },
-    },
+    // {
+    //   id: 1826096195,
+    //   name: "AMIRA FERIAL",
+    //   balance: 8546250,
+    //   category: {
+    //     bank: {
+    //       name: "BNI",
+    //       type: "TAPLUS MUDA",
+    //     },
+    //   },
+    // },
+    // {
+    //   id: 1922276179,
+    //   name: "AMIRA FERIAL",
+    //   balance: 26546250,
+    //   category: {
+    //     bank: {
+    //       name: "BNI",
+    //       type: "BNI RDN",
+    //     },
+    //   },
+    // },
   ];
 
   // --- NEW: Reset the transaction state every time this screen is focused ---
