@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { FlatList } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
-import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
+
+import { FlatList } from "react-native";
+import { useState, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
 import {
   HandCoins,
   BanknoteArrowUp,
@@ -14,9 +15,11 @@ import {
   Send,
   Package,
 } from "lucide-react-native";
-import { WondrColors } from "@/utils/colorUtils";
 
-// --- KONFIGURASI KATEGORI ---
+import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
+import ReusableCellContent from "@/components/common/tableCells/ReusableCellContent";
+
 const CATEGORY_DETAILS = {
   penjualan: {
     name: "Penjualan",
@@ -24,7 +27,7 @@ const CATEGORY_DETAILS = {
     color: WondrColors["purple-wondr"],
     bgColor: "bg-purple-wondr-light-translucent",
   },
-  "top up": {
+  topup: {
     name: "Top up",
     Icon: BanknoteArrowUp,
     color: WondrColors["tosca-wondr"],
@@ -62,74 +65,91 @@ const CATEGORY_DETAILS = {
   },
 };
 
-const MAIN_INCOME_CATEGORIES = ["penjualan", "top up"];
+const MAIN_INCOME_CATEGORIES = ["penjualan", "topup"];
 const MAIN_EXPENSE_CATEGORIES = ["gaji", "withdraw", "transfer", "pembelian"];
 
-// --- DATA TRANSAKSI (CONTOH) ---
-const allTransactions = [
-  { id: 1, type: "pemasukan", category: "Penjualan", amount: 750000 },
-  { id: 2, type: "pemasukan", category: "Top up", amount: 200000 },
-  { id: 3, type: "pemasukan", category: "Bonus Proyek", amount: 100000 },
-  { id: 4, type: "pemasukan", category: "Cashback", amount: 25000 },
-  { id: 5, type: "pengeluaran", category: "Gaji", amount: 2500000 },
-  { id: 6, type: "pengeluaran", category: "Withdraw", amount: 500000 },
-  { id: 7, type: "pengeluaran", category: "Pembelian Stok", amount: 1200000 },
-  { id: 8, type: "pengeluaran", category: "Listrik", amount: 450000 },
-  { id: 9, type: "pengeluaran", category: "Transfer", amount: 450000 },
-  { id: 10, type: "pengeluaran", category: "Pembelian", amount: 450000 },
-];
-
-// --- FUNGSI LOGIKA ---
 const processTransactionsForDisplay = (transactions, activeType) => {
+  if (!transactions || transactions.length === 0) {
+    return [];
+  }
+
+  // 1. Agregasi semua transaksi berdasarkan kategori
+  const aggregatedData = transactions.reduce((acc, transaction) => {
+    const categoryKey = transaction.category
+      .toLowerCase()
+      .replace(/[\s-_]/g, "");
+
+    if (!acc[categoryKey]) {
+      acc[categoryKey] = {
+        id: categoryKey,
+        type: transaction.type,
+        category: transaction.category,
+        amount: 0,
+      };
+    }
+    acc[categoryKey].amount += Number(transaction.amount);
+    return acc;
+  }, {});
+
+  // 2. Pisahkan kategori utama dan gabungkan sisanya ke "Lainnya"
   const mainCategoriesForType =
-    activeType === "pemasukan"
-      ? MAIN_INCOME_CATEGORIES
-      : MAIN_EXPENSE_CATEGORIES;
+    activeType === "Income" ? MAIN_INCOME_CATEGORIES : MAIN_EXPENSE_CATEGORIES;
 
-  const mainItems = [];
-  const otherItemsToAggregate = [];
+  const displayItems = [];
+  let otherItemsToAggregate = [];
 
-  transactions.forEach((transaction) => {
-    const categoryKey = transaction.category.toLowerCase();
+  Object.values(aggregatedData).forEach((item) => {
+    const categoryKey = item.category.toLowerCase().replace(/[\s-_]/g, "");
     if (mainCategoriesForType.includes(categoryKey)) {
-      mainItems.push(transaction);
+      displayItems.push(item);
     } else {
-      otherItemsToAggregate.push(transaction);
+      otherItemsToAggregate.push(item);
     }
   });
 
+  // 3. Jika ada kategori "Lainnya", jumlahkan dan tambahkan sebagai satu item
   if (otherItemsToAggregate.length > 0) {
     const totalOtherAmount = otherItemsToAggregate.reduce(
       (sum, current) => sum + current.amount,
       0,
     );
-    const aggregatedOtherItem = {
+    displayItems.push({
       id: "lainnya_aggregated",
       type: otherItemsToAggregate[0].type,
       category: "Lainnya",
       amount: totalOtherAmount,
-    };
-    mainItems.push(aggregatedOtherItem);
+    });
   }
 
-  return mainItems;
+  return displayItems;
 };
 
 // --- KOMPONEN UTAMA ---
 export default function BalanceCategory() {
-  const [activeTab, setActiveTab] = useState("pemasukan");
+  const { id } = useLocalSearchParams();
+  const [activeTab, setActiveTab] = useState("Income");
+  const { transactionHistoryRecap, fetchTransactionHistoryRecap } =
+    usePocketStore();
 
-  const filteredTransactions = allTransactions.filter(
+  useEffect(() => {
+    if (!id) return;
+    const pocketId = Array.isArray(id) ? id[0] : id;
+    fetchTransactionHistoryRecap(pocketId);
+  }, [id, fetchTransactionHistoryRecap]);
+
+  const filteredTransactions = transactionHistoryRecap.filter(
     (t) => t.type === activeTab,
   );
+
+  // Memanggil fungsi yang sudah diperbarui
   const displayData = processTransactionsForDisplay(
     filteredTransactions,
     activeTab,
   );
 
   const balanceTabs = [
-    { name: "pemasukan", label: "Pemasukan" },
-    { name: "pengeluaran", label: "Pengeluaran" },
+    { name: "Income", label: "Pemasukan" },
+    { name: "Expense", label: "Pengeluaran" },
   ];
 
   const handleTabChange = (newTabName) => {
@@ -137,7 +157,7 @@ export default function BalanceCategory() {
   };
 
   const renderTransactionItem = ({ item }) => {
-    const categoryKey = item.category.toLowerCase();
+    const categoryKey = item.category.toLowerCase().replace(/[\s-_]/g, "");
     const details = CATEGORY_DETAILS[categoryKey] || CATEGORY_DETAILS.lainnya;
     const formattedAmount = new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -179,15 +199,13 @@ export default function BalanceCategory() {
               className="flex-1"
             >
               <Box
-                className={`py-2 px-3 rounded-full justify-center items-center ${
+                className={`p-3 rounded-full justify-center items-center ${
                   isActive ? "bg-lime-wondr" : "bg-transparent"
                 }`}
               >
                 <Text
                   className={`text-sm ${
-                    isActive
-                      ? "font-extrabold text-black"
-                      : "font-normal text-black"
+                    isActive ? "font-bold text-black" : "font-normal text-black"
                   }`}
                 >
                   {tab.label}
@@ -201,20 +219,17 @@ export default function BalanceCategory() {
   );
 
   return (
-    // >>> PERUBAHAN DI SINI: `flex-1` dihapus agar tinggi container tidak meregang <<<
-    <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border gap-5">
+    <Box className="flex-1 w-full bg-white p-5 rounded-3xl border border-gray-wondr-border gap-5">
       <ListHeader />
-      {/* >>> PERUBAHAN DI SINI: `flex-1` pada Box pembungkus juga dihapus <<< */}
       <Box>
         {displayData && displayData.length > 0 ? (
           <FlatList
             data={displayData}
             renderItem={renderTransactionItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.id}
             ItemSeparatorComponent={renderSeparator}
             showsVerticalScrollIndicator={false}
             scrollEnabled={false}
-            // `paddingBottom` di sini memberikan sedikit ruang di bawah item terakhir
             contentContainerStyle={{ paddingBottom: 5 }}
           />
         ) : (

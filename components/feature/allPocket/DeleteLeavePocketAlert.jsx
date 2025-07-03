@@ -18,8 +18,8 @@ import PrimaryButton from "../../common/buttons/PrimaryButton";
 export default function DeletePocketAlert({
   isOpen,
   onClose,
-  onDelete,
-  onLeave,
+  onDelete = () => {},
+  onLeave = () => {},
   pocketName,
   pocketType,
   icon,

@@ -18,6 +18,7 @@ import { personalIcons } from "@/utils/pocketCustomization/personalPocketIconUti
 import { businessIcons } from "@/utils/pocketCustomization/businessPocketIconUtils";
 import PocketNameInput from "@/components/feature/pocketCustomization/PocketNameInput";
 import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErrorAlert";
+import DeleteLeavePocketAlert from "@/components/feature/allPocket/DeleteLeavePocketAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
 
@@ -40,9 +41,10 @@ const colorMap = {
 };
 
 export default function Customization() {
-  const { pocketId } = useLocalSearchParams();
+  const { pocketId, innerEdit } = useLocalSearchParams();
   const navigation = useNavigation();
   const isEditMode = !!pocketId;
+  const isInnerEditMode = innerEdit === "true";
 
   // --- Local State for UI ---
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -50,6 +52,8 @@ export default function Customization() {
   const [isNameInvalid, setNameIsInvalid] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedIconIndex, setSelectedIconIndex] = useState(0);
+  const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // --- Zustand Store State and Actions ---
   const {
@@ -67,6 +71,7 @@ export default function Customization() {
     setPocketForEditing,
     allPockets,
     resetPocketData,
+    deletePocket,
   } = usePocketStore();
 
   // --- Effects ---
@@ -94,6 +99,7 @@ export default function Customization() {
     const colorIndex = colors.indexOf(pocketColor);
     const iconArray = isBusiness ? businessIcons : personalIcons;
     const iconIndex = iconArray.indexOf(pocketIcon);
+    console.log(innerEdit, typeof innerEdit);
 
     if (
       (colorIndex !== selectedColorIndex && colorIndex >= 0) ||
@@ -198,6 +204,28 @@ export default function Customization() {
     }
   };
 
+  const onDelete = async () => {
+    if (!pocketId) return;
+    setIsDeleting(true);
+    try {
+      await deletePocket(pocketId);
+      resetPocketData();
+      setTimeout(() => {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{ name: "home/index" }, { name: "pocket/all/index" }],
+          }),
+        );
+      }, 300);
+    } catch (error) {
+      console.error("Failed to delete pocket from component:", error);
+    } finally {
+      setShowDeleteLeaveAlert(false);
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col w-full h-fit px-6 py-5 items-center bg-[#F9F9F9]">
@@ -252,13 +280,24 @@ export default function Customization() {
               buttonAction={handleSaveChanges}
               buttonTitle={isUpdating ? "Menyimpan..." : "Simpan"}
               className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
-              disabled={isNameInvalid || isUpdating}
+              disabled={isNameInvalid || isUpdating || isDeleting}
             />
-            <PrimaryButton
-              buttonAction={() => router.back()}
-              buttonTitle="Batal"
-              className="bg-white border border-gray-wondr active:bg-light-gray-wondr"
-            />
+            {isInnerEditMode ? (
+              <PrimaryButton
+                buttonAction={() => setShowDeleteLeaveAlert(true)}
+                buttonTitle={isDeleting ? "Menghapus..." : "Hapus pocket"}
+                className="bg-white border-2 border-red-wondr mb-4 active:bg-red-wondr"
+                textClassName="text-red-wondr"
+                textPressed="text-white"
+                disabled={isDeleting}
+              />
+            ) : (
+              <PrimaryButton
+                buttonAction={() => router.back()}
+                buttonTitle="Batal"
+                className="bg-white border border-gray-wondr active:bg-light-gray-wondr"
+              />
+            )}
           </>
         ) : (
           <PrimaryButton
@@ -273,6 +312,15 @@ export default function Customization() {
           isOpen={showAlertDialog}
           onClose={() => setShowAlertDialog(false)}
           messages={alertMessages}
+        />
+        <DeleteLeavePocketAlert
+          isOpen={showDeleteLeaveAlert}
+          onClose={() => setShowDeleteLeaveAlert(false)}
+          onDelete={onDelete}
+          pocketName={pocketName}
+          pocketType={pocketType}
+          color={pocketColor}
+          icon={pocketIcon}
         />
       </Box>
     </Box>

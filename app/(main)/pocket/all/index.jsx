@@ -124,7 +124,11 @@ export default function AllPocket() {
     return (
       <ScrollView
         showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ paddingRight: 10, flexGrow: 1 }}
+        contentContainerStyle={{
+          paddingRight: 10,
+          paddingBottom: 30,
+          flexGrow: 1,
+        }}
         style={{ marginRight: -10 }}
       >
         <Box className="flex-row flex-wrap justify-between px-2">

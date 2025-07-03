@@ -11,6 +11,7 @@ import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
 import PocketCard from "@/components/common/cards/PocketCard";
 import { formatToLocalizedDate } from "@/utils/helperFunction";
+import { router } from "expo-router";
 
 export default function PocketDetail() {
   // Get data directly from the Zustand store
@@ -40,11 +41,19 @@ export default function PocketDetail() {
     currentPocket?.user_role === "admin" ||
     currentPocket?.user_role === "owner";
 
+  const handleInnerEdit = () => {
+    router.push({
+      pathname: "pocket/create/Customization",
+      params: { pocketId: currentPocket.id, innerEdit: true },
+    });
+  };
+
   return (
     <Box>
       <AppText variant="title">Pocket Detail</AppText>
       <Pressable
         disabled={!isOwnerAdmin}
+        onPress={handleInnerEdit}
         className="w-full active:bg-slate-50 data-[disabled=true]:opacity-100 data-[disabled=true]:bg-transparent"
       >
         <HStack
@@ -58,6 +67,7 @@ export default function PocketDetail() {
             mode="icon"
             color={currentPocket.color}
             icon={currentPocket.icon_name}
+            pocketType={currentPocket.type}
             iconSize="10"
             whiteSpace="mb-5"
             cardWidth="w-fit"

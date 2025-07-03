@@ -74,6 +74,7 @@ export default function Receipt() {
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{
             paddingRight: 10,
+            paddingBottom: 30,
             justifyContent: "center",
             alignItems: "center",
             flexGrow: 1,
