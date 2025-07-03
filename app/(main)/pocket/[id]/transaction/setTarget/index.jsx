@@ -145,7 +145,8 @@ export default function SetTargetScreen() {
 
   const isAmountInvalid =
     isAmountTouched &&
-    (!targetAmount || parseFloat(String(targetAmount).replace(/\D/g, "")) <= 0);
+    (!targetAmount ||
+      parseFloat(String(targetAmount).replace(/\D/g, "")) < 10000);
   const isDateInvalid = isDateTouched && !deadline;
 
   return (
@@ -188,6 +189,7 @@ export default function SetTargetScreen() {
               setAmount={setTargetAmount}
               setAmountTouched={setAmountTouched}
               isAmountInvalid={isAmountInvalid}
+              isMinimumAmountRequired={true}
             />
           </Box>
 
@@ -216,7 +218,9 @@ export default function SetTargetScreen() {
             buttonTitle="Ubah target"
             className="mb-8"
             textClassName="text-black font-bold text-base"
-            disabled={!deadline || !targetAmount || isUpdating}
+            disabled={
+              !deadline || !targetAmount || isUpdating || isAmountInvalid
+            }
             isLoading={isUpdating}
           />
         </ScrollView>

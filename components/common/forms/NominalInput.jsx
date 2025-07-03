@@ -15,6 +15,7 @@ export default function NominalInput({
   setAmount,
   isAmountInvalid,
   setAmountTouched,
+  isMinimumAmountRequired = false,
 }) {
   return (
     <FormControl isInvalid={isAmountInvalid} size="md" isRequired>
@@ -52,12 +53,31 @@ export default function NominalInput({
           />
         )}
       </Input>
+      <FormControlErrorSection
+        isMinimumAmountRequired={isMinimumAmountRequired}
+      />
+    </FormControl>
+  );
+}
+
+function FormControlErrorSection({ isMinimumAmountRequired }) {
+  if (!isMinimumAmountRequired) {
+    return (
       <FormControlError>
         <FormControlErrorIcon as={AlertCircleIcon} />
         <FormControlErrorText>
           Nominal harus terisi dan valid!
         </FormControlErrorText>
       </FormControlError>
-    </FormControl>
+    );
+  }
+
+  return (
+    <FormControlError>
+      <FormControlErrorIcon as={AlertCircleIcon} />
+      <FormControlErrorText>
+        Nominal harus terisi dan diatas Rp10.000!
+      </FormControlErrorText>
+    </FormControlError>
   );
 }
