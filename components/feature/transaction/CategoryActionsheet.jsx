@@ -34,7 +34,11 @@ export default function CategoryActionSheet({ isOpen, onClose, handleClose }) {
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
 
+        {/* PERUBAHAN DI SINI: Tambahkan `self-start` */}
+        <Heading className="my-7 self-start">Pilih Kategori</Heading>
+
         <ActionsheetSectionList
+          showsVerticalScrollIndicator={false}
           h="$56"
           sections={DATA}
           keyExtractor={(item, index) => item + index}
@@ -45,11 +49,6 @@ export default function CategoryActionSheet({ isOpen, onClose, handleClose }) {
             >
               <Text className="text-black">{item}</Text>
             </Pressable>
-          )}
-          renderSectionHeader={({ section: { title, data } }) => (
-            <Heading className="my-7">
-              Pilih {title} ({data.length})
-            </Heading>
           )}
         />
       </ActionsheetContent>
