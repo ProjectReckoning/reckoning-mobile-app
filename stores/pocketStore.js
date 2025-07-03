@@ -4,21 +4,27 @@ import api from "@/lib/api";
 
 // --- Helper Objects ---
 const colorClassToHex = {
-  "bg-orange-wondr": "#FF7A00",
-  "bg-yellow-wondr": "#FFC700",
-  "bg-lime-wondr": "#A8E05F",
-  "bg-tosca-wondr": "#58ABA1",
-  "bg-purple-wondr": "#8A2BE2",
-  "bg-pink-wondr": "#FF69B4",
+  "bg-orange-wondr": "#FF7A00" || "#FF8500",
+  "bg-yellow-wondr": "#FFC700" || "#FFC533",
+  "bg-lime-wondr": "#A8E05F" || "#D9F634",
+  "bg-tosca-wondr": "#58ABA1" || "#3FD8D4",
+  "bg-purple-wondr": "#8A2BE2" || "#A471E1",
+  "bg-pink-wondr": "#FF69B4" || "#FDA9FF",
 };
 
 const hexToColorClass = {
   "#FF7A00": "bg-orange-wondr",
+  "#FF8500": "bg-orange-wondr",
   "#FFC700": "bg-yellow-wondr",
+  "#FFC533": "bg-yellow-wondr",
   "#A8E05F": "bg-lime-wondr",
+  "#D9F634": "bg-lime-wondr",
   "#58ABA1": "bg-tosca-wondr",
+  "#3FD8D4": "bg-tosca-wondr",
   "#8A2BE2": "bg-purple-wondr",
+  "#A471E1": "bg-purple-wondr",
   "#FF69B4": "bg-pink-wondr",
+  "#FDA9FF": "bg-pink-wondr",
 };
 
 const typeToDisplayType = {
