@@ -59,4 +59,18 @@ export const modalData = [
       },
     ],
   },
+  {
+    id: "BUSINESS_APPROVAL_REQUIRED",
+    title: "Persetujuan Admin Diperlukan",
+    subTitle: "Transfer ini memerlukan persetujuan dari semua admin",
+    image: require("@/assets/images/approval.png"), // Added image
+    buttons: [
+      {
+        text: "Kirim Permintaan Persetujuan",
+      },
+      {
+        text: "Ubah Nominal",
+      },
+    ],
+  },
 ];

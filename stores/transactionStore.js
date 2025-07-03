@@ -149,6 +149,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error(response.data.message || "Withdrawal failed.");
       }
     } catch (error) {
+      // --- FIX: Replaced period with opening brace ---
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
@@ -174,13 +175,24 @@ export const useTransactionStore = create((set, get) => ({
       transactionError: null,
       transactionResult: null,
     });
-    const { amount, destination, description } = get();
+    const { amount, destination, description, category } = get();
+
+    const categoryMapping = {
+      Pembelian: "pembelian",
+      Gaji: "gaji",
+    };
+
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
       destination: destination.name,
       description: description || `Transfer to ${destination.name}`,
     };
+
+    if (category && categoryMapping[category]) {
+      requestBody.category = categoryMapping[category];
+    }
+
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
       const response = await api.post("/transaction/transfer", requestBody);
@@ -213,7 +225,6 @@ export const useTransactionStore = create((set, get) => ({
     );
     set({ isFetchingScheduleTransfer: true, fetchScheduleTransferError: null });
     try {
-      // Step 1: Fetch the initial list of schedules
       const listResponse = await api.get(
         `/transaction/transfer/schedule/${pocketId}`,
       );
@@ -230,15 +241,12 @@ export const useTransactionStore = create((set, get) => ({
         return [];
       }
 
-      // Step 2: Create an array of promises to fetch the detail for each schedule
       const detailPromises = initialList.map((item) =>
         api.get(`/transaction/transfer/schedule/${pocketId}/${item.id}`),
       );
 
-      // Step 3: Wait for all detail fetches to complete
       const detailResponses = await Promise.all(detailPromises);
 
-      // Step 4: Extract the detailed data from each response and build the final list
       const finalScheduleList = detailResponses.map((res) => res.data.data);
 
       set({
@@ -254,7 +262,7 @@ export const useTransactionStore = create((set, get) => ({
         "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
-        scheduleTransferConfig: [], // Set to empty array on error
+        scheduleTransferConfig: [],
         isFetchingScheduleTransfer: false,
         fetchScheduleTransferError: errorMessage,
       });

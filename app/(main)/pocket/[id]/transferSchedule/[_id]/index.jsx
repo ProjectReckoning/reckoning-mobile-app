@@ -7,7 +7,7 @@ import { Heading } from "@/components/ui/heading";
 
 import { useState, useEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Modal, ScrollView, ActivityIndicator } from "react-native";
+import { Modal, ScrollView, ActivityIndicator, Alert } from "react-native";
 
 import { WondrColors } from "@/utils/colorUtils";
 import { formatRupiah } from "@/utils/helperFunction";
@@ -50,8 +50,13 @@ export default function TransferBulananDetail() {
     currentPocket,
     isLoading: isPocketLoading,
   } = usePocketStore();
-  const { getScheduleDetail, currentSchedule, isFetchingScheduleDetail } =
-    useTransactionStore();
+  const {
+    getScheduleDetail,
+    currentSchedule,
+    isFetchingScheduleDetail,
+    deleteScheduleTransfer,
+    isProcessing,
+  } = useTransactionStore();
 
   useEffect(() => {
     if (pocketId) fetchPocketById(pocketId);
@@ -70,10 +75,20 @@ export default function TransferBulananDetail() {
     setIsDeleteModalVisible(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log("Jadwal transfer akan dihapus!");
-    setIsDeleteModalVisible(false);
-    navigation.goBack();
+  const handleConfirmDelete = async () => {
+    if (isProcessing) return; // Prevent multiple clicks
+
+    try {
+      await deleteScheduleTransfer(pocketId, scheduleId);
+      setIsDeleteModalVisible(false);
+      // After successful deletion, go back to the previous screen.
+      // The store will have already refetched the updated list.
+      navigation.goBack();
+    } catch (error) {
+      setIsDeleteModalVisible(false);
+      Alert.alert("Gagal", "Tidak dapat menghapus jadwal transfer saat ini.");
+      console.error("Failed to delete scheduled transfer:", error);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -140,7 +155,7 @@ export default function TransferBulananDetail() {
           <HStack className="justify-between">
             <Text className="text-sm text-black font-light">Bulan mulai</Text>
             <Text className="text-sm text-black font-light">
-              {currentSchedule?.detail.start_date
+              {currentSchedule?.detail?.start_date
                 ? formatMonthYear(new Date(currentSchedule.detail.start_date))
                 : "-"}
             </Text>
@@ -148,7 +163,7 @@ export default function TransferBulananDetail() {
           <HStack className="justify-between">
             <Text className="text-sm text-black font-light">Bulan selesai</Text>
             <Text className="text-sm text-black font-light">
-              {currentSchedule?.detail.end_date
+              {currentSchedule?.detail?.end_date
                 ? formatMonthYear(new Date(currentSchedule.detail.end_date))
                 : "-"}
             </Text>
@@ -180,8 +195,8 @@ export default function TransferBulananDetail() {
         <VStack space="lg" className="w-full">
           <TransactionCard
             title="Penerima"
-            heading={currentSchedule?.detail.destination?.toUpperCase() || "-"}
-            subheading={currentSchedule?.detail.user_id || ""}
+            heading={currentSchedule?.detail?.destination?.toUpperCase() || "-"}
+            subheading={currentSchedule?.detail?.user_id || ""}
           />
           <TransactionCard
             title="Sumber dana"
@@ -227,11 +242,12 @@ export default function TransferBulananDetail() {
 
             <PrimaryButton
               buttonAction={handleConfirmDelete}
-              buttonTitle="Hapus Sekarang"
+              buttonTitle={isProcessing ? "Menghapus..." : "Hapus Sekarang"}
               className="mb-3"
               buttonColor="bg-red-wondr"
               textClassName="text-white font-bold text-base"
               buttonActiveColor="active:bg-red-700"
+              disabled={isProcessing}
             />
             <PrimaryButton
               buttonAction={handleCancelDelete}
@@ -240,6 +256,7 @@ export default function TransferBulananDetail() {
               buttonColor="bg-white"
               className="border border-gray-300"
               buttonActiveColor="active:bg-gray-200"
+              disabled={isProcessing}
             />
           </Box>
         </Box>

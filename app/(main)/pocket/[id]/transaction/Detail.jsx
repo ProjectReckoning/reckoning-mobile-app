@@ -21,7 +21,6 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 
-// --- Core Changes: Import authStore and modal components ---
 import useAuthStore from "@/stores/authStore";
 import { modalData } from "@/utils/mockData/modalData";
 import ErrorModal from "@/components/common/ErrorModal";
@@ -45,11 +44,10 @@ export default function TransactionDetail() {
     setType,
   } = useTransactionStore();
   const { currentPocket, pocketType } = usePocketStore();
-
-  // --- Get the logged-in user from your authStore ---
   const { user } = useAuthStore();
-  const [showApprovalModal, setShowApprovalModal] = useState(false);
 
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [modalContent, setModalContent] = useState(null); // To hold modal data
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
@@ -70,14 +68,29 @@ export default function TransactionDetail() {
   );
 
   const handleNext = () => {
-    // --- Validation Logic using user from authStore ---
     if (!currentPocket || !user) {
       console.error("Pocket data or user data is not available.");
       return;
     }
 
+    // Check if the current user is the sole admin in a business pocket
+    const isSingleAdmin =
+      isBusiness &&
+      currentPocket.owner.id === user.id &&
+      !currentPocket.members.some((m) => m.PocketMember.role === "admin");
+
+    // If it's a business pocket and there are other admins, always require approval
+    if (isBusiness && !isSingleAdmin) {
+      const content = modalData.find(
+        (m) => m.id === "BUSINESS_APPROVAL_REQUIRED",
+      );
+      setModalContent(content);
+      setShowApprovalModal(true);
+      return;
+    }
+
+    // For personal pockets OR single-admin business pockets, check contribution
     let userContribution = 0;
-    // Find the current user's contribution by matching user.id
     if (currentPocket.owner.id === user.id) {
       userContribution = parseFloat(
         currentPocket.owner.PocketMember.contribution_amount,
@@ -91,13 +104,15 @@ export default function TransactionDetail() {
       }
     }
 
-    // Show modal if the transfer amount exceeds the user's contribution
+    // Show approval modal if transfer amount exceeds contribution
     if (amount > userContribution) {
+      const content = modalData.find((m) => m.id === "APPROVAL_REQUIRED");
+      setModalContent(content);
       setShowApprovalModal(true);
       return;
     }
 
-    // Proceed to confirmation if validation passes
+    // If all checks pass, proceed to confirmation
     if (id) {
       router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
     }
@@ -117,17 +132,34 @@ export default function TransactionDetail() {
     }
   };
 
-  // --- Modal Logic ---
-  const approvalModalContent = modalData.find(
-    (m) => m.id === "APPROVAL_REQUIRED",
-  );
-
   const handleRequestApproval = () => {
     setShowApprovalModal(false);
-    // On approval, navigate to the PinCode screen
+    // Navigate to Confirmation screen with a flag for the approval flow
     if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/PinCode`);
+      router.push({
+        pathname: `/(main)/pocket/${id}/transaction/Confirmation`,
+        params: { approvalRequired: "true" },
+      });
     }
+  };
+
+  // Dynamically assign button actions based on which modal is shown
+  const getButtonActions = () => {
+    if (!modalContent) {
+      return {};
+    }
+    // For business pockets, the "Kirim" button is the first one
+    if (modalContent.id === "BUSINESS_APPROVAL_REQUIRED") {
+      return {
+        specialButton1Action: handleRequestApproval,
+        specialButton2Action: () => setShowApprovalModal(false),
+      };
+    }
+    // For personal pockets, the "Kirim" button is the second one
+    return {
+      specialButton1Action: () => setShowApprovalModal(false),
+      specialButton2Action: handleRequestApproval,
+    };
   };
 
   return (
@@ -263,19 +295,17 @@ export default function TransactionDetail() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* --- Renders the modal when validation fails --- */}
-      {approvalModalContent && (
+      {modalContent && (
         <ErrorModal
           isOpen={showApprovalModal}
           onClose={() => setShowApprovalModal(false)}
-          imageSource={approvalModalContent.image}
-          title={approvalModalContent.title}
-          subtitle={approvalModalContent.subTitle}
+          imageSource={modalContent.image}
+          title={modalContent.title}
+          subtitle={modalContent.subTitle}
           showSpecialActions={true}
-          specialButton1Title={approvalModalContent.buttons[0].text}
-          specialButton1Action={() => setShowApprovalModal(false)}
-          specialButton2Title={approvalModalContent.buttons[1].text}
-          specialButton2Action={handleRequestApproval}
+          specialButton1Title={modalContent.buttons[0].text}
+          specialButton2Title={modalContent.buttons[1].text}
+          {...getButtonActions()}
         />
       )}
     </Box>
