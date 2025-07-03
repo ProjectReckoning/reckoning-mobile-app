@@ -56,7 +56,10 @@ export default function MainLayout() {
       }}
     >
       {/* ===== General and Home Screens ===== */}
-      <Stack.Screen name="home/index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="home/index"
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
       <Stack.Screen
         name="home/notification/index"
         options={{ title: "Notifications" }}
@@ -183,10 +186,16 @@ export default function MainLayout() {
         name="pocket/[id]/transaction/PinCode"
         options={{ title: "" }}
       />
+      {/* --- MODIFICATION HERE --- */}
       <Stack.Screen
         name="pocket/[id]/transaction/Statement"
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          // This line disables the swipe-back gesture for this screen only
+          gestureEnabled: false,
+        }}
       />
+      {/* --- END MODIFICATION --- */}
       <Stack.Screen
         name="pocket/[id]/transaction/Receipt"
         options={{

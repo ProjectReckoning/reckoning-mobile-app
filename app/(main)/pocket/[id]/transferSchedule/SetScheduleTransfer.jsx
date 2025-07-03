@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useFocusEffect } from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 
-export default function NotificationDetail() {
+export default function SetScheduleTransfer() {
   const { setType } = useTransactionStore();
 
   useFocusEffect(
