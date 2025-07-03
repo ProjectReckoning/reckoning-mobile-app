@@ -58,6 +58,7 @@ export default function PocketDetail() {
             mode="icon"
             color={currentPocket.color}
             icon={currentPocket.icon_name}
+            pocketType={currentPocket.type}
             iconSize="10"
             whiteSpace="mb-5"
             cardWidth="w-fit"
