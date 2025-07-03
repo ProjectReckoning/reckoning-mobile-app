@@ -6,7 +6,8 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 
-import { router, useLocalSearchParams } from "expo-router";
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, Platform } from "react-native";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
@@ -22,7 +23,8 @@ import StatementDecorator from "@/assets/images/decorators/statementlDecorator.p
 import ScheduleTrxDecorator from "@/assets/images/decorators/scheduleTrxDecorator.png";
 
 export default function Statement() {
-  let { isSchedule } = useLocalSearchParams();
+  let { id, isSchedule } = useLocalSearchParams();
+  const navigation = useNavigation(); // Get navigation object
   const {
     type,
     source,
@@ -37,11 +39,42 @@ export default function Statement() {
   isSchedule = isSchedule === "true";
 
   const handleFinish = () => {
-    // Reset the amount and go back to the home screen.
     resetPocketData();
     resetTransactionState();
-    router.replace("(main)/home");
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "home/index" }],
+      }),
+    );
   };
+
+  const handleSchedulePress = () => {
+    // --- FIX: Reset transaction state before navigating ---
+    resetTransactionState();
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 3,
+        routes: [
+          { name: "home/index" },
+          { name: "pocket/all/index" },
+          { name: "pocket/[id]/index", params: { id: id } },
+          {
+            name: "pocket/[id]/transferSchedule/index",
+            params: { id: id },
+          },
+        ],
+      }),
+    );
+  };
+
+  const featuresWithScheduleReset = scheduleTrxFeatures.map((feature) => {
+    if (feature.label === "Schedule") {
+      return { ...feature, onPress: handleSchedulePress };
+    }
+    return feature;
+  });
 
   if (!transactionResult) {
     return (
@@ -70,7 +103,7 @@ export default function Statement() {
     },
   );
 
-  const feature = isSchedule ? scheduleTrxFeatures : transactionFeatures;
+  const feature = isSchedule ? featuresWithScheduleReset : transactionFeatures;
 
   const formatIndoDateWithDay = (day, dateString) => {
     if (!day || !dateString) return "";
@@ -88,7 +121,6 @@ export default function Statement() {
   const startDate = formatIndoDateWithDay(selectedDate, selectedStartDate);
   const endDate = formatIndoDateWithDay(selectedDate, selectedEndDate);
 
-  // Helper to convert string to sentence case
   const toSentenceCase = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

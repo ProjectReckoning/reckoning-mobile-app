@@ -213,22 +213,40 @@ export const useTransactionStore = create((set, get) => ({
     );
     set({ isFetchingScheduleTransfer: true, fetchScheduleTransferError: null });
     try {
-      const response = await api.get(
+      // Step 1: Fetch the initial list of schedules
+      const listResponse = await api.get(
         `/transaction/transfer/schedule/${pocketId}`,
       );
-      console.log("Response Received:", JSON.stringify(response.data, null, 2));
-      if (response.data && response.data.ok) {
-        const scheduleTransfer = response.data.data || [];
-        set({
-          scheduleTransferConfig: scheduleTransfer,
-          isFetchingScheduleTransfer: false,
-        });
-        return scheduleTransfer;
-      } else {
+
+      if (!listResponse.data || !listResponse.data.ok) {
         throw new Error(
-          response.data.message || "Failed to fetch schedule transfer.",
+          listResponse.data.message || "Failed to fetch schedule list.",
         );
       }
+
+      const initialList = listResponse.data.data || [];
+      if (initialList.length === 0) {
+        set({ scheduleTransferConfig: [], isFetchingScheduleTransfer: false });
+        return [];
+      }
+
+      // Step 2: Create an array of promises to fetch the detail for each schedule
+      const detailPromises = initialList.map((item) =>
+        api.get(`/transaction/transfer/schedule/${pocketId}/${item.id}`),
+      );
+
+      // Step 3: Wait for all detail fetches to complete
+      const detailResponses = await Promise.all(detailPromises);
+
+      // Step 4: Extract the detailed data from each response and build the final list
+      const finalScheduleList = detailResponses.map((res) => res.data.data);
+
+      set({
+        scheduleTransferConfig: finalScheduleList,
+        isFetchingScheduleTransfer: false,
+      });
+
+      return finalScheduleList;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -236,7 +254,7 @@ export const useTransactionStore = create((set, get) => ({
         "An unexpected error occurred.";
       console.error("API Error:", errorMessage);
       set({
-        scheduleTransferConfig: null,
+        scheduleTransferConfig: [], // Set to empty array on error
         isFetchingScheduleTransfer: false,
         fetchScheduleTransferError: errorMessage,
       });
@@ -314,18 +332,15 @@ export const useTransactionStore = create((set, get) => ({
       category,
     } = get();
 
-    // Combine selectedDate (day) with month/year from selectedStartDate for "start"
     let formattedStartDate = selectedStartDate;
     if (selectedStartDate && selectedDate) {
       const startObj = new Date(selectedStartDate);
       if (!isNaN(startObj.getTime())) {
-        // Use year/month from selectedStartDate, day from selectedDate
         startObj.setDate(selectedDate);
         formattedStartDate = startObj.toISOString().slice(0, 10);
       }
     }
 
-    // Format selectedEndDate to "YYYY-MM-DD" if it exists and is a valid date
     let formattedEndDate = selectedEndDate;
     if (selectedEndDate) {
       const dateObj = new Date(selectedEndDate);
@@ -365,6 +380,42 @@ export const useTransactionStore = create((set, get) => ({
         return response.data.data;
       } else {
         throw new Error(response.data.message || "Transfer failed.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ isProcessing: false, transactionError: errorMessage });
+      throw error;
+    }
+  },
+
+  deleteScheduleTransfer: async (pocketId, scheduleId) => {
+    console.log(
+      "================================================================",
+    );
+    console.log(
+      `API Call: DELETE /transaction/transfer/schedule/${pocketId}/${scheduleId}`,
+    );
+    console.log(
+      "================================================================",
+    );
+    set({ isProcessing: true, transactionError: null });
+    try {
+      const response = await api.delete(
+        `/transaction/transfer/schedule/${pocketId}/${scheduleId}`,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isProcessing: false });
+        get().getScheduleTransfer(pocketId);
+        return response.data.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to delete scheduled transfer.",
+        );
       }
     } catch (error) {
       const errorMessage =
@@ -431,7 +482,6 @@ export const useTransactionStore = create((set, get) => ({
       console.log("Response Received:", JSON.stringify(response.data, null, 2));
       if (response.data && response.data.ok) {
         set({ isProcessing: false, transactionResult: response.data.data });
-        // The API for set-auto-budget returns the transaction result directly
         return response.data.data;
       } else {
         throw new Error(response.data.message || "Failed to set auto-budget.");
