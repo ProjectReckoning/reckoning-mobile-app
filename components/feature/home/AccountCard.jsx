@@ -68,7 +68,7 @@ export default function AccountCard({ user }) {
         <Animated.ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8, paddingRight: 16 }}
+          contentContainerStyle={{ gap: 8, paddingRight: 50 }}
           pagingEnabled
           snapToInterval={288 + 8} // w-72 (288px) + gap (8px)
           decelerationRate="fast"

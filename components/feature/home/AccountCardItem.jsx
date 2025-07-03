@@ -47,8 +47,14 @@ export default function AccountCardItem({
       {/* Saldo Efektif */}
       <Box className="flex flex-col gap-0 mt-4 z-10">
         <Text className="text-xs font-normal text-black">Saldo efektif</Text>
-        <Box className="flex flex-row items-center gap-2">
-          <Heading size="xl" bold="true" className="font-extrabold">
+        <Box className="flex flex-row w-[90%] items-center gap-2">
+          <Heading
+            size="xl"
+            bold="true"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="font-extrabold"
+          >
             {showSaldo ? saldo : "Rp**********"}
           </Heading>
           <Pressable onPress={() => setShowSaldo((prev) => !prev)}>
