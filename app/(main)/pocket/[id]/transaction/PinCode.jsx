@@ -6,10 +6,11 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Delete } from "lucide-react-native";
 import { ActivityIndicator } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { CommonActions } from "@react-navigation/native";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 const PIN_LENGTH = 6;
@@ -23,6 +24,7 @@ const keypad = [
 
 export default function PinCode() {
   const { id, isSchedule } = useLocalSearchParams();
+  const navigation = useNavigation(); // Get navigation object for advanced actions
   const [pin, setPin] = useState("");
 
   const {
@@ -53,7 +55,6 @@ export default function PinCode() {
     if (newPin.length === PIN_LENGTH) {
       try {
         let result;
-        // Await the result from the store's execution function
         if (type.id === "topup") {
           result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
@@ -66,14 +67,21 @@ export default function PinCode() {
           console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
-        // --- NEW: Conditional navigation based on transaction status ---
         if (result) {
           if (result.status === "pending") {
-            // For transfers needing approval, go back to the pocket dashboard.
-            // A toast can be added here later.
-            router.replace(`/(main)/pocket/${id}`);
+            // For pending transactions, reset the navigation stack to the pocket dashboard
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 2, // The active screen will be the last one in the routes array
+                routes: [
+                  { name: "home/index" },
+                  { name: "pocket/all/index" },
+                  { name: "pocket/[id]/index", params: { id } },
+                ],
+              }),
+            );
           } else {
-            // For completed transactions, go to the statement page.
+            // For completed transactions, go to the statement page
             router.push({
               pathname: "/(main)/pocket/[id]/transaction/Statement",
               params: {
@@ -83,7 +91,6 @@ export default function PinCode() {
             });
           }
         } else {
-          // This case might occur if the API returns success but no data
           alert(`Transaction Failed: Could not retrieve transaction details.`);
           setPin("");
         }
