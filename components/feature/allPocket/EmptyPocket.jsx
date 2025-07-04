@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -8,10 +7,7 @@ import { VStack } from "@/components/ui/vstack";
 import EmptyPocketDecorator from "@/assets/images/emptyPocket.png";
 import PrimaryButton from "../../common/buttons/PrimaryButton";
 
-export default function EmptyPocket() {
-  const GoToCreatePocket = () => {
-    router.push("/(main)/pocket/create");
-  };
+export default function EmptyPocket({ GoToCreatePocket }) {
   return (
     <Box className="flex-1 bg-white justify-between">
       <Box className="flex flex-col justify-center items-center my-5">
