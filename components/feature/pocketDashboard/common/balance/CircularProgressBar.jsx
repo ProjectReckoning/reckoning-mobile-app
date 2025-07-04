@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Animated, Easing } from "react-native";
 import { Box } from "@/components/ui/box";
+import { Heading } from "@/components/ui/heading";
+
+import { Animated, Easing } from "react-native";
 import * as Progress from "react-native-progress";
-import { usePocketStore } from "@/stores/pocketStore";
+import { useState, useEffect, useRef } from "react";
+
 import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
 import { formatCurrency } from "@/utils/helperFunction";
 import AppText from "@/components/common/typography/AppText";
 
@@ -31,6 +34,24 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
 
   const safeCurrentAmount = Number(currentAmount) || 0;
   const safeTargetAmount = Number(targetAmount) || 1;
+
+  // Calculate digit count (excluding non-digit characters)
+  const amountDigits = String(Math.floor(Math.abs(safeCurrentAmount))).replace(
+    /\D/g,
+    "",
+  ).length;
+
+  // Determine heading size based on digit count
+  let headingSize = "lg";
+  if (amountDigits > 14) {
+    headingSize = "xs";
+  } else if (amountDigits > 12) {
+    headingSize = "sm";
+  } else if (amountDigits > 10) {
+    headingSize = "md";
+  } else {
+    headingSize = "lg";
+  }
 
   // Calculate the raw progress, which can exceed 1 (100%)
   const rawProgress =
@@ -137,10 +158,13 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
         <AppText variant="medium" className="mb-1 text-black">
           Saldo Terkumpul
         </AppText>
-        <AppText variant="pageTitle" className="mb-1 text-black">
+        {/* <AppText variant="pageTitle" className="mb-1 text-black">
+          {formatCurrency(safeCurrentAmount)}
+        </AppText> */}
+        <Heading size={headingSize} className="mb-1 font-extrabold text-black">
           {/* This text remains uncapped and shows the true current amount */}
           {formatCurrency(safeCurrentAmount)}
-        </AppText>
+        </Heading>
         <AppText variant="caption" className="text-black">
           /{formatCurrency(safeTargetAmount)}
         </AppText>
