@@ -6,6 +6,8 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 import { useState } from "react";
 import { Delete } from "lucide-react-native";
 import { ActivityIndicator } from "react-native";
@@ -23,9 +25,12 @@ const keypad = [
 ];
 
 export default function PinCode() {
-  const { id, isSchedule } = useLocalSearchParams();
   const navigation = useNavigation(); // Get navigation object for advanced actions
+  const params = useLocalSearchParams();
+  const { id, isSchedule } = params;
+
   const [pin, setPin] = useState("");
+  const toast = useToast();
 
   const {
     type,
@@ -55,6 +60,7 @@ export default function PinCode() {
     if (newPin.length === PIN_LENGTH) {
       try {
         let result;
+        // ... (logika if/else untuk executeTopUp, executeWithdraw, dll. tetap sama)
         if (type.id === "topup") {
           result = await executeTopUp(id);
         } else if (type.id === "withdraw") {
@@ -63,13 +69,24 @@ export default function PinCode() {
           result = await executeTransfer(id);
         } else if (type.id === "transfer_bulanan") {
           result = await executeScheduleTransfer(id);
-        } else {
-          console.warn(`Transaction type "${type.name}" not yet implemented.`);
         }
 
         if (result) {
-          if (result.status === "pending") {
-            // For pending transactions, reset the navigation stack to the pocket dashboard
+          // For completed transactions, go to the statement page
+          // Cek apakah statusnya pending DAN ada 'pesan' untuk menampilkan toast
+          if (
+            result.status === "pending" &&
+            params.successAction === "showApprovalToast"
+          ) {
+            // Tampilkan toast dengan pesan dari layar sebelumnya
+            toast.show({
+              placement: "top",
+              duration: 2500,
+              render: ({ id }) => {
+                return <CustomToast id={id} title={params.toastMessage} />;
+              },
+            });
+
             navigation.dispatch(
               CommonActions.reset({
                 index: 2, // The active screen will be the last one in the routes array
@@ -80,14 +97,13 @@ export default function PinCode() {
                 ],
               }),
             );
+
+            // Beri jeda 2 detik agar toast terbaca
+            setTimeout(() => {}, 2000);
           } else {
-            // For completed transactions, go to the statement page
             router.push({
               pathname: "/(main)/pocket/[id]/transaction/Statement",
-              params: {
-                id,
-                isSchedule,
-              },
+              params: { id, isSchedule },
             });
           }
         } else {

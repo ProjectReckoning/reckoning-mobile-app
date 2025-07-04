@@ -13,6 +13,9 @@ import ScheduleIcon from "@/assets/images/icon/pocketcreation1.png";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransparentIcon from "@/assets/images/icon/pocketcreation3.png";
 import OnboardingDecorator from "@/assets/images/decorators/onboarding2.png";
+import { ScrollView } from "@/components/ui/scroll-view";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 
 export default function CreatePocketOnboarding() {
   useEffect(() => {
@@ -22,7 +25,7 @@ export default function CreatePocketOnboarding() {
   const GoToCreatePocket = () => {
     router.push("pocket/create");
   };
-
+  const toast = useToast();
   return (
     <Box className="flex-1 bg-white -z-20">
       <Box className="flex flex-col pt-5">
@@ -36,7 +39,10 @@ export default function CreatePocketOnboarding() {
         </Box>
       </Box>
 
-      <Box className="flex-1 px-6 mt-10 justify-between">
+      <ScrollView
+        className="flex-1 px-6 mt-10"
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "space-between" }}
+      >
         <Box className="flex">
           <Heading size="xl" bold="true" className="font-extrabold mb-5">
             Kelola Impian Finansial Bersama Lebih Mudah!
@@ -98,11 +104,9 @@ export default function CreatePocketOnboarding() {
             </HStack>
           </VStack>
         </Box>
-        <PrimaryButton
-          buttonAction={GoToCreatePocket}
-          buttonTitle="Lanjut"
-          className="mb-8"
-        />
+      </ScrollView>
+      <Box className="px-6 justify-end">
+        <PrimaryButton buttonAction={GoToCreatePocket} buttonTitle="Lanjut" />
       </Box>
     </Box>
   );
