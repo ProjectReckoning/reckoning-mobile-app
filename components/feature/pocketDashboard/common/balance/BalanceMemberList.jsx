@@ -1,17 +1,20 @@
 // components/feature/pocketDashboard/common/balance/BalanceMemberList.jsx
-import React, { useState, useMemo } from "react";
-import { FlatList, View, TouchableOpacity } from "react-native";
-import { usePocketStore } from "@/stores/pocketStore";
-import BalanceMemberListCell from "@/components/common/tableCells/BalanceMemberListCell";
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
-import { formatCurrency } from "@/utils/helperFunction";
+
+import { useState, useMemo } from "react";
 import { Crown } from "lucide-react-native";
+import { FlatList, View, TouchableOpacity } from "react-native";
+
+import useAuthStore from "@/stores/authStore";
 import { WondrColors } from "@/utils/colorUtils";
+import { usePocketStore } from "@/stores/pocketStore";
+import { formatCurrency } from "@/utils/helperFunction";
 import AppText from "@/components/common/typography/AppText";
+import BalanceMemberListCell from "@/components/common/tableCells/BalanceMemberListCell";
 
 // ... (getConsistentInitials dan MemberInfoCard tetap sama)
 const getConsistentInitials = (name) => {
@@ -94,19 +97,39 @@ const MemberInfoCard = ({ name, role, contributionAmount, pocketType }) => {
 export default function BalanceMemberList() {
   const members = usePocketStore((state) => state.currentPocket?.members);
   const pocketType = usePocketStore((state) => state.currentPocket?.type);
+  const currentUserId = useAuthStore((state) => state.user?.user_id);
   const [showAll, setShowAll] = useState(false);
 
-  const memberData = useMemo(() => {
+  // const memberData = useMemo(() => {
+  //   if (!Array.isArray(members)) return [];
+  //   const sortedMembers = [...members].sort(
+  //     (a, b) =>
+  //       b.PocketMember.contribution_amount - a.PocketMember.contribution_amount,
+  //   );
+  //   if (showAll || sortedMembers.length <= 5) {
+  //     return sortedMembers;
+  //   }
+  //   return sortedMembers.slice(0, 5);
+  // }, [members, showAll]);
+
+  const sortedMembers = useMemo(() => {
     if (!Array.isArray(members)) return [];
-    const sortedMembers = [...members].sort(
+    // Find current user
+    const userMember = members.find((m) => m.id === currentUserId);
+    // Exclude current user from the rest
+    const otherMembers = members.filter((m) => m.id !== currentUserId);
+    // Sort the rest by contribution
+    const sortedOthers = otherMembers.sort(
       (a, b) =>
         b.PocketMember.contribution_amount - a.PocketMember.contribution_amount,
     );
-    if (showAll || sortedMembers.length <= 5) {
-      return sortedMembers;
+    // Combine: user first, then sorted others
+    const combined = userMember ? [userMember, ...sortedOthers] : sortedOthers;
+    if (showAll || combined.length <= 5) {
+      return combined;
     }
-    return sortedMembers.slice(0, 5);
-  }, [members, showAll]);
+    return combined.slice(0, 5);
+  }, [members, showAll, currentUserId]);
 
   if (!members || members.length === 0) {
     return null;
@@ -148,7 +171,7 @@ export default function BalanceMemberList() {
   return (
     <Box className="bg-white p-5 rounded-3xl border border-gray-wondr-border flex-1">
       <FlatList
-        data={memberData}
+        data={sortedMembers}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         ItemSeparatorComponent={ItemSeparator}
