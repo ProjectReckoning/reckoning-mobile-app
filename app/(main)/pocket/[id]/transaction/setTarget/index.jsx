@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// app/(main)/pocket/[id]/transaction/setTarget/index.jsx
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ScrollView,
   KeyboardAvoidingView,
@@ -7,7 +8,11 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  useLocalSearchParams,
+  useNavigation,
+  useFocusEffect,
+} from "expo-router";
 import { CommonActions } from "@react-navigation/native";
 import { CalendarClock } from "lucide-react-native";
 
@@ -34,27 +39,26 @@ export default function SetTargetScreen() {
     updatePocketTarget,
     isUpdating,
     updateError,
+    resetPocketData,
   } = usePocketStore();
 
-  // Form state
   const [targetAmount, setTargetAmount] = useState("");
   const [deadline, setDeadline] = useState(null);
-
-  // Date picker state management
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const [displayDate, setDisplayDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
   const [pickerMode, setPickerMode] = useState("date");
-
-  // Validation state
   const [isAmountTouched, setAmountTouched] = useState(false);
   const [isDateTouched, setDateTouched] = useState(false);
 
-  useEffect(() => {
-    if (pocketId) {
-      fetchPocketById(pocketId);
-    }
-  }, [pocketId, fetchPocketById]);
+  useFocusEffect(
+    useCallback(() => {
+      if (pocketId) {
+        fetchPocketById(pocketId);
+      }
+      return () => resetPocketData();
+    }, [pocketId, fetchPocketById]),
+  );
 
   useEffect(() => {
     if (currentPocket) {
@@ -62,7 +66,6 @@ export default function SetTargetScreen() {
       if (currentPocket.deadline) {
         const existingDeadline = new Date(currentPocket.deadline);
         setDeadline(existingDeadline);
-        // Also initialize the picker's display state
         setDisplayDate(existingDeadline);
         setSelectedDay(existingDeadline.getDate());
       }
@@ -88,22 +91,23 @@ export default function SetTargetScreen() {
       });
       toast.show({
         placement: "top",
-        duration: 2000,
-        render: ({ id }) => {
-          return <CustomToast id={id} title="Target berhasil diperbarui" />;
-        },
+        duration: 1500,
+        render: ({ id }) => (
+          <CustomToast id={id} title="Target berhasil diperbarui" />
+        ),
       });
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 2,
-          routes: [
-            { name: "home/index" },
-            { name: "pocket/all/index" },
-            { name: "pocket/[id]/index", params: { id: pocketId } },
-          ],
-        }),
-      );
-      setTimeout(() => {}, 1500);
+      setTimeout(() => {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 2,
+            routes: [
+              { name: "home/index" },
+              { name: "pocket/all/index" },
+              { name: "pocket/[id]/index", params: { id: pocketId } },
+            ],
+          }),
+        );
+      }, 1600);
     } catch (e) {
       console.error("Failed to update target:", e);
       Alert.alert(
@@ -223,7 +227,7 @@ export default function SetTargetScreen() {
 
           <PrimaryButton
             buttonAction={handleUpdate}
-            buttonTitle="Set target"
+            buttonTitle="Ubah target"
             className="mb-8"
             textClassName="text-black font-bold text-base"
             disabled={
