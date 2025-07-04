@@ -9,10 +9,21 @@ import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 import { useState, useEffect, useCallback } from "react";
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
-import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import {
+  router,
+  useLocalSearchParams,
+  useFocusEffect,
+  useNavigation,
+} from "expo-router";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { CalendarClock, ChevronRight } from "lucide-react-native";
-import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  Alert,
+} from "react-native";
+import { CommonActions } from "@react-navigation/native";
 import {
   Popover,
   PopoverBackdrop,
@@ -32,7 +43,9 @@ import CategoryActionSheet from "@/components/feature/transaction/CategoryAction
 
 export default function TransactionDetail() {
   const { id } = useLocalSearchParams();
+  const navigation = useNavigation();
   const {
+    type,
     source,
     destination,
     amount,
@@ -42,6 +55,8 @@ export default function TransactionDetail() {
     setCategory,
     setDescription,
     setType,
+    setDestination,
+    resetTransactionState,
   } = useTransactionStore();
   const { currentPocket, pocketType } = usePocketStore();
   const { user } = useAuthStore();
@@ -63,53 +78,78 @@ export default function TransactionDetail() {
 
   useFocusEffect(
     useCallback(() => {
-      setType({ id: "transfer", name: "Transfer" });
-    }, []),
+      if (!type || (type.id !== "transfer" && type.id !== "withdraw")) {
+        setType({ id: "transfer", name: "Transfer" });
+      }
+    }, [type]),
   );
 
+  const showModal = (modalId) => {
+    const content = modalData.find((m) => m.id === modalId);
+    if (content) {
+      setModalContent(content);
+      setShowApprovalModal(true);
+    }
+  };
+
   const handleNext = () => {
-    if (!currentPocket || !user) {
-      console.error("Pocket data or user data is not available.");
+    if (!currentPocket || !user) return;
+
+    const pocketBalance = parseFloat(currentPocket.current_balance);
+    if (amount > pocketBalance) {
+      Alert.alert(
+        "Saldo Tidak Cukup",
+        "Jumlah transaksi melebihi saldo yang tersedia di pocket ini.",
+      );
       return;
     }
 
-    const isSingleAdmin =
-      isBusiness &&
-      currentPocket.owner.id === user.id &&
-      !currentPocket.members.some((m) => m.PocketMember.role === "admin");
-
-    if (isBusiness && !isSingleAdmin) {
-      const content = modalData.find(
-        (m) => m.id === "BUSINESS_APPROVAL_REQUIRED",
-      );
-      setModalContent(content);
-      setShowApprovalModal(true);
+    const currentUserInData = currentPocket.members?.find(
+      (m) => m.id == user.user_id,
+    );
+    if (!currentUserInData) {
+      Alert.alert("Error", "Anda bukan merupakan anggota pocket ini.");
       return;
     }
 
-    let userContribution = 0;
-    if (currentPocket.owner.id === user.id) {
-      userContribution = parseFloat(
-        currentPocket.owner.PocketMember.contribution_amount,
-      );
-    } else {
-      const memberData = currentPocket.members.find((m) => m.id === user.id);
-      if (memberData) {
-        userContribution = parseFloat(
-          memberData.PocketMember.contribution_amount,
-        );
+    const currentUserRole = currentUserInData.PocketMember.role;
+    const isOwner = currentUserRole === "owner";
+    const otherMembers = currentPocket.members.filter(
+      (m) => m.id != user.user_id,
+    );
+    const hasOtherAdmins = otherMembers.some(
+      (m) => m.PocketMember.role === "admin",
+    );
+    const userContribution = parseFloat(
+      currentUserInData.PocketMember.contribution_amount || 0,
+    );
+
+    // --- TRANSFER LOGIC ---
+    if (type.id === "transfer") {
+      if (isBusiness) {
+        if (isOwner && !hasOtherAdmins) {
+          router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+        } else {
+          showModal("BUSINESS_APPROVAL_REQUIRED");
+        }
+      } else {
+        if (amount > userContribution) {
+          showModal("APPROVAL_REQUIRED");
+        } else {
+          router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+        }
       }
-    }
-
-    if (amount > userContribution) {
-      const content = modalData.find((m) => m.id === "APPROVAL_REQUIRED");
-      setModalContent(content);
-      setShowApprovalModal(true);
       return;
     }
 
-    if (id) {
-      router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+    // --- WITHDRAW LOGIC ---
+    if (type.id === "withdraw") {
+      if (amount > userContribution) {
+        showModal("EXCEEDS_CONTRIBUTION");
+      } else {
+        router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
+      }
+      return;
     }
   };
 
@@ -130,7 +170,6 @@ export default function TransactionDetail() {
   const handleRequestApproval = () => {
     setShowApprovalModal(false);
     if (id) {
-      // Pass parameters for the approval flow and the toast message
       router.push({
         pathname: `/(main)/pocket/${id}/transaction/Confirmation`,
         params: {
@@ -142,20 +181,59 @@ export default function TransactionDetail() {
     }
   };
 
+  const handleSwitchToTransfer = () => {
+    setShowApprovalModal(false);
+    const previousAmount = amount;
+    resetTransactionState();
+    setType({ id: "transfer", name: "Transfer" });
+    setAmount(previousAmount);
+
+    setDestination({
+      id: user.user_id,
+      name: user.name,
+      category: {
+        bank: {
+          name: "TAPLUS PEGAWAI BNI",
+          type: "My Account",
+        },
+      },
+    });
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 4,
+        routes: [
+          { name: "home/index" },
+          { name: "pocket/all/index" },
+          { name: "pocket/[id]/index", params: { id } },
+          { name: "pocket/[id]/transaction/transfer/index", params: { id } },
+          { name: "pocket/[id]/transaction/Detail", params: { id } },
+        ],
+      }),
+    );
+  };
+
   const getButtonActions = () => {
-    if (!modalContent) {
-      return {};
+    if (!modalContent) return {};
+    switch (modalContent.id) {
+      case "BUSINESS_APPROVAL_REQUIRED":
+        return {
+          specialButton1Action: handleRequestApproval,
+          specialButton2Action: () => setShowApprovalModal(false),
+        };
+      case "APPROVAL_REQUIRED":
+        return {
+          specialButton1Action: () => setShowApprovalModal(false),
+          specialButton2Action: handleRequestApproval,
+        };
+      case "EXCEEDS_CONTRIBUTION":
+        return {
+          specialButton1Action: () => setShowApprovalModal(false),
+          specialButton2Action: handleSwitchToTransfer,
+        };
+      default:
+        return {};
     }
-    if (modalContent.id === "BUSINESS_APPROVAL_REQUIRED") {
-      return {
-        specialButton1Action: handleRequestApproval,
-        specialButton2Action: () => setShowApprovalModal(false),
-      };
-    }
-    return {
-      specialButton1Action: () => setShowApprovalModal(false),
-      specialButton2Action: handleRequestApproval,
-    };
   };
 
   return (
@@ -199,7 +277,7 @@ export default function TransactionDetail() {
               setAmountTouched={setAmountTouched}
             />
 
-            {isBusiness && (
+            {isBusiness && type.id === "transfer" && (
               <VStack space="sm">
                 <Text className="text-sm my-2">Kategori</Text>
                 <Pressable
@@ -300,7 +378,7 @@ export default function TransactionDetail() {
           subtitle={modalContent.subTitle}
           showSpecialActions={true}
           specialButton1Title={modalContent.buttons[0].text}
-          specialButton2Title={modalContent.buttons[1].text}
+          specialButton2Title={modalContent.buttons[1]?.text}
           {...getButtonActions()}
         />
       )}

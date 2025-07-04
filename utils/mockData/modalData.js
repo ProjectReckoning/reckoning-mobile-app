@@ -18,14 +18,14 @@ export const modalData = [
     id: "EXCEEDS_CONTRIBUTION",
     title: "Penarikan Melebihi Kontribusi",
     subTitle:
-      "Untuk melanjutkan, silakan sesuaikan nominal penarikan dengan jumlah kontribusi yang telah kamu setor ke pocket ini.",
+      "Untuk melanjutkan, kamu bisa ubah nominal sesuai kontribusi atau beralih ke transfer untuk minta persetujuan semua admin.",
     image: require("@/assets/images/contribution.png"), // Added image
     buttons: [
       {
         text: "Ubah Nominal",
       },
       {
-        text: "Cek saldo pocket",
+        text: "Beralih ke transfer",
       },
     ],
   },
@@ -62,7 +62,7 @@ export const modalData = [
   {
     id: "BUSINESS_APPROVAL_REQUIRED",
     title: "Persetujuan Admin Diperlukan",
-    subTitle: "Transfer ini memerlukan persetujuan dari semua admin",
+    subTitle: "Transfer ini memerlukan persetujuan dari semua admin.",
     image: require("@/assets/images/approval.png"), // Added image
     buttons: [
       {
