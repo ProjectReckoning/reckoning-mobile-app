@@ -96,18 +96,17 @@ export default function SetTargetScreen() {
           <CustomToast id={id} title="Target berhasil diperbarui" />
         ),
       });
-      setTimeout(() => {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 2,
-            routes: [
-              { name: "home/index" },
-              { name: "pocket/all/index" },
-              { name: "pocket/[id]/index", params: { id: pocketId } },
-            ],
-          }),
-        );
-      }, 1600);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 2,
+          routes: [
+            { name: "home/index" },
+            { name: "pocket/all/index" },
+            { name: "pocket/[id]/index", params: { id: pocketId } },
+          ],
+        }),
+      );
+      setTimeout(() => {}, 1600);
     } catch (e) {
       console.error("Failed to update target:", e);
       Alert.alert(

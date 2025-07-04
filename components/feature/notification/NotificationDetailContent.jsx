@@ -17,6 +17,7 @@ import { useTransactionStore } from "@/stores/transactionStore";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import notificationApproval from "@/assets/images/notification-approval.png";
 import notificationWithdraw from "@/assets/images/notification-withdraw.png";
+import notificationInformation from "@/assets/images/approval.png";
 import ReusableInformationCell from "@/components/common/tableCells/ReusableInformationCell";
 import useAuthStore from "@/stores/authStore";
 
@@ -58,8 +59,9 @@ export default function NotificationDetailContent() {
       case "transaction_approval_needed":
         return notificationApproval;
       case "transaction_success":
-      case "information":
         return notificationWithdraw;
+      case "information":
+        return notificationInformation;
       default:
         return null;
     }
@@ -172,7 +174,7 @@ export default function NotificationDetailContent() {
         );
       case "information":
         return (
-          <Text className="text-sm text-black" style={{ flex: 1 }}>
+          <Text className="text-lg text-black" style={{ flex: 1 }}>
             {notification.body}
           </Text>
         );

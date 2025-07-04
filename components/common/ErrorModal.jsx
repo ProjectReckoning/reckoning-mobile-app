@@ -62,12 +62,13 @@ export default function ErrorModal({
                 buttonAction={specialButton1Action}
                 buttonTitle={specialButton1Title}
                 className="mb-2"
-                textClassName="text-black font-bold text-base"
+                textClassName="text-black font-bold"
               />
               <PrimaryButton
                 buttonAction={specialButton2Action}
                 buttonTitle={specialButton2Title}
                 buttonColor="bg-white"
+                buttonActiveColor="active:bg-gray-200"
                 className="border border-gray-300"
                 textClassName="text-black font-bold"
               />

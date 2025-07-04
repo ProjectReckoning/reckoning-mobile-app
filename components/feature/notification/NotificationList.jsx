@@ -45,9 +45,10 @@ export default function NotificationList() {
     markAsRead(notifId);
     // The detail screen will fetch its own data using the ID
     // Do not navigate for purely informational notifications
-    if (notifType !== "information") {
-      router.push(`/home/notification/${notifId}`);
-    }
+    // if (notifType !== "information") {
+    //   router.push(`/home/notification/${notifId}`);
+    // }
+    router.push(`/home/notification/${notifId}`);
   };
 
   // getItemLayout function to optimize FlatList rendering

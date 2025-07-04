@@ -99,7 +99,7 @@ export const transactionFeatures = [
     label: "Bukti Transaksi",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
-    onPress: () => router.replace("pocket/[id]/transaction/Receipt"),
+    onPress: () => router.push("pocket/[id]/transaction/Receipt"),
   },
   {
     icon: <Share2 />,
