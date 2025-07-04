@@ -21,6 +21,8 @@ import PocketErrorAlert from "@/components/feature/pocketCustomization/PocketErr
 import DeleteLeavePocketAlert from "@/components/feature/allPocket/DeleteLeavePocketAlert";
 import PocketIconSelector from "@/components/feature/pocketCustomization/PocketIconSelector";
 import PocketColorSelector from "@/components/feature/pocketCustomization/PocketColorSelector";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 
 const colors = [
   "bg-orange-wondr",
@@ -46,7 +48,6 @@ export default function Customization() {
   const isEditMode = !!pocketId;
   const isInnerEditMode = innerEdit === "true";
 
-  // --- Local State for UI ---
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [alertMessages, setAlertMessages] = useState([]);
   const [isNameInvalid, setNameIsInvalid] = useState(false);
@@ -55,7 +56,6 @@ export default function Customization() {
   const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // --- Zustand Store State and Actions ---
   const {
     pocketName,
     pocketType,
@@ -73,10 +73,8 @@ export default function Customization() {
     resetPocketData,
     deletePocket,
   } = usePocketStore();
+  const toast = useToast();
 
-  // --- Effects ---
-
-  // On screen focus, set up for edit mode or reset
   useFocusEffect(
     useCallback(() => {
       if (isEditMode) {
@@ -84,7 +82,6 @@ export default function Customization() {
         if (pocketToEdit) {
           setPocketForEditing(pocketToEdit);
         }
-        console.log(pocketType, "pocket type to edit");
       }
       return () => {
         if (isEditMode) {
@@ -94,68 +91,43 @@ export default function Customization() {
     }, [pocketId, isEditMode, allPockets]),
   );
 
-  // When store data changes (in edit mode), update local index state
   useEffect(() => {
     const colorIndex = colors.indexOf(pocketColor);
     const iconArray = isBusiness ? businessIcons : personalIcons;
     const iconIndex = iconArray.indexOf(pocketIcon);
-    console.log(innerEdit, typeof innerEdit);
 
     if (
-      (colorIndex !== selectedColorIndex && colorIndex >= 0) ||
-      (iconIndex !== selectedIconIndex && iconIndex >= 0)
+      (colorIndex !== -1 && colorIndex !== selectedColorIndex) ||
+      (iconIndex !== -1 && iconIndex !== selectedIconIndex)
     ) {
       setTimeout(() => {
-        if (colorIndex !== selectedColorIndex && colorIndex >= 0) {
-          setSelectedColorIndex(colorIndex);
-        }
-        if (iconIndex !== selectedIconIndex && iconIndex >= 0) {
-          setSelectedIconIndex(iconIndex);
-        }
+        if (colorIndex !== -1) setSelectedColorIndex(colorIndex);
+        if (iconIndex !== -1) setSelectedIconIndex(iconIndex);
       }, 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pocketColor, pocketIcon, pocketType]);
+  }, [pocketColor, pocketIcon, pocketType, isBusiness]);
 
-  // When local index changes, update the Zustand store
   useEffect(() => {
     setPocketColor(colors[selectedColorIndex]);
-  }, [selectedColorIndex]);
+  }, [selectedColorIndex, setPocketColor]);
 
   useEffect(() => {
-    if (isBusiness) {
-      setPocketIcon(businessIcons[selectedIconIndex] || businessIcons[0]);
-    } else {
-      setPocketIcon(personalIcons[selectedIconIndex] || personalIcons[0]);
-    }
-  }, [selectedIconIndex]);
+    const iconArray = isBusiness ? businessIcons : personalIcons;
+    setPocketIcon(iconArray[selectedIconIndex] || iconArray[0]);
+  }, [selectedIconIndex, isBusiness, setPocketIcon]);
 
-  // Validate pocket name
   useEffect(() => {
     setNameIsInvalid(pocketName.length > 20 || pocketName.trim().length === 0);
   }, [pocketName]);
 
-  // --- Handlers ---
   const isBusiness = pocketType?.toLowerCase().includes("business");
-  const selectedColor =
+  const selectedColorValue =
     selectedColorIndex !== null ? colors[selectedColorIndex] : pocketColor;
-  const selectedSolid = colorMap[selectedColor]?.solid;
+  const selectedSolid = colorMap[selectedColorValue]?.solid;
 
   const handleCreatePocket = async () => {
-    if (!pocketName || pocketName.trim().length === 0 || isNameInvalid) {
-      setAlertMessages([
-        "Pocket name is invalid. It must be between 1 and 20 characters.",
-      ]);
-      setShowAlertDialog(true);
-      return;
-    }
-    if (!pocketColor) {
-      setAlertMessages(["Please select a pocket color."]);
-      setShowAlertDialog(true);
-      return;
-    }
-    if (!pocketIcon) {
-      setAlertMessages(["Please select a pocket icon."]);
+    if (isNameInvalid) {
+      setAlertMessages(["Nama Pocket tidak valid."]);
       setShowAlertDialog(true);
       return;
     }
@@ -163,7 +135,6 @@ export default function Customization() {
     try {
       const pocketData = await createPocket();
       const newPocketId = pocketData?.id;
-
       if (newPocketId) {
         resetPocketData();
         navigation.dispatch(
@@ -182,24 +153,35 @@ export default function Customization() {
       }
     } catch (error) {
       const latestError = usePocketStore.getState().createError;
-      setAlertMessages([latestError || "An unknown error occurred."]);
+      setAlertMessages([latestError || "Gagal membuat pocket."]);
       setShowAlertDialog(true);
     }
   };
 
   const handleSaveChanges = async () => {
     if (isNameInvalid) {
-      setAlertMessages(["Pocket name is invalid."]);
+      setAlertMessages(["Nama Pocket tidak valid."]);
       setShowAlertDialog(true);
       return;
     }
     try {
-      await updatePocket(pocketId);
-      resetPocketData();
-      router.back();
+      const result = await updatePocket(pocketId);
+      if (result) {
+        toast.show({
+          placement: "top",
+          duration: 2000,
+          render: ({ id }) => (
+            <CustomToast id={id} title="Pocket telah diperbarui" />
+          ),
+        });
+        setTimeout(() => {
+          resetPocketData();
+          router.back();
+        }, 1500);
+      }
     } catch (error) {
       const latestError = usePocketStore.getState().updateError;
-      setAlertMessages([latestError || "Failed to save changes."]);
+      setAlertMessages([latestError || "Gagal menyimpan perubahan."]);
       setShowAlertDialog(true);
     }
   };
@@ -219,7 +201,7 @@ export default function Customization() {
         );
       }, 300);
     } catch (error) {
-      console.error("Failed to delete pocket from component:", error);
+      console.error("Failed to delete pocket:", error);
     } finally {
       setShowDeleteLeaveAlert(false);
       setIsDeleting(false);
@@ -240,7 +222,6 @@ export default function Customization() {
           cardWidth="min-w-48"
         />
       </Box>
-
       <Box className="flex-1 flex-col mt-5 px-6 justify-between">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -252,13 +233,11 @@ export default function Customization() {
             contentContainerStyle={{ flexGrow: 1 }}
           >
             <VStack space="2xl" className="w-full px-3">
-              {isEditMode && (
-                <PocketNameInput
-                  pocketName={pocketName}
-                  setPocketName={setPocketName}
-                  isNameInvalid={isNameInvalid}
-                />
-              )}
+              <PocketNameInput
+                pocketName={pocketName}
+                setPocketName={setPocketName}
+                isNameInvalid={isNameInvalid}
+              />
               <PocketColorSelector
                 colors={colors}
                 selectedIndex={selectedColorIndex}

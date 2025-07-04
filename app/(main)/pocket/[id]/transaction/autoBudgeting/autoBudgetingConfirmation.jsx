@@ -4,13 +4,12 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Modal, ScrollView, Pressable, Alert } from "react-native";
+import { Modal, ScrollView, Alert } from "react-native";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import { WondrColors } from "@/utils/colorUtils";
 import TransactionCard from "@/components/common/cards/TransactionCard";
 import { CommonActions } from "@react-navigation/native";
-import { ArrowLeft } from "lucide-react-native";
 import { useTransactionStore } from "@/stores/transactionStore";
 import useAuthStore from "@/stores/authStore";
 
@@ -84,16 +83,6 @@ export default function AutoBudgetingConfirmation() {
       }),
     );
   };
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <Pressable onPress={handleDone} style={{ paddingLeft: 24 }}>
-          <ArrowLeft size={24} color="black" />
-        </Pressable>
-      ),
-    });
-  }, [navigation, pocketId]);
 
   const handleConfirmDelete = async () => {
     if (!pocketId || isProcessing) return;

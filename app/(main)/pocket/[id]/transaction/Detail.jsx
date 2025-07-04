@@ -47,7 +47,7 @@ export default function TransactionDetail() {
   const { user } = useAuthStore();
 
   const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [modalContent, setModalContent] = useState(null); // To hold modal data
+  const [modalContent, setModalContent] = useState(null);
   const [isAmountInvalid, setIsAmountInvalid] = useState(false);
   const [amountTouched, setAmountTouched] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
@@ -73,13 +73,11 @@ export default function TransactionDetail() {
       return;
     }
 
-    // Check if the current user is the sole admin in a business pocket
     const isSingleAdmin =
       isBusiness &&
       currentPocket.owner.id === user.id &&
       !currentPocket.members.some((m) => m.PocketMember.role === "admin");
 
-    // If it's a business pocket and there are other admins, always require approval
     if (isBusiness && !isSingleAdmin) {
       const content = modalData.find(
         (m) => m.id === "BUSINESS_APPROVAL_REQUIRED",
@@ -89,7 +87,6 @@ export default function TransactionDetail() {
       return;
     }
 
-    // For personal pockets OR single-admin business pockets, check contribution
     let userContribution = 0;
     if (currentPocket.owner.id === user.id) {
       userContribution = parseFloat(
@@ -104,7 +101,6 @@ export default function TransactionDetail() {
       }
     }
 
-    // Show approval modal if transfer amount exceeds contribution
     if (amount > userContribution) {
       const content = modalData.find((m) => m.id === "APPROVAL_REQUIRED");
       setModalContent(content);
@@ -112,7 +108,6 @@ export default function TransactionDetail() {
       return;
     }
 
-    // If all checks pass, proceed to confirmation
     if (id) {
       router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
     }
@@ -134,28 +129,29 @@ export default function TransactionDetail() {
 
   const handleRequestApproval = () => {
     setShowApprovalModal(false);
-    // Navigate to Confirmation screen with a flag for the approval flow
     if (id) {
+      // Pass parameters for the approval flow and the toast message
       router.push({
         pathname: `/(main)/pocket/${id}/transaction/Confirmation`,
-        params: { approvalRequired: "true" },
+        params: {
+          approvalRequired: "true",
+          successAction: "showApprovalToast",
+          toastMessage: "Permintaan Persetujuan Transaksi Telah Dikirim",
+        },
       });
     }
   };
 
-  // Dynamically assign button actions based on which modal is shown
   const getButtonActions = () => {
     if (!modalContent) {
       return {};
     }
-    // For business pockets, the "Kirim" button is the first one
     if (modalContent.id === "BUSINESS_APPROVAL_REQUIRED") {
       return {
         specialButton1Action: handleRequestApproval,
         specialButton2Action: () => setShowApprovalModal(false),
       };
     }
-    // For personal pockets, the "Kirim" button is the second one
     return {
       specialButton1Action: () => setShowApprovalModal(false),
       specialButton2Action: handleRequestApproval,

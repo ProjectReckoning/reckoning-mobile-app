@@ -17,7 +17,9 @@ import { maskId, formatRupiah } from "@/utils/helperFunction";
 import DetailConfirmation from "@/components/feature/transaction/DetailConfirmation";
 
 export default function Confirmation() {
-  const { id, approvalRequired } = useLocalSearchParams();
+  // Get all params, including those for the toast
+  const { id, approvalRequired, successAction, toastMessage } =
+    useLocalSearchParams();
   const { type, source, amount, destination } = useTransactionStore();
   const { currentPocket } = usePocketStore();
   const isSchedule = type.id === "transfer_bulanan";
@@ -26,15 +28,17 @@ export default function Confirmation() {
     if (id) {
       router.push({
         pathname: "/(main)/pocket/[id]/transaction/PinCode",
+        // Forward all necessary params to the PinCode screen
         params: {
           id,
           isSchedule,
+          successAction,
+          toastMessage,
         },
       });
     }
   };
 
-  // Conditionally set the button title based on the navigation parameter
   const buttonTitle =
     approvalRequired === "true"
       ? "Kirim Permintaan Persetujuan"
@@ -82,7 +86,7 @@ export default function Confirmation() {
       <Box style={styles.shadowAbove} className="bg-white px-6 py-4">
         <VStack className="gap-4 mt-3">
           <HStack className="justify-between">
-            <Text className="text=-lg text-black font-semibold">Total</Text>
+            <Text className="text-lg text-black font-semibold">Total</Text>
             <Text className="text-xl text-black font-extrabold">
               {formatRupiah(amount)}
             </Text>

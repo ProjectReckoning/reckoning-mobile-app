@@ -209,12 +209,16 @@ export default function LoginFormScreen() {
                       placeholder="87xxxx-xxxx-xxxx"
                       value={phoneNumberValue} // This state only holds the numbers user types
                       onChangeText={(text) => {
-                        // Only allow digits for phoneNumberValue state
-                        setPhoneNumberValue(text.replace(/\D/g, ""));
+                        let cleaned = text.replace(/\D/g, "");
+                        if (cleaned.startsWith("0")) {
+                          cleaned = cleaned.replace(/^0+/, "");
+                        }
+                        setPhoneNumberValue(cleaned);
                         setPhoneNumberError(""); // Clear error on change
                         setLoginError(""); // Clear general login error on change
                       }}
                       keyboardType="phone-pad"
+                      maxLength={15}
                     />
                   </Input>
                   {phoneNumberError ? (
