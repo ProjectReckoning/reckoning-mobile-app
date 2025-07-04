@@ -100,18 +100,6 @@ export default function BalanceMemberList() {
   const currentUserId = useAuthStore((state) => state.user?.user_id);
   const [showAll, setShowAll] = useState(false);
 
-  // const memberData = useMemo(() => {
-  //   if (!Array.isArray(members)) return [];
-  //   const sortedMembers = [...members].sort(
-  //     (a, b) =>
-  //       b.PocketMember.contribution_amount - a.PocketMember.contribution_amount,
-  //   );
-  //   if (showAll || sortedMembers.length <= 5) {
-  //     return sortedMembers;
-  //   }
-  //   return sortedMembers.slice(0, 5);
-  // }, [members, showAll]);
-
   const sortedMembers = useMemo(() => {
     if (!Array.isArray(members)) return [];
     // Find current user

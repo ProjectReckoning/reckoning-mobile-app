@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from "react";
-// Impor TouchableOpacity untuk tombol "Lihat semua"
-import { FlatList, View, TouchableOpacity } from "react-native";
-import { Box } from "@/components/ui/box";
-import { usePocketStore } from "@/stores/pocketStore";
+import { useMemo, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
+import { FlatList, View, TouchableOpacity } from "react-native";
+
+import useAuthStore from "@/stores/authStore";
+import { usePocketStore } from "@/stores/pocketStore";
+import AppText from "@/components/common/typography/AppText";
 import InfoMemberDetailCell from "@/components/common/tableCells/InfoMemberDetailCell";
 import InfoBalanceContent from "@/components/feature/pocketDashboard/common/InfoBalanceContent";
-import AppText from "@/components/common/typography/AppText";
 
 /**
  * Renders the scrollable list of members and manages the member action sheet.
@@ -17,6 +17,7 @@ export default function MemberDetailList() {
   const members = usePocketStore((state) => state.currentPocket?.members);
   const pocketType = usePocketStore((state) => state.currentPocket?.type);
   const currentPocket = usePocketStore((state) => state.currentPocket);
+  const currentUserId = useAuthStore((state) => state.user?.user_id);
 
   const isOwnerAdmin =
     currentPocket?.user_role === "owner" ||
@@ -81,6 +82,7 @@ export default function MemberDetailList() {
       index={index}
       onManagePress={() => handleManagePress(item)}
       isOwnerAdmin={isOwnerAdmin}
+      currentUserId={currentUserId}
     />
   );
 

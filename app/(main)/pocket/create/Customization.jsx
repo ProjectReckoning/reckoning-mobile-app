@@ -174,9 +174,9 @@ export default function Customization() {
             <CustomToast id={id} title="Pocket telah diperbarui" />
           ),
         });
+        router.back();
         setTimeout(() => {
           resetPocketData();
-          router.back();
         }, 1500);
       }
     } catch (error) {
@@ -192,14 +192,13 @@ export default function Customization() {
     try {
       await deletePocket(pocketId);
       resetPocketData();
-      setTimeout(() => {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [{ name: "home/index" }, { name: "pocket/all/index" }],
-          }),
-        );
-      }, 300);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{ name: "home/index" }, { name: "pocket/all/index" }],
+        }),
+      );
+      setTimeout(() => {}, 300);
     } catch (error) {
       console.error("Failed to delete pocket:", error);
     } finally {

@@ -110,7 +110,7 @@ export default function NewUser() {
         marginVertical={0}
       />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={90}
         style={{ flex: 1 }}
       >

@@ -28,6 +28,7 @@ export default function InfoMemberDetailCell({
   onManagePress,
   pocketType,
   isOwnerAdmin = false,
+  currentUserId = null,
 }) {
   if (!member || !member.PocketMember) {
     return null;
@@ -40,6 +41,7 @@ export default function InfoMemberDetailCell({
   const displayInitials = getConsistentInitials(memberName);
   const avatarBgColor = WondrColors["translucent-gray-wondr"];
   const avatarTextColor = WondrColors["tosca-wondr"];
+  const isMe = currentUserId === member.id;
 
   return (
     <Box
@@ -69,7 +71,7 @@ export default function InfoMemberDetailCell({
         </VStack>
       </Box>
 
-      {isOwnerAdmin && (
+      {isOwnerAdmin && !isMe && (
         <Pressable
           className="justify-center items-center"
           onPress={onManagePress}

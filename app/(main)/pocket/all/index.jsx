@@ -35,6 +35,7 @@ export default function AllPocket() {
     isAllPocketsLoading,
     fetchAllPockets,
     deletePocket,
+    leavePocket,
   } = usePocketStore();
 
   // This useEffect handles the navigation after a pocket is created
@@ -92,7 +93,19 @@ export default function AllPocket() {
     }
   };
 
-  const handleLeave = () => {};
+  const handleLeave = async () => {
+    if (!selectedPocket) return;
+
+    try {
+      await leavePocket(selectedPocket.pocket_id);
+
+      setShowDeleteLeaveAlert(false);
+      setSelectedPocket(null);
+    } catch (error) {
+      console.error("Failed to leave pocket from component:", error);
+      setShowDeleteLeaveAlert(false);
+    }
+  };
 
   const handleCardPress = (pocketId) => {
     router.push(`/(main)/pocket/${pocketId}`);
