@@ -7,6 +7,8 @@ import { Circle } from "lucide-react-native";
 import { VStack } from "@/components/ui/vstack";
 import { ActivityIndicator } from "react-native";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 import { Modal, ModalBackdrop, ModalContent } from "@/components/ui/modal";
 import {
   RadioGroup,
@@ -67,7 +69,7 @@ export default function InfoBalanceContent({
         ];
 
   const availableRoleValues = availableRoles.map((r) => r.value);
-
+  const toast = useToast();
   useEffect(() => {
     if (memberData) {
       const currentRole = memberData.PocketMember?.role || "viewer";
@@ -103,13 +105,27 @@ export default function InfoBalanceContent({
 
   const handleDeleteMember = async () => {
     try {
-      await removePocketMembers(pocketId, [memberData.id]);
-      setShowDeleteModal(false);
+      const result = await removePocketMembers(pocketId, [memberData.id]);
+
+      if (result) {
+        setShowDeleteModal(false);
+        onClose();
+        toast.show({
+          placement: "top",
+          duration: 2000,
+          render: ({ id }) => {
+            return <CustomToast id={id} title="Member berhasil dihapus" />;
+          },
+        });
+      } else {
+        console.error("Gagal menghapus member: API returned a falsy result.");
+        setShowDeleteModal(false);
+      }
     } catch (e) {
       console.error("Failed to delete member:", e);
+      setShowDeleteModal(false);
     }
   };
-
   const displayRole = (memberData.PocketMember?.role || "viewer").toUpperCase();
 
   return (
@@ -246,6 +262,8 @@ export default function InfoBalanceContent({
               className="bg-red-wondr"
               buttonActiveColor={"active:bg-red-wondr-dark"}
               textClassName="text-white text-base text-center font-bold"
+              isLoading={isMemberActionLoading}
+              disabled={isMemberActionLoading}
             />
             <PrimaryButton
               buttonAction={() => setShowDeleteModal(false)}

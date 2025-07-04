@@ -7,7 +7,15 @@ import { Heading } from "@/components/ui/heading";
 
 import { useState, useEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Modal, ScrollView, ActivityIndicator, Alert } from "react-native";
+import {
+  Modal,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  ActivityIndicator as RNActivityIndicator,
+} from "react-native";
+import { useToast } from "@/components/ui/toast";
+import CustomToast from "@/components/common/customToast/CustomToast";
 
 import { WondrColors } from "@/utils/colorUtils";
 import { formatRupiah } from "@/utils/helperFunction";
@@ -16,7 +24,6 @@ import { useTransactionStore } from "@/stores/transactionStore";
 import PocketCard from "@/components/common/cards/PocketCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import TransactionCard from "@/components/common/cards/TransactionCard";
-
 const formatMonthYear = (date) => {
   if (!date) return null;
   const monthNames = [

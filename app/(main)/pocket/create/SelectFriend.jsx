@@ -7,10 +7,10 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-
+import { useToast, Toast, ToastTitle } from "@/components/ui/toast";
+import React, { useState, useMemo, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView, ActivityIndicator } from "react-native";
-import { useState, useMemo, useEffect } from "react";
 
 import FriendList from "@/components/common/FriendList";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -18,10 +18,36 @@ import { usePocketStore } from "@/stores/pocketStore";
 import { useFriendshipStore } from "@/stores/friendshipStore";
 import CustomGoalIcon from "@/assets/images/icon/customGoal.png";
 import { WondrColors } from "@/utils/colorUtils";
+import { Check } from "lucide-react-native";
+
+const CustomToast = React.forwardRef(function CustomToast(props, ref) {
+  const { id, ...rest } = props;
+  const toastId = "toast-" + id;
+
+  return (
+    <Toast
+      ref={ref}
+      nativeID={toastId}
+      className="bg-white p-4 rounded-xl shadow-lg"
+      {...rest}
+    >
+      <Box className="flex-row items-center gap-3">
+        <Box className="rounded-full h-6 w-6 items-center justify-center bg-green-500">
+          <Check size={12} color="white" />
+        </Box>
+
+        <ToastTitle className="text-black font-medium">
+          Undangan berhasil terkirim
+        </ToastTitle>
+      </Box>
+    </Toast>
+  );
+});
 
 export default function SelectFriendScreen() {
   const { id: pocketId } = useLocalSearchParams();
   const isInviteMode = !!pocketId;
+  const toast = useToast();
 
   // --- Store Hooks ---
   const { invitePocketMembers, isMemberActionLoading } = usePocketStore();
@@ -57,32 +83,35 @@ export default function SelectFriendScreen() {
     console.log("--- handleLanjut called. isInviteMode:", isInviteMode);
 
     if (isInviteMode) {
-      // --- Flow 2: Invite to Existing Pocket ---
       if (!pocketId || currentSelection.length === 0) {
-        console.log("Invite mode: No pocketId or no selection. Aborting.");
         return;
       }
 
-      console.log(
-        "Invite mode: Attempting to invite friends to pocketId:",
-        pocketId,
-        currentSelection,
-      );
       try {
         const result = await invitePocketMembers(pocketId, currentSelection);
         console.log("Invite API call result:", result);
 
         if (result) {
-          console.log("Invite successful, navigating back.");
-          router.back(); // Navigate back on success
+          console.log("Invite successful, showing toast...");
+          toast.show({
+            placement: "top",
+            duration: 2000,
+            render: ({ id }) => {
+              return <CustomToast id={id} />;
+            },
+          });
+          router.back();
+
+          setTimeout(() => {
+            console.log("Navigating back after delay.");
+          }, 1500);
         } else {
-          console.warn("Invite result was falsy, not navigating back.");
+          console.warn("Invite result was falsy, something went wrong.");
         }
       } catch (e) {
         console.error("Failed to invite members on screen:", e);
       }
     } else {
-      // --- Flow 1: Create Pocket ---
       console.log("Create mode: Navigating back.");
       router.back();
     }
