@@ -228,6 +228,10 @@ export const useTransactionStore = create((set, get) => ({
       const listResponse = await api.get(
         `/transaction/transfer/schedule/${pocketId}`,
       );
+      console.log(
+        "Response Schedule Received:",
+        JSON.stringify(listResponse.data, null, 2),
+      );
 
       if (!listResponse.data || !listResponse.data.ok) {
         throw new Error(

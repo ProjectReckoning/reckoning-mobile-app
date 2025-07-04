@@ -118,7 +118,7 @@ export default function AllPocket() {
     }
 
     if (filteredPockets.length === 0) {
-      return <EmptyPocket createAction={GoToCreatePocket} />;
+      return <EmptyPocket GoToCreatePocket={GoToCreatePocket} />;
     }
 
     return (
