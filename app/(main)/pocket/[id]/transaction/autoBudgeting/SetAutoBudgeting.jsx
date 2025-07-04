@@ -3,7 +3,7 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Pressable } from "@/components/ui/pressable";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import {
   ScrollView,
   KeyboardAvoidingView,
@@ -38,9 +38,11 @@ import { WondrColors } from "@/utils/colorUtils";
 import CustomDatePicker from "@/components/common/CustomDatePicker/CustomDatePicker";
 import { usePocketStore } from "@/stores/pocketStore";
 import useAuthStore from "@/stores/authStore";
+import { CommonActions } from "@react-navigation/native";
 
 export default function SetAutoBudgeting() {
   const { id: pocketId } = useLocalSearchParams();
+  const navigation = useNavigation();
   const { currentPocket } = usePocketStore();
   const { amount, setAmount, setAutoBudgeting, isProcessing } =
     useTransactionStore();
@@ -63,7 +65,6 @@ export default function SetAutoBudgeting() {
   const [errors, setErrors] = useState({});
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
 
-  // FIX: Removed "Harian" from the options
   const frequencyOptions = ["Mingguan", "Bulanan"];
 
   const handleSelectFrequency = (value) => {
@@ -141,7 +142,6 @@ export default function SetAutoBudgeting() {
       return;
     }
 
-    // FIX: Removed "Harian" mapping
     const scheduleTypeMap = {
       Mingguan: "weekly",
       Bulanan: "monthly",
@@ -160,16 +160,27 @@ export default function SetAutoBudgeting() {
     try {
       const result = await setAutoBudgeting(pocketId, budgetData);
       if (result) {
-        router.push({
-          pathname: `/(main)/pocket/${pocketId}/transaction/autoBudgeting/autoBudgetingConfirmation`,
-          params: {
-            ...result,
-            pocketName: currentPocket?.name,
-            pocketAccountNumber: currentPocket?.account_number,
-            pocketColor: currentPocket?.color,
-            pocketIcon: currentPocket?.icon_name,
-          },
-        });
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 3, // The active screen is the 4th one in the stack
+            routes: [
+              { name: "home/index" },
+              { name: "pocket/all/index" },
+              { name: "pocket/[id]/index", params: { id: pocketId } },
+              {
+                name: "pocket/[id]/transaction/autoBudgeting/autoBudgetingConfirmation",
+                params: {
+                  ...result,
+                  pocketId: pocketId,
+                  pocketName: currentPocket?.name,
+                  pocketAccountNumber: currentPocket?.account_number,
+                  pocketColor: currentPocket?.color,
+                  pocketIcon: currentPocket?.icon_name,
+                },
+              },
+            ],
+          }),
+        );
       }
     } catch (error) {
       console.error("Failed to set auto-budgeting:", error);
@@ -306,7 +317,6 @@ export default function SetAutoBudgeting() {
         </ScrollView>
       </TouchableWithoutFeedback>
 
-      {/* Modal Info Transfer Terjadwal */}
       <Modal
         animationType="fade"
         transparent={true}
