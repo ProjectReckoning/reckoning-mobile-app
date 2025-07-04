@@ -20,9 +20,6 @@ import {
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
 
-// --- Isolated Date Picker Component ---
-// By moving the Actionsheet and Picker into their own component, we isolate its state.
-// Now, only this small component will re-render when scrolling, not the entire screen.
 const DatePickerActionsheet = ({
   isVisible,
   onClose,
@@ -32,8 +29,6 @@ const DatePickerActionsheet = ({
   const [currentDate, setCurrentDate] = useState(initialDate);
   const dateOptions = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  // This effect syncs the picker's internal state with the global state
-  // only when the actionsheet is opened.
   useEffect(() => {
     if (isVisible) {
       setCurrentDate(initialDate);
@@ -42,7 +37,7 @@ const DatePickerActionsheet = ({
 
   const handleConfirmPress = () => {
     onConfirm(currentDate);
-    onClose(); // Close the sheet after confirming.
+    onClose();
   };
 
   return (
@@ -80,7 +75,6 @@ const DatePickerActionsheet = ({
 export default function ScheduleTransferContent() {
   const { id } = useLocalSearchParams();
 
-  // State from Zustand store
   const {
     selectedDate,
     selectedStartDate,
@@ -90,50 +84,17 @@ export default function ScheduleTransferContent() {
     setSelectedEndDate,
   } = useTransactionStore();
 
-  // State for month picker visibility and type ('start' or 'end')
   const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
   const [activePicker, setActivePicker] = useState(null);
-
-  // State for date picker visibility
   const [isPickerVisible, setPickerVisible] = useState(false);
-
   const [validationError, setValidationError] = useState("");
 
   useEffect(() => {
     let error = "";
-
-    // Helper: get month/year as number for comparison
     const getMonthYear = (date) =>
       date ? date.getFullYear() * 100 + date.getMonth() : null;
 
-    // Range: now to 1 year after now
-    const now = new Date();
-    const minMonth = getMonthYear(now);
-    const maxMonth = getMonthYear(
-      new Date(now.getFullYear() + 1, now.getMonth()),
-    );
-
-    // Validate Bulan Mulai
-    if (selectedStartDate) {
-      const startMonth = getMonthYear(selectedStartDate);
-      if (startMonth < minMonth || startMonth > maxMonth) {
-        error =
-          "Bulan Mulai hanya bisa dipilih dari bulan ini sampai 1 tahun ke depan.";
-      }
-    }
-
-    // Validate Bulan Selesai
-    if (!error && selectedEndDate) {
-      const endMonth = getMonthYear(selectedEndDate);
-      if (endMonth < minMonth || endMonth > maxMonth) {
-        error =
-          "Bulan Selesai hanya bisa dipilih dari bulan ini sampai 1 tahun ke depan.";
-      }
-    }
-
-    // Validate Bulan Selesai >= Bulan Mulai
     if (
-      !error &&
       selectedStartDate &&
       selectedEndDate &&
       getMonthYear(selectedEndDate) < getMonthYear(selectedStartDate)
@@ -141,15 +102,18 @@ export default function ScheduleTransferContent() {
       error = "Bulan Selesai tidak boleh lebih awal dari Bulan Mulai.";
     }
 
-    setValidationError(error);
-
-    // Optional: show alert (or use your own error UI)
-    if (error) {
-      Alert.alert("Validasi Jadwal", error);
+    if (
+      selectedStartDate &&
+      selectedEndDate &&
+      getMonthYear(selectedEndDate) < getMonthYear(selectedStartDate)
+    ) {
+      setSelectedEndDate(null);
+      error = "";
     }
-  }, [selectedStartDate, selectedEndDate]);
 
-  // --- Date Formatting ---
+    setValidationError(error);
+  }, [selectedStartDate, selectedEndDate, setSelectedEndDate]);
+
   const formatMonthYear = (date) => {
     if (!date) return null;
     const monthNames = [
@@ -169,16 +133,13 @@ export default function ScheduleTransferContent() {
     return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  // --- Date Picker Logic (Simplified) ---
   const handleOpenDatePicker = () => setPickerVisible(true);
   const handleCloseDatePicker = () => setPickerVisible(false);
 
   const handleConfirmDate = (newDate) => {
     setSelectedDate(newDate);
-    // Closing is handled by the DatePickerActionsheet component itself
   };
 
-  // --- Month Picker Logic ---
   const handleOpenMonthPicker = (type) => {
     setActivePicker(type);
     setMonthPickerVisible(true);
@@ -192,6 +153,9 @@ export default function ScheduleTransferContent() {
   const handleConfirmMonth = (newDate) => {
     if (activePicker === "start") {
       setSelectedStartDate(newDate);
+      if (selectedEndDate && newDate.getTime() > selectedEndDate.getTime()) {
+        setSelectedEndDate(null);
+      }
     } else if (activePicker === "end") {
       setSelectedEndDate(newDate);
     }
@@ -199,12 +163,12 @@ export default function ScheduleTransferContent() {
   };
 
   const getInitialDateForPicker = () => {
-    if (activePicker === "start" && selectedStartDate) return selectedStartDate;
-    if (activePicker === "end" && selectedEndDate) return selectedEndDate;
+    if (activePicker === "start") return selectedStartDate || new Date();
+    if (activePicker === "end")
+      return selectedEndDate || selectedStartDate || new Date();
     return new Date();
   };
 
-  // --- Navigation ---
   const handleNext = () => {
     if (id) {
       router.push(`/(main)/pocket/${id}/transaction/Confirmation`);
@@ -215,7 +179,6 @@ export default function ScheduleTransferContent() {
     <>
       <Box className="flex-1 justify-between py-6 px-8 bg-white" gap={25}>
         <Box className="flex-1 gap-4">
-          {/* Date Picker Component */}
           <Pressable onPress={handleOpenDatePicker}>
             <Box className="flex-row justify-between items-center border p-4 rounded-xl border-gray-wondr-border">
               <Text className="text-black text-base">
@@ -225,7 +188,6 @@ export default function ScheduleTransferContent() {
             </Box>
           </Pressable>
 
-          {/* Start and End Month Pickers */}
           <Box className="flex-row justify-between">
             <Pressable
               onPress={() => handleOpenMonthPicker("start")}
@@ -266,6 +228,7 @@ export default function ScheduleTransferContent() {
             <Pressable
               onPress={() => handleOpenMonthPicker("end")}
               style={{ width: "48%" }}
+              disabled={!selectedStartDate}
             >
               <Box
                 className={`flex-row justify-between items-center p-4 rounded-xl ${
@@ -273,6 +236,7 @@ export default function ScheduleTransferContent() {
                     ? "border border-gray-wondr-border"
                     : "bg-translucent-gray-wondr"
                 }`}
+                style={{ opacity: !selectedStartDate ? 0.5 : 1 }}
               >
                 {selectedEndDate ? (
                   <Box>
@@ -307,7 +271,6 @@ export default function ScheduleTransferContent() {
           ) : null}
         </Box>
 
-        {/* Info Box */}
         <Box className="justify-between border p-4 rounded-xl border-gray-wondr-border">
           <Box className="flex-row items-center" gap={8}>
             <Info size={20} color={WondrColors["green-select"]} />
@@ -350,7 +313,6 @@ export default function ScheduleTransferContent() {
         </Box>
       </Box>
 
-      {/* Continue Button Area */}
       <Box className="px-8 py-4 gap-4 bg-white">
         <PrimaryButton
           buttonAction={handleNext}
@@ -365,7 +327,6 @@ export default function ScheduleTransferContent() {
         />
       </Box>
 
-      {/* Actionsheet for DATE picker is now the new component */}
       <DatePickerActionsheet
         isVisible={isPickerVisible}
         onClose={handleCloseDatePicker}
@@ -373,7 +334,6 @@ export default function ScheduleTransferContent() {
         initialDate={selectedDate || 1}
       />
 
-      {/* Actionsheet for MONTH & YEAR picker */}
       <CustomMonthPicker
         isVisible={isMonthPickerVisible}
         onClose={handleCloseMonthPicker}
@@ -382,6 +342,8 @@ export default function ScheduleTransferContent() {
         title={
           activePicker === "start" ? "Pilih Bulan Mulai" : "Pilih Bulan Selesai"
         }
+        activePicker={activePicker}
+        selectedStartDate={selectedStartDate}
       />
     </>
   );
