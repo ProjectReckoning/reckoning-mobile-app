@@ -5,7 +5,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { AlertCircleIcon } from "@/components/ui/icon";
-import { Input, InputField } from "@/components/ui/input";
+import { Input, InputField, InputSlot } from "@/components/ui/input";
 import {
   FormControl,
   FormControlError,
@@ -32,6 +32,11 @@ const tabList = [
   { key: "handphone", label: "No. HP" },
 ];
 
+function validatePhoneNumber(phone) {
+  // Only digits, no leading zero, length 9-15
+  return /^\d{9,15}$/.test(phone) && !phone.startsWith("0");
+}
+
 export default function NewUser() {
   const [activeTab, setActiveTab] = useState("rekening");
   const [rekening, setRekening] = useState("");
@@ -42,6 +47,22 @@ export default function NewUser() {
   const { sendFriendRequest, isSendingRequest, sendRequestError } =
     useFriendshipStore();
 
+  const formatPhoneNumberForBackend = (phoneNumber) => {
+    // Remove all non-digit characters
+    let cleanedNumber = phoneNumber.replace(/\D/g, "");
+
+    // If it starts with '0', remove it (this is for user convenience if they type 08...)
+    if (cleanedNumber.startsWith("0")) {
+      cleanedNumber = cleanedNumber.substring(1);
+    }
+
+    // Prepend '62' (assuming phoneNumberValue only contains digits after 62/0)
+    if (!cleanedNumber.startsWith("62")) {
+      cleanedNumber = "62" + cleanedNumber;
+    }
+    return cleanedNumber;
+  };
+
   const handleAddFriend = async () => {
     if (activeTab === "rekening") {
       console.log(
@@ -51,7 +72,9 @@ export default function NewUser() {
     } else if (activeTab === "handphone") {
       if (!hpEmail || isSendingRequest) return;
       try {
-        const response = await sendFriendRequest([hpEmail]);
+        const response = await sendFriendRequest([
+          formatPhoneNumberForBackend(hpEmail),
+        ]);
         // --- CHANGE: Navigate to confirmation screen on success ---
         if (response && response.ok && response.data?.added?.length > 0) {
           const addedPhoneNumber = response.data.added[0];
@@ -152,24 +175,40 @@ export default function NewUser() {
                   size="md"
                   className="h-16 border rounded-xl mt-5 mb-2 px-3 py-3 border-gray-wondr-border data-[focus=true]:border-green-select"
                 >
+                  <InputSlot pl="$3">
+                    <Text className="text-gray-500 font-normal text-lg -mr-1">
+                      +62
+                    </Text>
+                  </InputSlot>
                   <InputField
-                    placeholder="Nomor HP"
+                    placeholder="87xxxx-xxxx-xxxx"
                     type="text"
                     className="text-lg"
                     keyboardType="phone-pad"
                     value={hpEmail}
                     onChangeText={(text) => {
-                      setHpEmail(text);
-                      setIsHpEmailInvalid(false);
+                      let cleaned = text.replace(/\D/g, "");
+                      if (cleaned.startsWith("0")) {
+                        cleaned = cleaned.replace(/^0+/, "");
+                      }
+                      setHpEmail(cleaned);
+                      setIsHpEmailInvalid(
+                        cleaned.length > 0 && !validatePhoneNumber(cleaned),
+                      );
                     }}
+                    maxLength={15}
+                    returnKeyType="done"
                   />
                 </Input>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    No. HP tidak ditemukan atau sudah menjadi teman.
-                  </FormControlErrorText>
-                </FormControlError>
+                {isHpEmailInvalid && (
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} />
+                    <FormControlErrorText>
+                      No. HP tidak valid atau tidak ditemukan atau sudah menjadi
+                      teman.
+                    </FormControlErrorText>
+                  </FormControlError>
+                )}
               </FormControl>
             )}
           </Box>
@@ -177,12 +216,14 @@ export default function NewUser() {
           <PrimaryButton
             buttonAction={handleAddFriend}
             buttonTitle="Lanjut"
-            className={"my-5"}
+            className="my-5"
             disabled={
               (activeTab === "rekening" &&
                 (rekening === "" || isRekeningInvalid)) ||
               (activeTab === "handphone" &&
-                (isHpEmailInvalid || hpEmail === ""))
+                (isHpEmailInvalid ||
+                  hpEmail === "" ||
+                  !validatePhoneNumber(hpEmail)))
             }
             isLoading={isSendingRequest}
           />
