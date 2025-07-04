@@ -114,7 +114,11 @@ export default function TransferScheduleContent() {
       <ReusableCellContent
         icon={avatarIcon}
         title={item.detail.destination.toUpperCase()}
-        description={formatNextRunDate(item.next_run_date)}
+        description={
+          activeTab === "terjadwal"
+            ? formatNextRunDate(item.next_run_date)
+            : "Selesai"
+        }
         date={formatRupiah(item.recurring_amount)}
         titleClassName="text-base"
         descriptionClassName="text-sm text-gray-500"

@@ -143,7 +143,6 @@ export default function TransferBulananDetail() {
             </Box>
           </Box>
         </Box>
-
         {/* --- Detail Jadwal --- */}
         <VStack space="sm" className="mt-5">
           <Text className="text-sm text-black font-semibold">
@@ -176,13 +175,21 @@ export default function TransferBulananDetail() {
             </Text>
           </HStack>
         </VStack>
-
         {/* --- Detail Transfer --- */}
         <VStack space="sm" className="my-5">
           <Text className="text-sm text-black font-semibold">
             Detail transfer
           </Text>
           <Divider />
+          <HStack className="justify-between">
+            <Text className="text-sm text-black font-light">Kategori</Text>
+            <Text className="text-sm text-black font-light">
+              {currentSchedule?.category
+                ? currentSchedule.category.charAt(0).toUpperCase() +
+                  currentSchedule.category.slice(1).toLowerCase()
+                : "Transfer"}
+            </Text>
+          </HStack>
           <HStack className="justify-between">
             <Text className="text-sm text-black font-light">Nominal</Text>
             <Text className="text-sm text-black font-light">
@@ -198,7 +205,6 @@ export default function TransferBulananDetail() {
             </Text>
           </HStack>
         </VStack>
-
         <VStack space="lg" className="w-full">
           <TransactionCard
             title="Penerima"
