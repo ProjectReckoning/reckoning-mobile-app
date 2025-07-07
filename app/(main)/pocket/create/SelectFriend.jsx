@@ -136,18 +136,25 @@ export default function SelectFriendScreen() {
                 {currentSelection.map((friend) => (
                   <Pressable
                     key={friend.id}
+                    disabled={isInviteMode}
+                    className="data-[disabled=true]:opacity-100"
                     onPress={() => {
-                      // setSelection((prev) =>
-                      //   prev.filter((f) => f.id !== friend.id),
-                      // );
-                      console.log("belum bisa di press", friend);
+                      if (!isInviteMode) {
+                        console.log("belum bisa di press", friend);
+                        const newNames = selectedFriendNames.filter(
+                          (name) => name !== friend.name,
+                        );
+                        handleSelectionChange(newNames);
+                      }
                     }}
                   >
-                    <Center className="w-5 h-5 z-10 self-end bg-red-wondr rounded-full absolute right-3 top-0">
-                      <Text className="text-white font-bold text-center -mt-1">
-                        -
-                      </Text>
-                    </Center>
+                    {!isInviteMode && (
+                      <Center className="w-5 h-5 z-10 self-end bg-red-wondr rounded-full absolute right-3 top-0">
+                        <Text className="text-white font-bold text-center -mt-1">
+                          -
+                        </Text>
+                      </Center>
+                    )}
                     <Avatar
                       size="lg"
                       className="bg-[#F2F2F2] items-center justify-center mr-4"
@@ -194,8 +201,6 @@ export default function SelectFriendScreen() {
         />
 
         <PrimaryButton
-          // --- FIX: The `onPress` prop has been corrected to `buttonAction` ---
-          // This ensures the handleLanjut function is correctly passed to the button component.
           buttonAction={handleLanjut}
           buttonTitle={
             isInviteMode && isMemberActionLoading ? (
