@@ -97,6 +97,7 @@ export default function FormPocketDetail({
                 value={pocketName}
                 onChangeText={setPocketName}
                 className="p-3"
+                maxLength={20}
               />
               <InputSlot className="mr-3">
                 <Text
@@ -136,6 +137,7 @@ export default function FormPocketDetail({
                     : ""
                 }
                 onChangeText={setPocketBalanceTarget}
+                maxLength={21}
                 className="p-3 pl-0"
                 keyboardType="numeric"
               />
