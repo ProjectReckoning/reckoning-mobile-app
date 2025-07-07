@@ -30,7 +30,10 @@ export default function SpendingBalanceScreen() {
   return (
     <Box className="flex-1 bg-white">
       {/* --- Static Header Content --- */}
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
         <AccountNumber />
         <PaymentDateInfo />
         <Box

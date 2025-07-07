@@ -10,6 +10,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import TabBar from "@/components/common/TabBar";
 import { CirclePlus } from "lucide-react-native";
 import { WondrColors } from "@/utils/colorUtils";
+import { useGlobalStore } from "@/stores/globalStore";
 import { usePocketStore } from "@/stores/pocketStore";
 import PocketCard from "@/components/common/cards/PocketCard";
 import EmptyPocket from "@/components/feature/allPocket/EmptyPocket";
@@ -47,6 +48,11 @@ export default function AllPocket() {
       setIsRefreshing(false);
     }
   };
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-white");
+  }, []);
+  useFocusEffect(setSavColor);
 
   // This useEffect handles the navigation after a pocket is created
   useEffect(() => {

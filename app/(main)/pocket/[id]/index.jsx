@@ -14,10 +14,10 @@ import {
 
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
+import { useGlobalStore } from "@/stores/globalStore";
 import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
 import { useTransactionStore } from "@/stores/transactionStore";
-import PocketDashboardTopBar from "@/components/feature/pocketDashboard/PocketDashboardTopBar";
 
 import SavingBalanceScreen from "@/components/feature/pocketDashboard/saving/savingBalance";
 import SavingHistoryScreen from "@/components/feature/pocketDashboard/saving/savingHistory";
@@ -50,6 +50,11 @@ export default function PocketDashboardScreen() {
   const resetTransactionState = useTransactionStore(
     (state) => state.resetTransactionState,
   );
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-white");
+  }, []);
+  useFocusEffect(setSavColor);
 
   useEffect(() => {
     if (currentPocket) {

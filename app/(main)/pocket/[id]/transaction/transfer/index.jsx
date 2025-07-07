@@ -10,6 +10,7 @@ import { useLocalSearchParams, useFocusEffect } from "expo-router";
 
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
+import { useGlobalStore } from "@/stores/globalStore";
 import { usePocketStore } from "@/stores/pocketStore";
 import FriendList from "@/components/common/FriendList";
 import { useTransactionStore } from "@/stores/transactionStore";
@@ -34,6 +35,14 @@ export default function Transfer() {
   } = usePocketStore();
   const { setType, setSource, setDestination, resetTransactionState } =
     useTransactionStore();
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-light-gray-wondr");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
+  }, []);
+  useFocusEffect(setSavColor);
 
   // --- NEW: Reset the transaction state every time this screen is focused ---
   useFocusEffect(

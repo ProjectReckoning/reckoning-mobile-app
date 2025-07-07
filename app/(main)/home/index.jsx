@@ -16,6 +16,7 @@ import { ScrollView, RefreshControl } from "react-native";
 import useAuthStore from "@/stores/authStore";
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
+import { useGlobalStore } from "@/stores/globalStore";
 import AccountCard from "@/components/feature/home/AccountCard";
 import { useNotificationStore } from "@/stores/notificationStore";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
@@ -25,10 +26,10 @@ import {
   getUnreadCount,
 } from "@/utils/notification/notification";
 
+import QRISicon from "@/assets/images/QRIS.svg";
 import WondrLogo from "@/assets/images/wondr-logo.png";
 import LogoutIcon from "@/assets/images/icon/logout.png";
 import BillIcon from "@/assets/images/icon/bill-icon.png";
-import QRISicon from "@/assets/images/QRIS.svg";
 
 const tabList = [
   { key: "insight", label: "Insight" },
@@ -40,6 +41,14 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
   const { user, removeToken, fetchUser } = useAuthStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-[#F9F9F9]");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
+  }, []);
+  useFocusEffect(setSavColor);
 
   const onRefresh = async () => {
     try {

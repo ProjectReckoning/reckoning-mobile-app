@@ -10,7 +10,8 @@ import {
   AvatarGroup,
 } from "@/components/ui/avatar";
 
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useGlobalStore } from "@/stores/globalStore";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useState, useEffect, useCallback } from "react";
 import { UserPlus, ChevronRight } from "lucide-react-native";
@@ -138,6 +139,11 @@ export default function Details() {
   const GoToCustomization = () => {
     router.push("pocket/create/Customization");
   };
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-[#C3F0EC]");
+  }, []);
+  useFocusEffect(setSavColor);
 
   useEffect(() => {
     if (pocketName.length > 20 || pocketName.length === null) {
