@@ -123,9 +123,9 @@ export default function NotificationDetailContent() {
       <Box className="px-8 py-4 bg-white" style={styles.shadowAbove}>
         {(() => {
           let buttonTitle;
-          if (notification.response === "accepted") {
+          if (notification.data.response === "accepted") {
             buttonTitle = "Diterima";
-          } else if (notification.response === "rejected") {
+          } else if (notification.data.response === "rejected") {
             buttonTitle = "Ditolak";
           } else {
             buttonTitle = "Direspon";
