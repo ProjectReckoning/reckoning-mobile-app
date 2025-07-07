@@ -79,10 +79,21 @@ export default function SelectFriendScreen() {
     : setGlobalSelectedFriends;
 
   const handleSelectionChange = (selectedNames) => {
-    const newSelectedFriendObjects = allFriends.filter((friend) =>
+    // const newSelectedFriendObjects = allFriends.filter((friend) =>
+    //   selectedNames.includes(friend.name),
+    // );
+    // 1. Keep the order of the previous selection for names that are still selected
+    let ordered = currentSelection.filter((friend) =>
       selectedNames.includes(friend.name),
     );
-    setSelection(newSelectedFriendObjects);
+    // 2. Add new selections (names that are in selectedNames but not in ordered)
+    selectedNames.forEach((name) => {
+      if (!ordered.some((friend) => friend.name === name)) {
+        const newFriend = allFriends.find((friend) => friend.name === name);
+        if (newFriend) ordered.push(newFriend);
+      }
+    });
+    setSelection(ordered);
   };
 
   const selectedFriendNames = useMemo(
@@ -155,7 +166,7 @@ export default function SelectFriendScreen() {
                 style={{ flex: 1 }}
               >
                 {[...currentSelection]
-                  .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                  // .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                   .map((friend) => (
                     <Pressable
                       key={friend.id}

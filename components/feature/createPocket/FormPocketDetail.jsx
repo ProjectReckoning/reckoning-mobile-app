@@ -63,6 +63,7 @@ export default function FormPocketDetail({
               value={pocketName}
               onChangeText={setPocketName}
               className="p-3"
+              maxLength={20}
             />
             <InputSlot className="mr-3">
               <Text
