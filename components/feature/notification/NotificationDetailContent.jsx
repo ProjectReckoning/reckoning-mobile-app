@@ -45,10 +45,10 @@ export default function NotificationDetailContent() {
 
   const formattedDate = notification?.data?.date
     ? new Date(notification.data.date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
     : "";
 
   const notificationImage = useMemo(() => {
@@ -93,19 +93,9 @@ export default function NotificationDetailContent() {
 
   const renderButtonBasedOnType = () => {
     if (!notification) return null;
+    console.log("testing::", notification);
 
-    const notifType = notification.data?.type;
-    let status;
-
-    if (notifType === "member_approval_needed") {
-      status = notification.data.inviteData?.status;
-    } else if (notifType === "transaction_approval_needed") {
-      status = notification.data.status;
-    } else {
-      return null;
-    }
-
-    if (status === "pending") {
+    if (!notification.data.responded) {
       return (
         <Box className="px-8 py-4 gap-4 bg-white" style={styles.shadowAbove}>
           <PrimaryButton
@@ -129,31 +119,27 @@ export default function NotificationDetailContent() {
       );
     }
 
-    if (status === "accepted") {
-      return (
-        <Box className="px-8 py-4 bg-white" style={styles.shadowAbove}>
-          <PrimaryButton
-            buttonTitle="Diterima"
-            buttonColor="bg-green-select"
-            disabled={true}
-          />
-        </Box>
-      );
-    }
-
-    if (status === "rejected") {
-      return (
-        <Box className="px-8 py-4 bg-white" style={styles.shadowAbove}>
-          <PrimaryButton
-            buttonTitle="Ditolak"
-            buttonColor="bg-red-wondr"
-            disabled={true}
-          />
-        </Box>
-      );
-    }
-
-    return null;
+    return (
+      <Box className="px-8 py-4 bg-white" style={styles.shadowAbove}>
+        {(() => {
+          let buttonTitle;
+          if (notification.response === "accepted") {
+            buttonTitle = "Diterima";
+          } else if (notification.response === "rejected") {
+            buttonTitle = "Ditolak";
+          } else {
+            buttonTitle = "Direspon";
+          }
+          return (
+            <PrimaryButton
+              buttonTitle={buttonTitle}
+              buttonColor="bg-green-select"
+              disabled={true}
+            />
+          );
+        })()}
+      </Box>
+    );
   };
 
   const renderMessageBasedOnType = () => {
