@@ -58,8 +58,10 @@ export default function PocketInfo() {
         />
         <ScrollView
           showsVerticalScrollIndicator={true}
+          style={{ marginRight: -10 }}
           contentContainerStyle={{
             paddingBottom: 30,
+            paddingRight: 10,
             flexGrow: 1,
           }}
         >

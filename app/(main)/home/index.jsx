@@ -183,14 +183,14 @@ export default function Home() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={onRefresh}
-            colors={[WondrColors["tosca-wondr"]]} // Optional: custom spinner color
+            colors={[WondrColors["tosca-wondr"]]}
             tintColor={WondrColors["tosca-wondr"]}
           />
         }
       >
         <AccountCard user={user} />
         <SelectedFeature />
-        {/* <DashboardPocketCard /> */}
+        <DashboardPocketCard />
       </ScrollView>
     </Box>
   );
