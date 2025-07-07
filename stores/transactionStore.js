@@ -539,4 +539,37 @@ export const useTransactionStore = create((set, get) => ({
       throw error;
     }
   },
+
+  respondToTransfer: async (trasactionId, responseAction) => {
+    console.log(
+      "================================================================",
+    );
+    console.log("API Call: PATCH /transaction/transfer/{transactionId}");
+    console.log(
+      "================================================================",
+    );
+    set({ isProcessing: true, transactionError: null });
+    const requestBody = { status: responseAction };
+    try {
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+      const response = await api.patch(
+        `/transaction/transfer/${trasactionId}`,
+        requestBody,
+      );
+      console.log("Response Received:", JSON.stringify(response.data, null, 2));
+      if (response.data && response.data.ok) {
+        set({ isProcessing: false });
+        return response.data;
+      } else {
+        throw new Error(
+          response.data.message || "Failed to respond to invite.",
+        );
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred.";
+      console.error("API Error:", errorMessage);
+      set({ transactionError: errorMessage, isProcessing: false });
+      throw error;
+    }
+  },
 }));

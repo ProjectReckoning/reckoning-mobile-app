@@ -45,10 +45,10 @@ export default function NotificationDetailContent() {
 
   const formattedDate = notification?.data?.date
     ? new Date(notification.data.date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
     : "";
 
   const notificationImage = useMemo(() => {
@@ -100,7 +100,13 @@ export default function NotificationDetailContent() {
     if (notifType === "member_approval_needed") {
       status = notification.data.inviteData?.status;
     } else if (notifType === "transaction_approval_needed") {
-      status = notification.data.status;
+      if (notification.data.response === "accepted") {
+        status = "accepted";
+      } else if (notification.data.response === "rejected") {
+        status = "rejected";
+      } else {
+        status = "pending";
+      }
     } else {
       return null;
     }
