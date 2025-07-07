@@ -257,7 +257,7 @@ export default function Customization() {
             <PrimaryButton
               buttonAction={handleSaveChanges}
               buttonTitle={isUpdating ? "Menyimpan..." : "Simpan"}
-              className="bg-yellow-wondr mb-3 active:bg-yellow-wondr-dark"
+              className="mb-3"
               disabled={isNameInvalid || isUpdating || isDeleting}
             />
             {isInnerEditMode ? (
