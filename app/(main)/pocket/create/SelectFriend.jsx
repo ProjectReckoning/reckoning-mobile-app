@@ -50,7 +50,8 @@ export default function SelectFriendScreen() {
   const toast = useToast();
 
   // --- Store Hooks ---
-  const { invitePocketMembers, isMemberActionLoading } = usePocketStore();
+  const { invitePocketMembers, isMemberActionLoading, currentPocket } =
+    usePocketStore();
   const { friends: allFriends } = useFriendshipStore();
   const {
     selectedFriends: globalSelectedFriends,
@@ -60,6 +61,16 @@ export default function SelectFriendScreen() {
   // --- State Management for the two flows ---
   const [localSelectedFriends, setLocalSelectedFriends] = useState([]);
 
+  // Prefill selection with current members in invite mode
+  useEffect(() => {
+    if (isInviteMode && currentPocket && Array.isArray(currentPocket.members)) {
+      const selected = allFriends.filter((friend) =>
+        currentPocket.members.some((member) => member.id === friend.id),
+      );
+      setLocalSelectedFriends(selected);
+    }
+  }, [isInviteMode, currentPocket, allFriends]);
+
   const currentSelection = isInviteMode
     ? localSelectedFriends
     : globalSelectedFriends;
@@ -68,10 +79,21 @@ export default function SelectFriendScreen() {
     : setGlobalSelectedFriends;
 
   const handleSelectionChange = (selectedNames) => {
-    const newSelectedFriendObjects = allFriends.filter((friend) =>
+    // const newSelectedFriendObjects = allFriends.filter((friend) =>
+    //   selectedNames.includes(friend.name),
+    // );
+    // 1. Keep the order of the previous selection for names that are still selected
+    let ordered = currentSelection.filter((friend) =>
       selectedNames.includes(friend.name),
     );
-    setSelection(newSelectedFriendObjects);
+    // 2. Add new selections (names that are in selectedNames but not in ordered)
+    selectedNames.forEach((name) => {
+      if (!ordered.some((friend) => friend.name === name)) {
+        const newFriend = allFriends.find((friend) => friend.name === name);
+        if (newFriend) ordered.push(newFriend);
+      }
+    });
+    setSelection(ordered);
   };
 
   const selectedFriendNames = useMemo(
@@ -117,6 +139,16 @@ export default function SelectFriendScreen() {
     }
   };
 
+  const lockedMemberIds = useMemo(() => {
+    if (
+      !isInviteMode ||
+      !currentPocket ||
+      !Array.isArray(currentPocket.members)
+    )
+      return [];
+    return currentPocket.members.map((m) => m.id);
+  }, [isInviteMode, currentPocket]);
+
   return (
     <Box className="flex-1 bg-white">
       <Box className="w-full flex-1 flex-col px-6 pt-5">
@@ -133,31 +165,39 @@ export default function SelectFriendScreen() {
                 showsHorizontalScrollIndicator={false}
                 style={{ flex: 1 }}
               >
-                {currentSelection.map((friend) => (
-                  <Pressable
-                    key={friend.id}
-                    onPress={() => {
-                      // setSelection((prev) =>
-                      //   prev.filter((f) => f.id !== friend.id),
-                      // );
-                      console.log("belum bisa di press", friend);
-                    }}
-                  >
-                    <Center className="w-5 h-5 z-10 self-end bg-red-wondr rounded-full absolute right-3 top-0">
-                      <Text className="text-white font-bold text-center -mt-1">
-                        -
-                      </Text>
-                    </Center>
-                    <Avatar
-                      size="lg"
-                      className="bg-[#F2F2F2] items-center justify-center mr-4"
+                {[...currentSelection]
+                  // .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                  .map((friend) => (
+                    <Pressable
+                      key={friend.id}
+                      disabled={lockedMemberIds.includes(friend.id)}
+                      className="data-[disabled=true]:opacity-100"
+                      onPress={() => {
+                        if (!lockedMemberIds.includes(friend.id)) {
+                          const newNames = selectedFriendNames.filter(
+                            (name) => name !== friend.name,
+                          );
+                          handleSelectionChange(newNames);
+                        }
+                      }}
                     >
-                      <AvatarFallbackText className="text-[#58ABA1] text-center item-center justify-center">
-                        {friend.name}
-                      </AvatarFallbackText>
-                    </Avatar>
-                  </Pressable>
-                ))}
+                      {!lockedMemberIds.includes(friend.id) && (
+                        <Center className="w-5 h-5 z-10 self-end bg-red-wondr rounded-full absolute right-3 top-0">
+                          <Text className="text-white font-bold text-center -mt-1">
+                            -
+                          </Text>
+                        </Center>
+                      )}
+                      <Avatar
+                        size="lg"
+                        className="bg-[#F2F2F2] items-center justify-center mr-4"
+                      >
+                        <AvatarFallbackText className="text-[#58ABA1] text-center item-center justify-center">
+                          {friend.name}
+                        </AvatarFallbackText>
+                      </Avatar>
+                    </Pressable>
+                  ))}
               </ScrollView>
             </HStack>
           </VStack>
@@ -191,11 +231,10 @@ export default function SelectFriendScreen() {
           mode="checkbox"
           selectedFriends={selectedFriendNames}
           setSelectedFriends={handleSelectionChange}
+          lockedMemberIds={isInviteMode ? lockedMemberIds : []}
         />
 
         <PrimaryButton
-          // --- FIX: The `onPress` prop has been corrected to `buttonAction` ---
-          // This ensures the handleLanjut function is correctly passed to the button component.
           buttonAction={handleLanjut}
           buttonTitle={
             isInviteMode && isMemberActionLoading ? (

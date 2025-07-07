@@ -168,13 +168,13 @@ export default function NotificationDetailContent() {
     switch (type) {
       case "transaction_approval_needed":
         return (
-          <HStack className="items-center gap-2 p-3 bg-red-100 rounded-lg">
+          <HStack className="items-center gap-2 p-3 -my-2 rounded-lg">
             <Info size={24} color={WondrColors["red-wondr"]} />
             <Text
               className="text-sm font-semibold text-black"
               style={{ flex: 1 }}
             >
-              {message}
+              Transaksi ini melebihi jumlah kontribusi anggota ke Shared Pocket.
             </Text>
           </HStack>
         );

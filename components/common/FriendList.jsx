@@ -37,6 +37,7 @@ export default function FriendList({
   mode = "checkbox",
   selectedFriends,
   setSelectedFriends,
+  lockedMemberIds,
   setDestination,
 }) {
   const { id } = useLocalSearchParams();
@@ -109,6 +110,9 @@ export default function FriendList({
                     <Checkbox
                       key={friend.id}
                       value={friend.name}
+                      isDisabled={
+                        lockedMemberIds && lockedMemberIds.includes(friend.id)
+                      }
                       className="flex-row items-center px-0 py-3 rounded-lg bg-white"
                     >
                       <Avatar
