@@ -12,6 +12,7 @@ import {
   useNavigation,
 } from "expo-router";
 
+import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
 import AppText from "@/components/common/typography/AppText";
@@ -27,6 +28,12 @@ import BusinessInfoScreen from "@/components/feature/pocketDashboard/business/bu
 import SpendingBalanceScreen from "@/components/feature/pocketDashboard/spending/spendingBalance";
 import SpendingHistoryScreen from "@/components/feature/pocketDashboard/spending/spendingHistory";
 import SpendingInfoScreen from "@/components/feature/pocketDashboard/spending/spendingInformation";
+
+const tabList = [
+  { key: "balance", label: "Balance" },
+  { key: "info", label: "Info" },
+  { key: "history", label: "History" },
+];
 
 export default function PocketDashboardScreen() {
   const { id } = useLocalSearchParams();
@@ -158,10 +165,17 @@ export default function PocketDashboardScreen() {
   }
 
   return (
-    <Box className="flex-1 bg-white px-8">
-      <PocketDashboardTopBar
+    <Box className="flex-1 bg-white px-6">
+      {/* <PocketDashboardTopBar
         initialTab={activeTab}
         onTabChange={setActiveTab}
+      /> */}
+      <TabBar
+        tabList={tabList}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        size={14}
+        marginVertical={18}
       />
       <Box className="flex-1">{renderTabContent()}</Box>
     </Box>

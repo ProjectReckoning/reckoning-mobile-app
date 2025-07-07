@@ -50,7 +50,7 @@ export default function BusinessBalanceScreen() {
 
         {/* --- Scrollable List Section --- */}
         <Box className="mt-4">
-          <AppText variant="pageTitle" className="mb-4">
+          <AppText variant="pageTitle" className="mb-4 font-bold">
             Rekap Keuangan
           </AppText>
           <BalanceCategory />
