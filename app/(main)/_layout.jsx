@@ -72,6 +72,14 @@ export default function MainLayout() {
         name="home/testscreen/index"
         options={{ title: "Test Screen" }}
       />
+      <Stack.Screen
+        name="home/qris/index"
+        options={{ title: "Pilih sumber dana" }}
+      />
+      <Stack.Screen
+        name="home/SelectSource"
+        options={{ title: "Pilih sumber dana" }}
+      />
 
       {/* ===== Pocket Screens ===== */}
       <Stack.Screen

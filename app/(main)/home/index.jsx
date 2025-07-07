@@ -18,6 +18,7 @@ import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
 import { useGlobalStore } from "@/stores/globalStore";
 import AccountCard from "@/components/feature/home/AccountCard";
+import { useTransactionStore } from "@/stores/transactionStore";
 import { useNotificationStore } from "@/stores/notificationStore";
 import SelectedFeature from "@/components/feature/home/SelectedFeature";
 import DashboardPocketCard from "@/components/feature/home/DashboardPocketCard";
@@ -41,6 +42,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
   const { user, removeToken, fetchUser } = useAuthStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { setSource } = useTransactionStore();
 
   const setSavColor = useCallback(() => {
     useGlobalStore.getState().setSavColor("bg-[#F9F9F9]");
@@ -74,6 +76,25 @@ export default function Home() {
     }, []),
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        // Set a default source for transaction
+        setSource({
+          id: user?.user_id,
+          name: (user?.name || "").toUpperCase(),
+          balance: user?.balance || 0,
+          category: {
+            bank: {
+              name: "BNI",
+              type: "TAPLUS PEGAWAI BNI",
+            },
+          },
+        });
+      }
+    }, [user]),
+  );
+
   const handleLogout = async () => {
     console.log("Logout button pressed. Attempting to clear token...");
     await removeToken();
@@ -83,6 +104,10 @@ export default function Home() {
 
   const GoToNotification = () => {
     router.push("/(main)/home/notification");
+  };
+
+  const GoToQRIS = () => {
+    router.push("/(main)/home/qris");
   };
 
   // Helper to get first name and initials
@@ -206,7 +231,7 @@ export default function Home() {
         <DashboardPocketCard />
       </ScrollView>
 
-      <Pressable className="justify-center items-center">
+      <Pressable className="justify-center items-center" onPress={GoToQRIS}>
         <Center className="w-28 h-fit py-3 rounded-full bg-black absolute bottom-14">
           <QRISicon width="100%" height={18} />
         </Center>
