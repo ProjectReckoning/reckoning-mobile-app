@@ -92,10 +92,11 @@ export const useTransactionStore = create((set, get) => ({
       transactionError: null,
       transactionResult: null,
     });
-    const { amount } = get();
+    const { amount, source } = get();
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
+      description: `Top Up dari ${source.name}`,
     };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
@@ -133,10 +134,11 @@ export const useTransactionStore = create((set, get) => ({
       transactionError: null,
       transactionResult: null,
     });
-    const { amount } = get();
+    const { amount, destination } = get();
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
+      description: `Withdraw ke ${destination.name}`,
     };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
@@ -186,7 +188,7 @@ export const useTransactionStore = create((set, get) => ({
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
       destination: destination.name,
-      description: description || `Transfer to ${destination.name}`,
+      description: description || `Transfer ke ${destination.name}`,
     };
 
     if (category && categoryMapping[category]) {
