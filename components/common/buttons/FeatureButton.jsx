@@ -12,9 +12,10 @@ export default function FeatureButton({
   border,
   className = "",
   textClassName = "",
+  disabled = false,
 }) {
   return (
-    <Pressable onPress={onPress} className="w-full px-3">
+    <Pressable onPress={onPress} className="w-full px-3" disabled={disabled}>
       {({ pressed }) => (
         <VStack space="sm" className="items-center">
           <Box

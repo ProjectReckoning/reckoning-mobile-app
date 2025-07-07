@@ -3,8 +3,9 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
 import { Link, LinkText } from "@/components/ui/link";
+
+import { useState, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback } from "react";
 import { usePocketStore } from "@/stores/pocketStore";
 
 import FeatureButton from "../../common/buttons/FeatureButton";
@@ -12,9 +13,11 @@ import { features } from "../../../utils/mockData/featureData";
 
 export default function SelectedFeature() {
   const { allPockets, fetchAllPockets } = usePocketStore();
+  const [isPocketButtonDisabled, setPocketButtonDisabled] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
+      setPocketButtonDisabled(false);
       console.log(
         "[SelectedFeature.jsx] Focus effect: Fetching pockets for check.",
       );
@@ -23,6 +26,8 @@ export default function SelectedFeature() {
   );
 
   const handlePocketPress = () => {
+    if (isPocketButtonDisabled) return;
+    setPocketButtonDisabled(true);
     const hasPocket = allPockets && allPockets.length > 0;
 
     // --- THIS IS THE LOG FOR THE HOME SCREEN ---
@@ -58,6 +63,11 @@ export default function SelectedFeature() {
                 {...featureProps}
                 onPress={
                   isPocketButton ? handlePocketPress : featureProps.onPress
+                }
+                disabled={
+                  isPocketButton
+                    ? isPocketButtonDisabled
+                    : featureProps.disabled
                 }
               />
             </Box>
