@@ -43,6 +43,7 @@ import CategoryActionSheet from "@/components/feature/transaction/CategoryAction
 
 export default function TransactionDetail() {
   const { id } = useLocalSearchParams();
+  const isHomeTransfer = id === "0" || id === 0;
   const navigation = useNavigation();
   const {
     type,
@@ -93,13 +94,14 @@ export default function TransactionDetail() {
   };
 
   const handleNext = () => {
-    if (!currentPocket || !user) return;
+    if (!isHomeTransfer && (!currentPocket || !user)) return;
 
-    const pocketBalance = parseFloat(currentPocket.current_balance);
+    // const pocketBalance = parseFloat(currentPocket.current_balance);
+    const pocketBalance = parseFloat(source.balance);
     if (amount > pocketBalance) {
       Alert.alert(
         "Saldo Tidak Cukup",
-        "Jumlah transaksi melebihi saldo yang tersedia di pocket ini.",
+        "Jumlah transaksi melebihi saldo yang tersedia di rekening ini.",
       );
       return;
     }
@@ -107,7 +109,7 @@ export default function TransactionDetail() {
     const currentUserInData = currentPocket.members?.find(
       (m) => m.id == user.user_id,
     );
-    if (!currentUserInData) {
+    if (!isHomeTransfer && !currentUserInData) {
       Alert.alert("Error", "Anda bukan merupakan anggota pocket ini.");
       return;
     }
@@ -157,6 +159,10 @@ export default function TransactionDetail() {
     if (id && isBusiness) {
       router.push(`/(main)/pocket/${id}/transferSchedule/SetScheduleTransfer`);
     }
+  };
+
+  const handleCardPress = () => {
+    router.push("/home/SelectSource");
   };
 
   const handleCalendarPress = () => {
@@ -313,11 +319,14 @@ export default function TransactionDetail() {
             <TransactionCard
               title="Sumber dana"
               heading={
-                source?.category?.bank?.type || source?.category?.pocket?.type
+                source?.category?.bank?.type.toUpperCase() ||
+                source?.category?.pocket?.name.toUpperCase()
               }
               subheading={source.id}
               showBalance={true}
               balance={source.balance}
+              pressable={isHomeTransfer}
+              onPress={handleCardPress}
             />
           </VStack>
 

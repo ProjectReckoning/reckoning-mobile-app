@@ -207,7 +207,7 @@ export default function SelectSource() {
                       category: {
                         pocket: {
                           name: pocket.name,
-                          type: pocket.type,
+                          type: "SHARED POCKET BNI",
                         },
                       },
                     });

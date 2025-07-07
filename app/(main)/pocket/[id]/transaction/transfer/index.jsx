@@ -8,6 +8,7 @@ import { Search } from "lucide-react-native";
 import { useState, useEffect, useCallback } from "react";
 import { useLocalSearchParams, useFocusEffect } from "expo-router";
 
+import useAuthStore from "@/stores/authStore";
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
 import { useGlobalStore } from "@/stores/globalStore";
@@ -24,7 +25,9 @@ const tabList = [
 
 export default function Transfer() {
   const { id } = useLocalSearchParams();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("tersimpan");
+  const isHomeTransfer = id === "0" || id === 0;
 
   const {
     selectedFriends,
@@ -44,22 +47,33 @@ export default function Transfer() {
   }, []);
   useFocusEffect(setSavColor);
 
-  // --- NEW: Reset the transaction state every time this screen is focused ---
   useFocusEffect(
     useCallback(() => {
-      // 1. Reset the state to prevent data pollution
       resetTransactionState();
-      // 2. Set the type for this specific flow
       setType({ id: "transfer", name: "Transfer" });
-      // 3. Fetch the required pocket data
-      if (id) {
+      if (!isHomeTransfer && id) {
         fetchPocketById(id);
       }
-    }, [id]),
+
+      // Set source for home transfer
+      if (isHomeTransfer && user) {
+        setSource({
+          id: user?.user_id,
+          name: (user?.name || "").toUpperCase(),
+          balance: user?.balance || 0,
+          category: {
+            bank: {
+              name: "BNI",
+              type: "TAPLUS PEGAWAI BNI",
+            },
+          },
+        });
+      }
+    }, [id, isHomeTransfer, user]),
   );
 
   useEffect(() => {
-    if (currentPocket) {
+    if (!isHomeTransfer && currentPocket) {
       setSource({
         id: currentPocket.account_number,
         name: currentPocket.name,
@@ -73,9 +87,9 @@ export default function Transfer() {
       });
       setPocketType(currentPocket.type);
     }
-  }, [currentPocket]);
+  }, [id, currentPocket, isHomeTransfer]);
 
-  if (!currentPocket) {
+  if (!currentPocket && !isHomeTransfer) {
     return (
       <Box className="flex-1 justify-center items-center">
         <Text>Loading...</Text>
