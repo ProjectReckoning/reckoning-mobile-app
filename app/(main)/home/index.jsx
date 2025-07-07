@@ -7,7 +7,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { ScrollView } from "react-native";
+import { ScrollView, RefreshControl } from "react-native";
 import { Bell } from "lucide-react-native";
 import { useState, useCallback, useEffect } from "react";
 import useAuthStore from "@/stores/authStore";
@@ -35,6 +35,17 @@ const tabList = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState("transaksi");
   const { user, removeToken, fetchUser } = useAuthStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await fetchUser(); // Re-fetch user data
+      await useNotificationStore.getState().loadReadIds(); // Optional: refresh notification state
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     useNotificationStore.getState().loadReadIds();
@@ -137,7 +148,7 @@ export default function Home() {
               )}
             </Pressable>
             <Pressable
-              onPress={() => {}}
+              onPress={() => { }}
               className="items-center justify-center"
             >
               <Box className="flex flex-column items-center justify-center gap-1.5">
@@ -168,6 +179,14 @@ export default function Home() {
         className="px-6"
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{ paddingRight: 10, paddingBottom: 30 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={[WondrColors["tosca-wondr"]]} // Optional: custom spinner color
+            tintColor={WondrColors["tosca-wondr"]}
+          />
+        }
       >
         <AccountCard user={user} />
         <SelectedFeature />
