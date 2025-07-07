@@ -63,7 +63,7 @@ export default function PocketActionSheet({
             onClose();
           }}
           buttonTitle="Ubah pocket"
-          className="bg-yellow-wondr mb-4 active:bg-yellow-wondr-dark"
+          className="mb-4"
           disabled={!isOwnerAdmin}
         />
 

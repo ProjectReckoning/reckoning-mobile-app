@@ -222,7 +222,16 @@ export default function Details() {
                 <Box className="flex flex-row justify-between">
                   <HStack space="md">
                     <UserPlus size={24} color={"#848688"} />
-                    <Text className="text-gray-500 text-lg">Undang teman</Text>
+                    <HStack space="xs" className="items-center">
+                      <Text className="text-gray-500 text-lg">
+                        Undang teman
+                      </Text>
+                      {!selectedFriends.length > 0 && (
+                        <Text className="text-gray-400 text-sm">
+                          (opsional)
+                        </Text>
+                      )}
+                    </HStack>
                   </HStack>
                   <HStack space="xs" className="items-center justify-center">
                     {selectedFriends.length > 0 && (

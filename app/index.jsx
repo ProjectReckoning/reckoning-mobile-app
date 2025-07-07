@@ -2,9 +2,9 @@
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View, Text } from "react-native";
-import "@/global.css"; // Assuming global.css is relative to 'app' directory
+import "@/global.css";
 
-import useAuthStore from "@/stores/authStore"; // Use alias for consistency
+import useAuthStore from "@/stores/authStore";
 
 export default function AppEntry() {
   const token = useAuthStore((state) => state.token);
@@ -15,11 +15,9 @@ export default function AppEntry() {
     const initializeAuth = async () => {
       console.log("AppEntry: Initializing authentication...");
       try {
-        await loadToken(); // Load token from SecureStore and update Zustand
+        await loadToken();
       } catch (e) {
         console.error("AppEntry: Error loading token:", e);
-        // If an error occurs during token loading (e.g., SecureStore issue),
-        // we'll assume not authenticated and proceed to login.
       } finally {
         setLoading(false);
         console.log("AppEntry: Authentication initialization complete.");
@@ -27,7 +25,7 @@ export default function AppEntry() {
     };
 
     initializeAuth();
-  }, []); // Only run once on component mount
+  }, []);
 
   if (loading) {
     console.log("AppEntry: Still loading, showing spinner...");
@@ -46,7 +44,6 @@ export default function AppEntry() {
     );
   }
 
-  // Redirect based on token status
   console.log("AppEntry: Redirecting. Token present:", !!token);
   return <Redirect href={token ? "/(main)/home" : "/(auth)/login"} />;
 }
