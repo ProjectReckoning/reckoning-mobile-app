@@ -3,7 +3,7 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
-import { ActivityIndicator, ScrollView } from "react-native";
+import { ActivityIndicator, ScrollView, RefreshControl } from "react-native";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useState, useCallback, useMemo, useEffect } from "react";
 
@@ -27,6 +27,7 @@ export default function AllPocket() {
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [selectedPocket, setSelectedPocket] = useState(null);
   const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
     setPocketSubject,
@@ -37,6 +38,15 @@ export default function AllPocket() {
     deletePocket,
     leavePocket,
   } = usePocketStore();
+
+  const onRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await fetchAllPockets();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // This useEffect handles the navigation after a pocket is created
   useEffect(() => {
@@ -131,7 +141,23 @@ export default function AllPocket() {
     }
 
     if (filteredPockets.length === 0) {
-      return <EmptyPocket GoToCreatePocket={GoToCreatePocket} />;
+      return (
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              colors={[WondrColors["tosca-wondr"]]}
+              tintColor={WondrColors["tosca-wondr"]}
+            />
+          }
+        >
+          <EmptyPocket GoToCreatePocket={GoToCreatePocket} />
+        </ScrollView>
+      );
     }
 
     return (
@@ -143,6 +169,14 @@ export default function AllPocket() {
           flexGrow: 1,
         }}
         style={{ marginRight: -10 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={[WondrColors["tosca-wondr"]]} // Optional: custom spinner color
+            tintColor={WondrColors["tosca-wondr"]}
+          />
+        }
       >
         <Box className="flex-row flex-wrap justify-between px-2">
           {filteredPockets.map((pocket) => (

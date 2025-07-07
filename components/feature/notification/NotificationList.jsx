@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { Box } from "@/components/ui/box";
 import { FlatList, Text, View, ActivityIndicator } from "react-native";
 
@@ -22,6 +22,17 @@ export default function NotificationList() {
     markAsRead,
     loadReadIds,
   } = useNotificationStore();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await fetchAllNotifications(); // replace with your actual refetch logic
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Fetch notifications every time the screen comes into focus
   useFocusEffect(
@@ -112,6 +123,7 @@ export default function NotificationList() {
         </Box>
       );
     }
+
     if (error) {
       return (
         <Box className="flex-1 justify-center items-center p-4">
@@ -121,13 +133,7 @@ export default function NotificationList() {
         </Box>
       );
     }
-    if (notifications.length === 0) {
-      return (
-        <Box className="flex-1 justify-center items-center p-4">
-          <Text className="text-center">Tidak ada notifikasi.</Text>
-        </Box>
-      );
-    }
+
     return (
       <FlatList
         data={notifications}
@@ -140,7 +146,14 @@ export default function NotificationList() {
           paddingHorizontal: 24,
           paddingVertical: 16,
         }}
+        onRefresh={() => onRefresh()}
         extraData={readIds} // Re-render list when readIds changes
+        refreshing={isRefreshing}
+        ListEmptyComponent={
+          <Box className="flex-1 justify-center items-center p-4">
+            <Text className="text-center">Tidak ada notifikasi.</Text>
+          </Box>
+        }
         // --- ADD THIS PROP ---
         getItemLayout={getItemLayout}
         // --- END ---
