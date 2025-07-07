@@ -26,7 +26,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <GluestackUIProvider mode={colorScheme === "dark" ? "light" : "light"}>
         <ThemeProvider value={DefaultTheme}>
-          <SafeAreaView style={{ flex: 1 }}>
+          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
             <Stack>
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(main)" options={{ headerShown: false }} />

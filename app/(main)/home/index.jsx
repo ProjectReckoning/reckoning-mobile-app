@@ -198,8 +198,8 @@ export default function Home() {
       </ScrollView>
 
       <Pressable className="justify-center items-center">
-        <Center className="w-24 h-fit py-3 rounded-full bg-black absolute bottom-7">
-          <QRISicon width="100%" height={16} />
+        <Center className="w-28 h-fit py-3 rounded-full bg-black absolute bottom-14">
+          <QRISicon width="100%" height={18} />
         </Center>
       </Pressable>
     </Box>
