@@ -82,7 +82,16 @@ export default function MainLayout() {
       />
       <Stack.Screen
         name="pocket/[id]/index"
-        options={{ title: "Pocket Details" }}
+        options={{
+          title: "Pocket Details",
+        }}
+      />
+      <Stack.Screen
+        name="pocket/[id]/PocketInfo"
+        options={{
+          title: "Kenali Pocket Lebih Dekat",
+          headerLeft: null,
+        }}
       />
       <Stack.Screen
         name="pocket/onboarding/index"
