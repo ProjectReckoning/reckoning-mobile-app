@@ -9,8 +9,13 @@ import {
   useNavigation,
   useFocusEffect,
 } from "expo-router";
-import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 
 import { CommonActions } from "@react-navigation/native";
 import PocketCard from "@/components/common/cards/PocketCard";
@@ -55,6 +60,7 @@ export default function Customization() {
   const [selectedIconIndex, setSelectedIconIndex] = useState(0);
   const [showDeleteLeaveAlert, setShowDeleteLeaveAlert] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     pocketName,
@@ -77,13 +83,20 @@ export default function Customization() {
 
   useFocusEffect(
     useCallback(() => {
+      let isActive = true;
       if (isEditMode) {
+        setIsLoading(true);
         const pocketToEdit = allPockets.find((p) => p.pocket_id == pocketId);
-        if (pocketToEdit) {
+        if (pocketToEdit && isActive) {
           setPocketForEditing(pocketToEdit);
+          setIsLoading(false);
+        } else if (isActive && allPockets.length > 0) {
+          // If not found, stop loading anyway
+          setIsLoading(false);
         }
       }
       return () => {
+        isActive = false;
         if (isEditMode) {
           resetPocketData();
         }
@@ -206,6 +219,14 @@ export default function Customization() {
       setIsDeleting(false);
     }
   };
+
+  if (isEditMode && isLoading) {
+    return (
+      <Box className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" />
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex-1 bg-white justify-between">
