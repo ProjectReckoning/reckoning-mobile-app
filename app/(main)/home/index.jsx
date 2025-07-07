@@ -2,29 +2,33 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
+import { Center } from "@/components/ui/center";
 import { VStack } from "@/components/ui/vstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
 
-import { ScrollView, RefreshControl } from "react-native";
 import { Bell } from "lucide-react-native";
+import { router, useFocusEffect } from "expo-router";
 import { useState, useCallback, useEffect } from "react";
+import { ScrollView, RefreshControl } from "react-native";
+
 import useAuthStore from "@/stores/authStore";
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
-import { router, useFocusEffect } from "expo-router";
-import WondrLogo from "@/assets/images/wondr-logo.png";
-import LogoutIcon from "@/assets/images/icon/logout.png";
-import BillIcon from "@/assets/images/icon/bill-icon.png";
 import AccountCard from "@/components/feature/home/AccountCard";
 import { useNotificationStore } from "@/stores/notificationStore";
+import SelectedFeature from "@/components/feature/home/SelectedFeature";
+import DashboardPocketCard from "@/components/feature/home/DashboardPocketCard";
 import {
   notificationData,
   getUnreadCount,
 } from "@/utils/notification/notification";
-import SelectedFeature from "@/components/feature/home/SelectedFeature";
-import DashboardPocketCard from "@/components/feature/home/DashboardPocketCard";
+
+import WondrLogo from "@/assets/images/wondr-logo.png";
+import LogoutIcon from "@/assets/images/icon/logout.png";
+import BillIcon from "@/assets/images/icon/bill-icon.png";
+import QRISicon from "@/assets/images/QRIS.svg";
 
 const tabList = [
   { key: "insight", label: "Insight" },
@@ -192,6 +196,12 @@ export default function Home() {
         <SelectedFeature />
         <DashboardPocketCard />
       </ScrollView>
+
+      <Pressable className="justify-center items-center">
+        <Center className="w-24 h-fit py-3 rounded-full bg-black absolute bottom-7">
+          <QRISicon width="100%" height={16} />
+        </Center>
+      </Pressable>
     </Box>
   );
 }
