@@ -148,7 +148,7 @@ export default function Home() {
               )}
             </Pressable>
             <Pressable
-              onPress={() => { }}
+              onPress={() => {}}
               className="items-center justify-center"
             >
               <Box className="flex flex-column items-center justify-center gap-1.5">

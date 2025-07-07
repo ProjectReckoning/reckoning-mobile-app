@@ -1,21 +1,23 @@
 // app/(main)/pocket/[id]/index.jsx
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Box } from "@/components/ui/box";
-import { ActivityIndicator } from "react-native";
+
+import { CircleHelp } from "lucide-react-native";
+import { ActivityIndicator, Pressable } from "react-native";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
+  router,
   useLocalSearchParams,
   useFocusEffect,
   useNavigation,
 } from "expo-router";
+
+import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
-// 1. Import the transaction store
+import AppText from "@/components/common/typography/AppText";
 import { useTransactionStore } from "@/stores/transactionStore";
 import PocketDashboardTopBar from "@/components/feature/pocketDashboard/PocketDashboardTopBar";
-import AppText from "@/components/common/typography/AppText";
-import { WondrColors } from "@/utils/colorUtils";
 
-// --- Import ALL screen components ---
 import SavingBalanceScreen from "@/components/feature/pocketDashboard/saving/savingBalance";
 import SavingHistoryScreen from "@/components/feature/pocketDashboard/saving/savingHistory";
 import SavingInfoScreen from "@/components/feature/pocketDashboard/saving/savingInformation";
@@ -38,8 +40,6 @@ export default function PocketDashboardScreen() {
   const fetchTransactionHistory = usePocketStore(
     (state) => state.fetchTransactionHistory,
   );
-
-  // 2. Get the reset action from the transaction store
   const resetTransactionState = useTransactionStore(
     (state) => state.resetTransactionState,
   );
@@ -48,6 +48,11 @@ export default function PocketDashboardScreen() {
     if (currentPocket) {
       navigation.setOptions({
         title: currentPocket.name || "Pocket Details",
+        headerRight: () => (
+          <Pressable onPress={handleInfoPress}>
+            <CircleHelp size={18} color={WondrColors["orange-wondr"]} />
+          </Pressable>
+        ),
       });
     }
   }, [navigation, currentPocket]);
@@ -73,6 +78,10 @@ export default function PocketDashboardScreen() {
       fetchTransactionHistory(currentPocket.id, monthString);
     }
   }, [currentPocket, fetchTransactionHistory]);
+
+  const handleInfoPress = () => {
+    router.push("pocket/[id]/PocketInfo");
+  };
 
   const screenMapping = useMemo(() => {
     if (!currentPocket) {
@@ -139,6 +148,14 @@ export default function PocketDashboardScreen() {
       </Box>
     );
   };
+
+  if (isLoading && !currentPocket) {
+    return (
+      <Box className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color={WondrColors["tosca-wondr"]} />
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex-1 bg-white px-8">
