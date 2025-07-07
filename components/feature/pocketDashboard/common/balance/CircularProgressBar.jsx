@@ -17,6 +17,9 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
   const targetAmount = usePocketStore(
     (state) => state.currentPocket?.target_nominal,
   );
+  const pocketColor = usePocketStore((state) => state.currentPocket?.color);
+  const formattedPocketColor =
+    pocketColor?.replace(/^bg-/, "") || "tosca-wondr";
 
   const [displayProgress, setDisplayProgress] = useState(0);
   const [percentage, setPercentage] = useState(0);
@@ -147,7 +150,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
         size={circleSizeForProgressComponent}
         progress={displayProgress} // This will be capped due to the animation
         showsText={false}
-        color={WondrColors["tosca-wondr"]}
+        color={WondrColors[formattedPocketColor]}
         unfilledColor={WondrColors["light-gray-wondr"]}
         thickness={progressLineThickness}
         borderWidth={0}
@@ -190,11 +193,14 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
             width: smallCircleSize - 6,
             height: smallCircleSize - 6,
             borderRadius: (smallCircleSize - 6) / 2,
-            backgroundColor: WondrColors["tosca-wondr"],
+            backgroundColor: WondrColors[formattedPocketColor],
           }}
           className="items-center justify-center"
         >
-          <AppText variant="caption" className="font-bold text-white">
+          <AppText
+            variant="caption"
+            className={`font-bold ${formattedPocketColor === "lime-wondr" ? "text-black" : "text-white"}`}
+          >
             {/* This percentage text is now capped at 100% */}
             {`${percentage}%`}
           </AppText>

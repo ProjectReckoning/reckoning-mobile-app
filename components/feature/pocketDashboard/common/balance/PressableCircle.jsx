@@ -1,8 +1,11 @@
-import React, { useState, useMemo } from "react";
-import { Pressable } from "@/components/ui/pressable";
 import { Box } from "@/components/ui/box";
-import AppText from "@/components/common/typography/AppText";
+import { Pressable } from "@/components/ui/pressable";
+
+import { useState, useMemo } from "react";
+
+import { usePocketStore } from "@/stores/pocketStore";
 import { formatRupiah } from "@/utils/helperFunction";
+import AppText from "@/components/common/typography/AppText";
 
 const DEFAULT_CIRCLE_SIZE = 100;
 
@@ -21,21 +24,30 @@ export default function PressableCircle({
   expense = 0,
 }) {
   const [displayIndex, setDisplayIndex] = useState(0);
+  const pocketColor = usePocketStore((state) => state.currentPocket?.color);
 
   // Memoize the data array to prevent re-creation on every render
   const displayData = useMemo(() => {
     if (pocketType === "Business") {
       return [
-        { title: "Saldo", amount: currentBalance, color: "bg-tosca-wondr" },
+        {
+          title: "Saldo",
+          amount: currentBalance,
+          color: pocketColor || "bg-tosca-wondr",
+        },
         { title: "Pemasukan", amount: income, color: "bg-green-wondr" },
         { title: "Pengeluaran", amount: expense, color: "bg-red-wondr" },
       ];
     }
     // Default for 'Spending' or other types
     return [
-      { title: "Saldo", amount: currentBalance, color: "bg-tosca-wondr" },
+      {
+        title: "Saldo",
+        amount: currentBalance,
+        color: pocketColor || "bg-tosca-wondr",
+      },
     ];
-  }, [pocketType, currentBalance, income, expense]);
+  }, [pocketColor, pocketType, currentBalance, income, expense]);
 
   const handlePress = () => {
     // Only allow cycling for business pockets
