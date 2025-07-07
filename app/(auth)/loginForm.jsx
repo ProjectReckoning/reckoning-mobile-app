@@ -21,7 +21,7 @@ import { router } from "expo-router";
 import { KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
-import api from "@/lib/api";
+import api from "@/lib/api-without-interceptor";
 import useAuthStore from "@/stores/authStore";
 
 // Helper function to format phone number for backend
@@ -146,14 +146,9 @@ export default function LoginFormScreen() {
     } catch (error) {
       console.error("Login failed:", error);
       if (error.response) {
-        setLoginError(
-          error.response.data?.message ||
-            "Login gagal. Silakan periksa kembali kredensial Anda.",
-        );
+        setLoginError("Login gagal. Silakan periksa kembali kredensial Anda.");
       } else if (error.request) {
-        setLoginError(
-          "Tidak ada respons dari server. Periksa koneksi internet Anda.",
-        );
+        setLoginError("Koneksi buruk. Periksa koneksi internet Anda.");
       } else {
         setLoginError("Terjadi kesalahan tak terduga selama login.");
       }
