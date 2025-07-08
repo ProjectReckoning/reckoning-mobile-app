@@ -17,6 +17,7 @@ import useAuthStore from "@/stores/authStore";
 import TabBar from "@/components/common/TabBar";
 import { WondrColors } from "@/utils/colorUtils";
 import { useGlobalStore } from "@/stores/globalStore";
+import { SkeletonBox } from "@/components/common/SkeletonBox";
 import AccountCard from "@/components/feature/home/AccountCard";
 import { useTransactionStore } from "@/stores/transactionStore";
 import { useNotificationStore } from "@/stores/notificationStore";
@@ -43,6 +44,19 @@ export default function Home() {
   const { user, removeToken, fetchUser } = useAuthStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { setSource } = useTransactionStore();
+  const [userLoading, setUserLoading] = useState(true);
+
+  useEffect(() => {
+    setUserLoading(true);
+    fetchUser().finally(() => setUserLoading(false));
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setUserLoading(true);
+      fetchUser().finally(() => setUserLoading(false));
+    }, []),
+  );
 
   const setSavColor = useCallback(() => {
     useGlobalStore.getState().setSavColor("bg-[#F9F9F9]");
@@ -116,102 +130,122 @@ export default function Home() {
   return (
     <Box className="bg-white flex-1">
       {/* Header */}
-      <Box className="flex flex-column pt-5 pb-3 px-6 bg-[#F9F9F9]">
-        {/* Row 1: wondr icon and logout */}
-        <Box className="flex flex-row items-center justify-between">
-          <Image
-            size="md"
-            source={WondrLogo}
-            className="aspect-[16/5]"
-            alt="wondr-logo"
-          />
-
-          <Button
-            size="xs"
-            className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center data-[active=true]:bg-slate-100"
-            onPress={handleLogout}
-          >
+      {userLoading ? (
+        <Box className="flex flex-column pt-5 pb-3 px-6 bg-[#F9F9F9]">
+          <Box className="flex flex-row items-center justify-between">
+            <SkeletonBox className="w-24 h-8" />
+            <SkeletonBox className="w-16 h-8" />
+          </Box>
+          <Box className="flex flex-row items-center justify-between my-9">
+            <Box className="flex flex-row gap-2 items-center">
+              <SkeletonBox className="w-10 h-10 rounded-full mr-1" />
+              <SkeletonBox className="w-24 h-6" />
+            </Box>
+            <Box className="flex flex-row gap-4">
+              <SkeletonBox className="w-10 h-10 rounded-full" />
+              <SkeletonBox className="w-10 h-10 rounded-full" />
+            </Box>
+          </Box>
+          <SkeletonBox className="w-full h-8" />
+        </Box>
+      ) : (
+        <Box className="flex flex-column pt-5 pb-3 px-6 bg-[#F9F9F9]">
+          {/* Row 1: wondr icon and logout */}
+          <Box className="flex flex-row items-center justify-between">
             <Image
-              size="2xs"
-              source={LogoutIcon}
-              className="aspect-square w-4"
-              alt="logout"
+              size="md"
+              source={WondrLogo}
+              className="aspect-[16/5]"
+              alt="wondr-logo"
             />
-            <ButtonText className="text-black data-[active=true]:text-black">
-              Keluar
-            </ButtonText>
-          </Button>
-        </Box>
 
-        {/* Greeting */}
-        <Box className="flex flex-row items-center justify-between my-9">
-          <Box className="flex flex-row gap-2 jus items-center">
-            <Avatar
-              size={"sm"}
-              className="bg-[#F2F2F2] items-center justify-center mr-1"
+            <Button
+              size="xs"
+              className="flex flex-row gap-1 bg-white border border-gray-400 rounded-full items-center justify-center data-[active=true]:bg-slate-100"
+              onPress={handleLogout}
             >
-              <AvatarFallbackText className="text-[#58ABA1]">
-                {user?.name}
-              </AvatarFallbackText>
-            </Avatar>
-            <Text className="text-xl font-bold text-gray-800">
-              Hi, {firstName}!
-            </Text>
+              <Image
+                size="2xs"
+                source={LogoutIcon}
+                className="aspect-square w-4"
+                alt="logout"
+              />
+              <ButtonText className="text-black data-[active=true]:text-black">
+                Keluar
+              </ButtonText>
+            </Button>
           </Box>
 
-          <Box className="flex flex-row items-center justify-center gap-4">
-            <Pressable
-              onPress={GoToNotification}
-              className="items-center justify-center"
-            >
-              {({ pressed }) => (
-                <VStack className="flex flex-column items-center justify-center gap-1.5">
-                  {unreadCount > 0 && (
-                    <Box className="w-2.5 h-2.5 z-10 self-end bg-orange-wondr rounded-full -mb-3 mr-4" />
-                  )}
-                  <Bell
-                    size={20}
-                    color={
-                      pressed
-                        ? WondrColors["orange-wondr-dark"]
-                        : "currentColor"
-                    }
+          {/* Greeting */}
+          <Box className="flex flex-row items-center justify-between my-9">
+            <Box className="flex flex-row gap-2 jus items-center">
+              <Avatar
+                size={"sm"}
+                className="bg-[#F2F2F2] items-center justify-center mr-1"
+              >
+                <AvatarFallbackText className="text-[#58ABA1]">
+                  {user?.name}
+                </AvatarFallbackText>
+              </Avatar>
+              <Text className="text-xl font-bold text-gray-800">
+                Hi, {firstName}!
+              </Text>
+            </Box>
+
+            <Box className="flex flex-row items-center justify-center gap-4">
+              <Pressable
+                onPress={GoToNotification}
+                className="items-center justify-center"
+              >
+                {({ pressed }) => (
+                  <VStack className="flex flex-column items-center justify-center gap-1.5">
+                    {unreadCount > 0 && (
+                      <Box className="w-2.5 h-2.5 z-10 self-end bg-orange-wondr rounded-full -mb-3 mr-4" />
+                    )}
+                    <Bell
+                      size={20}
+                      color={
+                        pressed
+                          ? WondrColors["orange-wondr-dark"]
+                          : "currentColor"
+                      }
+                    />
+                    <Text
+                      className={`text-xs ${pressed ? "text-orange-wondr-dark" : "text-black"}`}
+                    >
+                      Notifikasi
+                    </Text>
+                  </VStack>
+                )}
+              </Pressable>
+              <Pressable
+                onPress={() => {}}
+                className="items-center justify-center"
+              >
+                <Box className="flex flex-column items-center justify-center gap-1.5">
+                  <Image
+                    size="2xs"
+                    source={BillIcon}
+                    className="aspect-square w-4"
+                    alt="logout"
                   />
-                  <Text
-                    className={`text-xs ${pressed ? "text-orange-wondr-dark" : "text-black"}`}
-                  >
-                    Notifikasi
-                  </Text>
-                </VStack>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {}}
-              className="items-center justify-center"
-            >
-              <Box className="flex flex-column items-center justify-center gap-1.5">
-                <Image
-                  size="2xs"
-                  source={BillIcon}
-                  className="aspect-square w-4"
-                  alt="logout"
-                />
-                <Text className="text-black text-xs">Bukti Transaksi</Text>
-              </Box>
-            </Pressable>
+                  <Text className="text-black text-xs">Bukti Transaksi</Text>
+                </Box>
+              </Pressable>
+            </Box>
           </Box>
-        </Box>
 
-        {/* Menu */}
-        <TabBar
-          tabList={tabList}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          size={16}
-          backgroundColor="#FFF"
-          marginVertical={0}
-        />
-      </Box>
+          {/* Menu */}
+          <TabBar
+            tabList={tabList}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            size={16}
+            backgroundColor="#FFF"
+            marginVertical={0}
+          />
+        </Box>
+      )}
 
       <ScrollView
         className="px-6"
@@ -226,7 +260,7 @@ export default function Home() {
           />
         }
       >
-        <AccountCard user={user} />
+        <AccountCard user={user} loading={userLoading} />
         <SelectedFeature />
         <DashboardPocketCard />
       </ScrollView>

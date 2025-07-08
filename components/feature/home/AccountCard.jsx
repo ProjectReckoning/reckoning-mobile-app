@@ -12,6 +12,7 @@ import { Animated, View } from "react-native";
 
 import { WondrColors } from "@/utils/colorUtils";
 import AccountCardItem from "./AccountCardItem";
+import { SkeletonBox } from "@/components/common/SkeletonBox";
 
 // Helper function to format the balance
 const formatCurrency = (value) => {
@@ -29,7 +30,7 @@ const formatCurrency = (value) => {
     .replace(/\s/g, ""); // remove any space like in 'Rp 1.000'
 };
 
-export default function AccountCard({ user }) {
+export default function AccountCard({ user, loading }) {
   const cards = [
     { type: "portfolio" },
     {
@@ -67,6 +68,15 @@ export default function AccountCard({ user }) {
       },
     },
   );
+
+  if (loading) {
+    return (
+      <Box className="flex flex-column my-5">
+        <SkeletonBox className="w-48 h-32 mb-3" />
+        <SkeletonBox className="w-32 h-6 mb-2" />
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex flex-column">

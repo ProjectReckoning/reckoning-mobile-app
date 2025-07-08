@@ -11,10 +11,11 @@ import { router, useFocusEffect } from "expo-router";
 
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
+import { SkeletonBox } from "@/components/common/SkeletonBox";
 import PocketCard from "@/components/common/cards/PocketCard";
 
 export default function DashboardPocketCard() {
-  const { allPockets, fetchAllPockets } = usePocketStore();
+  const { allPockets, fetchAllPockets, isAllPocketsLoading } = usePocketStore();
 
   useFocusEffect(
     useCallback(() => {
@@ -42,6 +43,16 @@ export default function DashboardPocketCard() {
   const GoToCreatePocket = () => {
     router.push("/pocket/create");
   };
+
+  if (isAllPocketsLoading) {
+    return (
+      <Box className="flex flex-row gap-2 my-5">
+        {[...Array(3)].map((_, i) => (
+          <SkeletonBox key={i} className="w-48 h-56 rounded-2xl" />
+        ))}
+      </Box>
+    );
+  }
 
   return (
     <Box className="flex flex-col gap-1 mb-5">
