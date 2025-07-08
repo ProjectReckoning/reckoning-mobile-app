@@ -107,7 +107,7 @@ export default function PocketInfo() {
           <Image
             source={activeTab === "personal" ? ApprovalImg : ApprovalBisnisImg}
             alt="approval"
-            className="w-full h-56 my-3"
+            className="w-full h-60 my-3"
             resizeMode="contain"
           />
         </ScrollView>
