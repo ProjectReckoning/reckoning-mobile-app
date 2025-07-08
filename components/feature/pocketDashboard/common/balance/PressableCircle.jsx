@@ -33,7 +33,7 @@ export default function PressableCircle({
         {
           title: "Saldo",
           amount: currentBalance,
-          color: pocketColor || "bg-tosca-wondr",
+          color: "bg-tosca-wondr",
         },
         { title: "Pemasukan", amount: income, color: "bg-green-wondr" },
         { title: "Pengeluaran", amount: expense, color: "bg-red-wondr" },

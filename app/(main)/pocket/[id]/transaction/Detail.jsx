@@ -94,6 +94,17 @@ export default function TransactionDetail() {
   };
 
   const handleNext = () => {
+    if (isHomeTransfer) {
+      Alert.alert("Info", "Fitur transfer regular akan segera tiba!");
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "home/index" }],
+        }),
+      );
+      return;
+    }
+
     if (!isHomeTransfer && (!currentPocket || !user)) return;
 
     // const pocketBalance = parseFloat(currentPocket.current_balance);

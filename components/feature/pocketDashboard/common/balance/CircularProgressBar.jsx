@@ -193,7 +193,7 @@ export default function CircularProgressBar({ calculatedCircleDimension }) {
             width: smallCircleSize - 6,
             height: smallCircleSize - 6,
             borderRadius: (smallCircleSize - 6) / 2,
-            backgroundColor: WondrColors[formattedPocketColor],
+            backgroundColor: WondrColors["formattedPocketColor"],
           }}
           className="items-center justify-center"
         >
