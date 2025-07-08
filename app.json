@@ -14,10 +14,7 @@
       "buildNumber": "1",
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": false,
-        "UIBackgroundModes": [
-          "fetch",
-          "remote-notification"
-        ],
+        "UIBackgroundModes": ["fetch", "remote-notification"],
         "NSAppTransportSecurity": {
           "NSExceptionDomains": {
             "3.0.98.158": {
@@ -66,7 +63,7 @@
           "image": "./assets/images/splash.png",
           "imageWidth": "100%",
           "imageHeight": "100%",
-          "resizeMode": "contain"
+          "resizeMode": "cover"
         }
       ],
       "expo-font",

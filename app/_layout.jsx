@@ -28,16 +28,16 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <GluestackUIProvider mode={colorScheme === "dark" ? "light" : "light"}>
         <ThemeProvider value={DefaultTheme}>
-          <SafeAreaView
+          {/* <SafeAreaView
             edges={["top"]}
             style={{ flex: 1 }}
             className={savColor}
           >
-            <Stack>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(main)" options={{ headerShown: false }} />
-            </Stack>
-          </SafeAreaView>
+          </SafeAreaView> */}
+          <Stack>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(main)" options={{ headerShown: false }} />
+          </Stack>
         </ThemeProvider>
 
         {/* --- FIX: The ErrorModal is now MOVED INSIDE the GluestackUIProvider --- */}

@@ -59,7 +59,7 @@ export default function Transfer() {
       if (isHomeTransfer && user) {
         setSource({
           id: user?.user_id,
-          name: (user?.name || "").toUpperCase(),
+          name: user?.name.toUpperCase() || "",
           balance: user?.balance || 0,
           category: {
             bank: {

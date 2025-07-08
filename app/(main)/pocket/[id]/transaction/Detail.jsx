@@ -73,6 +73,13 @@ export default function TransactionDetail() {
     currentPocket?.user_role === "owner" ||
     currentPocket?.user_role === "admin";
 
+  let headingText = "SHARED POCKET BNI";
+  if (source?.category?.bank?.type) {
+    headingText = source.category.bank.type.toUpperCase();
+  } else if (source?.category?.pocket?.name) {
+    headingText = source.category.pocket.name.toUpperCase();
+  }
+
   useEffect(() => {
     setIsAmountInvalid(amountTouched && amount === 0);
   }, [amount, amountTouched]);
@@ -329,10 +336,7 @@ export default function TransactionDetail() {
 
             <TransactionCard
               title="Sumber dana"
-              heading={
-                source?.category?.bank?.type.toUpperCase() ||
-                source?.category?.pocket?.name.toUpperCase()
-              }
+              heading={headingText}
               subheading={source.id}
               showBalance={true}
               balance={source.balance}

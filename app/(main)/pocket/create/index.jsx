@@ -3,8 +3,8 @@ import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 
-import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useState, useCallback } from "react";
 import { usePocketStore } from "@/stores/pocketStore";
 import { useGlobalStore } from "@/stores/globalStore";
 import { pocketTypes } from "@/utils/createPocket/pocketTypeData";
@@ -18,10 +18,13 @@ export default function CreatePocket() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { pocketType, setPocketSubject, setPocketType } = usePocketStore();
 
-  useEffect(() => {
+  const setSavColor = useCallback(() => {
     useGlobalStore.getState().setSavColor("bg-[#C3F0EC]");
-    return () => useGlobalStore.getState().setSavColor("bg-white");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
   }, []);
+  useFocusEffect(setSavColor);
 
   const GoToNext = () => {
     if (pocketType === "Spending") {

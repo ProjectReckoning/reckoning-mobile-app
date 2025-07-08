@@ -88,7 +88,7 @@ export default function AutoBudgetingConfirmation() {
     if (!pocketId || isProcessing) return;
     try {
       await deleteAutoBudget(pocketId);
-      Alert.alert("Sukses", "Jadwal auto-budgeting telah dihapus.");
+      // Alert.alert("Sukses", "Jadwal auto-budgeting telah dihapus.");
       handleDone();
     } catch (error) {
       Alert.alert("Gagal", "Tidak dapat menghapus jadwal auto-budgeting.");

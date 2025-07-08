@@ -180,7 +180,7 @@ export default function PinCode() {
                       className="w-[5.5rem] h-[5.5rem] rounded-full bg-light-gray-wondr items-center justify-center"
                       disabled={isProcessing}
                     >
-                      <Delete size={28} />
+                      <Delete size={28} color="black" />
                     </Pressable>
                   );
                 }
