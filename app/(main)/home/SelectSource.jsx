@@ -23,7 +23,7 @@ import { usePocketStore } from "@/stores/pocketStore";
 import { useTransactionStore } from "@/stores/transactionStore";
 
 import { WondrColors } from "@/utils/colorUtils";
-import { formatRupiah } from "@/utils/helperFunction";
+import { formatRupiah, maskId } from "@/utils/helperFunction";
 import Pocket from "@/assets/images/icon/pocket/pocket.svg";
 import TabunganIcon from "@/assets/images/icon/tabunganIcon.svg";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -220,10 +220,10 @@ export default function SelectSource() {
                     <Heading size={"md"} className="font-normal">
                       {pocket.name}
                     </Heading>
-                    <Text size={"md"}>{pocket.account_number}</Text>
-                    <Text size={"md"}>
+                    <Text size={"md"}>{maskId(pocket.account_number)}</Text>
+                    {/* <Text size={"md"}>
                       Saldo efektif: {formatRupiah(pocket.current_balance)}
-                    </Text>
+                    </Text> */}
                   </VStack>
                 </Pressable>
               ))}

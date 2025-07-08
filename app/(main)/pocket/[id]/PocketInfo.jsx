@@ -11,6 +11,8 @@ import { StyleSheet, Platform, ScrollView } from "react-native";
 import TabBar from "@/components/common/TabBar";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 
+import AboutImg from "@/assets/images/info/About.png";
+import AboutBisnisImg from "@/assets/images/info/AboutBisnis.png";
 import AdminImg from "@/assets/images/info/Admin.png";
 import AdminBisnisImg from "@/assets/images/info/AdminBisnis.png";
 import AdminOwnerImg from "@/assets/images/info/AdminOwner.png";
@@ -66,6 +68,21 @@ export default function PocketInfo() {
           }}
         >
           <VStack space="md" className="my-3">
+            <VStack space="md" className="mt-5 mb-3">
+              <Heading className="font-semibold">
+                Tentang{" "}
+                <Heading className="text-purple-wondr">
+                  Pocket {tabList.find((tab) => tab.key === activeTab)?.label}
+                </Heading>
+              </Heading>
+              <Divider className="bg-purple-wondr h-[0.2rem]" />
+            </VStack>
+            <Image
+              source={activeTab === "personal" ? AboutImg : AboutBisnisImg}
+              alt="about"
+              className={`w-full ${activeTab === "personal" ? "h-32 -mt-2 mb-3" : "h-44 mb-3"}`}
+              resizeMode="contain"
+            />
             <Heading className="font-semibold">
               Role dalam <Heading className="text-purple-wondr">Pocket</Heading>
             </Heading>

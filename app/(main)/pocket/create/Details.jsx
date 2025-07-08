@@ -142,6 +142,9 @@ export default function Details() {
 
   const setSavColor = useCallback(() => {
     useGlobalStore.getState().setSavColor("bg-[#C3F0EC]");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
   }, []);
   useFocusEffect(setSavColor);
 
