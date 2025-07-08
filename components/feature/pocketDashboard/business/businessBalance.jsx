@@ -31,7 +31,10 @@ export default function BusinessBalanceScreen() {
   return (
     <Box className="flex-1 bg-white">
       {/* --- Static Header Content --- */}
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
         <AccountNumber />
         <BusinessDashboardButtonGroup />
         <Box
@@ -50,7 +53,7 @@ export default function BusinessBalanceScreen() {
 
         {/* --- Scrollable List Section --- */}
         <Box className="mt-4">
-          <AppText variant="pageTitle" className="mb-4">
+          <AppText variant="pageTitle" className="mb-4 font-bold">
             Rekap Keuangan
           </AppText>
           <BalanceCategory />

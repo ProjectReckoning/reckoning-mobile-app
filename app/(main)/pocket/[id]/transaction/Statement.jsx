@@ -43,8 +43,12 @@ export default function Statement() {
     resetTransactionState();
     navigation.dispatch(
       CommonActions.reset({
-        index: 0,
-        routes: [{ name: "home/index" }],
+        index: 2,
+        routes: [
+          { name: "home/index" },
+          { name: "pocket/all/index" },
+          { name: "pocket/[id]/index", params: { id: id } },
+        ],
       }),
     );
   };
@@ -195,7 +199,7 @@ export default function Statement() {
       </ScrollView>
       <Box className="w-full px-6 py-4 bg-white" style={styles.shadowAbove}>
         <PrimaryButton
-          buttonTitle="Kembali ke beranda"
+          buttonTitle="Kembali ke pocket"
           buttonAction={handleFinish}
         />
       </Box>

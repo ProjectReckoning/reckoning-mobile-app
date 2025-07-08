@@ -1,6 +1,4 @@
 // components/common/CustomDatePicker.jsx
-
-import React from "react";
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
@@ -30,7 +28,7 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 // Anda bisa membuat ini lebih dinamis jika diperlukan
-const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+const years = Array.from({ length: 12 }, (_, i) => currentYear + i);
 
 // Helper functions (bisa diletakkan di luar komponen jika tidak bergantung pada props)
 const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();

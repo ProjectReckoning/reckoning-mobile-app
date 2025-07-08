@@ -22,7 +22,7 @@ import {
 
 export const features = [
   {
-    icon: <Send />,
+    icon: <Send color="black" />,
     label: "Transfer",
     bg: "bg-tosca-wondr-translucent",
     bgPressed: "bg-tosca-wondr-dark",
@@ -41,25 +41,25 @@ export const features = [
     bgPressed: "bg-orange-wondr-dark",
   },
   {
-    icon: <HandCoins />,
+    icon: <HandCoins color="black" />,
     label: "Bayar & Beli",
     bg: "bg-[#A3B8FF]",
     bgPressed: "bg-[#A4A9FD]",
   },
   {
-    icon: <WalletMinimal />,
+    icon: <WalletMinimal color="black" />,
     label: "E-Wallet",
     bg: "bg-tosca-wondr-translucent",
     bgPressed: "bg-tosca-wondr-dark",
   },
   {
-    icon: <CreditCard />,
+    icon: <CreditCard color="black" />,
     label: "Virtual Account",
     bg: "bg-tosca-wondr-translucent",
     bgPressed: "bg-tosca-wondr-dark",
   },
   {
-    icon: <Earth />,
+    icon: <Earth color="black" />,
     label: "Transfer Luar Negeri",
     bg: "bg-tosca-wondr-translucent",
     bgPressed: "bg-tosca-wondr-dark",
@@ -79,7 +79,7 @@ export const features = [
     // The onPress property has been correctly removed.
   },
   {
-    icon: <LayoutGrid />,
+    icon: <LayoutGrid color="black" />,
     label: "Lihat Semua",
     bg: "#fff",
     bgPressed: "bg-slate-300",
@@ -89,13 +89,13 @@ export const features = [
 
 export const transactionFeatures = [
   {
-    icon: <UserRoundPlus />,
+    icon: <UserRoundPlus color="black" />,
     label: "Simpan Penerima",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
   },
   {
-    icon: <FileText />,
+    icon: <FileText color="black" />,
     label: "Bukti Transaksi",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
@@ -111,7 +111,7 @@ export const transactionFeatures = [
 
 export const scheduleTrxFeatures = [
   {
-    icon: <CalendarCog />,
+    icon: <CalendarCog color="black" />,
     label: "Schedule",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
@@ -121,13 +121,13 @@ export const scheduleTrxFeatures = [
 
 export const receiptFeatures = [
   {
-    icon: <Download />,
+    icon: <Download color="black" />,
     label: "Download",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",
   },
   {
-    icon: <Share2 />,
+    icon: <Share2 color="black" />,
     label: "Bagikan",
     bg: "bg-orange-wondr",
     bgPressed: "bg-orange-wondr-dark",

@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
+import { useGlobalStore } from "@/stores/globalStore";
 import { CommonActions } from "@react-navigation/native";
 import PocketCard from "@/components/common/cards/PocketCard";
 import { personalIcons } from "@/utils/pocketCustomization/personalPocketIconUtils";
@@ -80,6 +81,14 @@ export default function Customization() {
     deletePocket,
   } = usePocketStore();
   const toast = useToast();
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-[#F9F9F9]");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
+  }, []);
+  useFocusEffect(setSavColor);
 
   useFocusEffect(
     useCallback(() => {

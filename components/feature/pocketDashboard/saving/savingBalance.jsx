@@ -30,7 +30,10 @@ export default function SavingBalanceScreen() {
 
   return (
     <Box className="flex-1 bg-white">
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
         <AccountNumber />
         <PaymentDateInfo />
         <Box

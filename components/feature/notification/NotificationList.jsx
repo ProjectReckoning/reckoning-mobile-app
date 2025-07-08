@@ -81,7 +81,7 @@ export default function NotificationList() {
       <IconComponent width="40%" height="40%" color="#848688" />
     );
 
-    const notificationId = item._id; // Use the top-level _id from the API response
+    const notificationId = item._id;
     const notificationType = item.data.type;
     const isRead = readIds.includes(notificationId);
     const formattedDate = new Date(item.data.date).toLocaleDateString("id-ID", {
@@ -107,7 +107,7 @@ export default function NotificationList() {
   const renderSeparator = () => <Box className="h-5" />;
 
   const renderListHeader = () => (
-    <View className="flex flex-row gap-3 mb-7 pb-3 items-center border-b border-gray-300">
+    <View className="flex flex-row gap-3 px-6 mt-3 mb-2 pb-3 items-center border-b border-gray-300">
       <Text className="text-lg font-bold text-black">Pesan lainnya</Text>
       <Box className="w-7 h-7 items-center justify-center bg-orange-wondr rounded">
         <Text className="text-sm text-white font-bold">{unreadCount}</Text>
@@ -135,29 +135,29 @@ export default function NotificationList() {
     }
 
     return (
-      <FlatList
-        data={notifications}
-        renderItem={renderNotificationItem}
-        keyExtractor={(item) => item._id} // Use the correct top-level _id
-        className="flex-1 bg-white text-black"
-        ItemSeparatorComponent={renderSeparator}
-        ListHeaderComponent={renderListHeader}
-        contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingVertical: 16,
-        }}
-        onRefresh={() => onRefresh()}
-        extraData={readIds} // Re-render list when readIds changes
-        refreshing={isRefreshing}
-        ListEmptyComponent={
-          <Box className="flex-1 justify-center items-center p-4">
-            <Text className="text-center">Tidak ada notifikasi.</Text>
-          </Box>
-        }
-        // --- ADD THIS PROP ---
-        getItemLayout={getItemLayout}
-        // --- END ---
-      />
+      <Box className="flex-1 bg-white">
+        {renderListHeader()}
+        <FlatList
+          data={notifications}
+          renderItem={renderNotificationItem}
+          keyExtractor={(item) => item._id}
+          className="flex-1 bg-white text-black"
+          ItemSeparatorComponent={renderSeparator}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingVertical: 16,
+          }}
+          onRefresh={onRefresh}
+          extraData={readIds}
+          refreshing={isRefreshing}
+          ListEmptyComponent={
+            <Box className="flex-1 justify-center items-center p-4">
+              <Text className="text-center">Tidak ada notifikasi.</Text>
+            </Box>
+          }
+          getItemLayout={getItemLayout}
+        />
+      </Box>
     );
   };
 

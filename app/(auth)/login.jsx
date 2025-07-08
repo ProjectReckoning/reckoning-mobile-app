@@ -4,7 +4,10 @@ import PrimaryButton from "@/components/common/buttons/PrimaryButton";
 import LoginBackground from "@/assets/images/background/LoginBackground.png";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  useSafeAreaInsets,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -30,7 +33,7 @@ export default function LoginScreen() {
         style={{
           flex: 1,
           justifyContent: "flex-end",
-          paddingBottom: insets.bottom + 40, // 40px margin from the safe area
+          paddingBottom: insets.bottom + 75, // 75px margin from the safe area
           paddingHorizontal: 32, // px-8 from your original design
         }}
       >

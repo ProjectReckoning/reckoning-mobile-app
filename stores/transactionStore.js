@@ -1,6 +1,7 @@
 // stores/transactionStore.js
 import { create } from "zustand";
 import api from "@/lib/api";
+import useAuthStore from "@/stores/authStore";
 
 const initialState = {
   type: { id: "topup", name: "Top-Up" },
@@ -92,10 +93,12 @@ export const useTransactionStore = create((set, get) => ({
       transactionError: null,
       transactionResult: null,
     });
-    const { amount } = get();
+    const { amount, source } = get();
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
+      description: `Top Up dari ${source.name}`,
+      destination_acc: `${source.name}`,
     };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
@@ -133,10 +136,13 @@ export const useTransactionStore = create((set, get) => ({
       transactionError: null,
       transactionResult: null,
     });
-    const { amount } = get();
+    const user = useAuthStore.getState().user;
+    const { amount, destination } = get();
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
+      description: `Withdraw ke ${destination.name}`,
+      destination_acc: `${destination.name}`,
     };
     try {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
@@ -176,6 +182,7 @@ export const useTransactionStore = create((set, get) => ({
       transactionResult: null,
     });
     const { amount, destination, description, category } = get();
+    const user = useAuthStore.getState().user;
 
     const categoryMapping = {
       Pembelian: "pembelian",
@@ -185,8 +192,9 @@ export const useTransactionStore = create((set, get) => ({
     const requestBody = {
       balance: amount,
       pocket_id: parseInt(pocketId, 10),
-      destination: destination.name,
-      description: description || `Transfer to ${destination.name}`,
+      destination_acc: destination.name,
+      description:
+        description || `${user.name} transfer ke ${destination.name}`,
     };
 
     if (category && categoryMapping[category]) {

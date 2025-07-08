@@ -44,11 +44,15 @@ export default function NotificationDetailContent() {
   }, [id, fetchNotificationById]);
 
   const formattedDate = notification?.data?.date
-    ? new Date(notification.data.date).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
+    ? (() => {
+        const dateObj = new Date(notification.data.date);
+        const hours = dateObj.getHours().toString().padStart(2, "0");
+        const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+        const day = dateObj.getDate();
+        const month = dateObj.toLocaleString("id-ID", { month: "short" });
+        const year = dateObj.getFullYear();
+        return `${hours}:${minutes} • ${day} ${month} ${year}`;
+      })()
     : "";
 
   const notificationImage = useMemo(() => {

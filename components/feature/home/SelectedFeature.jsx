@@ -8,16 +8,19 @@ import { useState, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
 import { usePocketStore } from "@/stores/pocketStore";
 
+import { SkeletonBox } from "@/components/common/SkeletonBox";
 import FeatureButton from "../../common/buttons/FeatureButton";
 import { features } from "../../../utils/mockData/featureData";
 
 export default function SelectedFeature() {
-  const { allPockets, fetchAllPockets } = usePocketStore();
+  const { allPockets, fetchAllPockets, isAllPocketsLoading } = usePocketStore();
   const [isPocketButtonDisabled, setPocketButtonDisabled] = useState(false);
+  const [isTransferButtonDisabled, setTransferButtonDisabled] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       setPocketButtonDisabled(false);
+      setTransferButtonDisabled(false);
       console.log(
         "[SelectedFeature.jsx] Focus effect: Fetching pockets for check.",
       );
@@ -44,6 +47,25 @@ export default function SelectedFeature() {
     router.push(destination);
   };
 
+  const handleTransferPress = () => {
+    if (isTransferButtonDisabled) return;
+    setTransferButtonDisabled(true);
+    router.push({
+      pathname: "/pocket/[id]/transaction/transfer",
+      params: { id: 0 },
+    });
+  };
+
+  if (isAllPocketsLoading) {
+    return (
+      <Box className="flex flex-row gap-2 my-5">
+        {[...Array(4)].map((_, i) => (
+          <SkeletonBox key={i} className="w-16 h-16 rounded-xl" />
+        ))}
+      </Box>
+    );
+  }
+
   return (
     <Box className="flex flex-col gap-1 my-5">
       <Box className="flex flex-row my-5 justify-between items-end">
@@ -57,17 +79,24 @@ export default function SelectedFeature() {
       <HStack className="flex flex-wrap justify-between">
         {features.map((featureProps, i) => {
           const isPocketButton = featureProps.label === "Pocket";
+          const isTransferButton = featureProps.label === "Transfer";
           return (
             <Box key={i} className="w-1/4 mb-6 items-center">
               <FeatureButton
                 {...featureProps}
                 onPress={
-                  isPocketButton ? handlePocketPress : featureProps.onPress
+                  isPocketButton
+                    ? handlePocketPress
+                    : isTransferButton
+                      ? handleTransferPress
+                      : featureProps.onPress
                 }
                 disabled={
                   isPocketButton
                     ? isPocketButtonDisabled
-                    : featureProps.disabled
+                    : isTransferButton
+                      ? isTransferButtonDisabled
+                      : featureProps.disabled
                 }
               />
             </Box>

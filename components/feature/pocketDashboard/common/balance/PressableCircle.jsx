@@ -1,18 +1,14 @@
-import React, { useState, useMemo } from "react";
-import { Pressable } from "@/components/ui/pressable";
 import { Box } from "@/components/ui/box";
-import AppText from "@/components/common/typography/AppText";
+import { Pressable } from "@/components/ui/pressable";
+import { useFocusEffect } from "expo-router";
+import { Animated, Easing } from "react-native";
+import { useState, useMemo, useRef, useCallback } from "react";
+import { usePocketStore } from "@/stores/pocketStore";
 import { formatRupiah } from "@/utils/helperFunction";
+import AppText from "@/components/common/typography/AppText";
 
 const DEFAULT_CIRCLE_SIZE = 100;
 
-/**
- * A pressable circle component that displays different financial values
- * based on the pocket type.
- *
- * For 'Business' pockets, it cycles through Saldo, Pemasukan, and Pengeluaran.
- * For other types, it only shows Saldo.
- */
 export default function PressableCircle({
   calculatedCircleDimension,
   pocketType,
@@ -21,8 +17,48 @@ export default function PressableCircle({
   expense = 0,
 }) {
   const [displayIndex, setDisplayIndex] = useState(0);
+  const pocketColor = usePocketStore((state) => state.currentPocket?.color);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const pulseRef = useRef(null);
 
-  // Memoize the data array to prevent re-creation on every render
+  // Pulse scale down animation ONCE for 3 seconds on focus
+  useFocusEffect(
+    useCallback(() => {
+      if (pocketType === "Business") {
+        pulseAnim.setValue(1);
+        pulseRef.current = Animated.loop(
+          Animated.sequence([
+            Animated.timing(pulseAnim, {
+              toValue: 0.95, // gentle scale down
+              duration: 600,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(pulseAnim, {
+              toValue: 1,
+              duration: 600,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+          ]),
+          { iterations: 2 }, // 2 pulses (2*1.2s = 2.4s)
+        );
+        pulseRef.current.start();
+
+        const timeout = setTimeout(() => {
+          pulseRef.current?.stop();
+          pulseAnim.setValue(1);
+        }, 2400);
+
+        return () => {
+          pulseRef.current?.stop();
+          clearTimeout(timeout);
+          pulseAnim.setValue(1);
+        };
+      }
+    }, [pocketType, pulseAnim]),
+  );
+
   const displayData = useMemo(() => {
     if (pocketType === "Business") {
       return [
@@ -31,14 +67,16 @@ export default function PressableCircle({
         { title: "Pengeluaran", amount: expense, color: "bg-red-wondr" },
       ];
     }
-    // Default for 'Spending' or other types
     return [
-      { title: "Saldo", amount: currentBalance, color: "bg-tosca-wondr" },
+      {
+        title: "Saldo",
+        amount: currentBalance,
+        color: pocketColor || "bg-tosca-wondr",
+      },
     ];
-  }, [pocketType, currentBalance, income, expense]);
+  }, [pocketColor, pocketType, currentBalance, income, expense]);
 
   const handlePress = () => {
-    // Only allow cycling for business pockets
     if (pocketType === "Business") {
       setDisplayIndex((prevIndex) => (prevIndex + 1) % displayData.length);
     }
@@ -56,19 +94,20 @@ export default function PressableCircle({
   return (
     <Pressable
       onPress={handlePress}
-      // --- CHANGE: Added mb-2 for consistent spacing ---
       className="justify-center items-center rounded-full bg-white mb-2"
-      style={{
-        width: circleSize,
-        height: circleSize,
-      }}
+      style={{ width: circleSize, height: circleSize }}
     >
-      <Box
-        className={`justify-center items-center rounded-full ${currentDisplay.color}`}
+      <Animated.View
         style={{
+          transform: [{ scale: pocketType === "Business" ? pulseAnim : 1 }],
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: (circleSize - 20) / 2,
           width: circleSize - 20,
           height: circleSize - 20,
+          backfaceVisibility: "hidden",
         }}
+        className={currentDisplay.color}
       >
         <Box
           className="justify-center items-center rounded-full elevation-5 bg-white p-2"
@@ -89,7 +128,7 @@ export default function PressableCircle({
             {formatRupiah(currentDisplay.amount)}
           </AppText>
         </Box>
-      </Box>
+      </Animated.View>
     </Pressable>
   );
 }

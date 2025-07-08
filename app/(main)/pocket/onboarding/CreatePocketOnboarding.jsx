@@ -15,11 +15,17 @@ import TransparentIcon from "@/assets/images/icon/pocketcreation3.png";
 import OnboardingDecorator from "@/assets/images/decorators/onboarding2.png";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { useToast } from "@/components/ui/toast";
+import { useGlobalStore } from "@/stores/globalStore";
 import CustomToast from "@/components/common/customToast/CustomToast";
 
 export default function CreatePocketOnboarding() {
   useEffect(() => {
     console.log("CreatePocketOnboarding: Component mounted");
+  }, []);
+
+  useEffect(() => {
+    useGlobalStore.getState().setSavColor("bg-[#C3F0EC]");
+    return () => useGlobalStore.getState().setSavColor("bg-white");
   }, []);
 
   const GoToCreatePocket = () => {

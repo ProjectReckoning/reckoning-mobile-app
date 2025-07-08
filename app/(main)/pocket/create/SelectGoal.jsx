@@ -3,12 +3,13 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 
-import { useState } from "react";
-import { router } from "expo-router";
 import { ScrollView } from "react-native";
+import { useState, useCallback } from "react";
+import { router, useFocusEffect } from "expo-router";
 
 import { WondrColors } from "@/utils/colorUtils";
 import { usePocketStore } from "@/stores/pocketStore";
+import { useGlobalStore } from "@/stores/globalStore";
 import { savingGoals, businessGoals } from "@/utils/createPocket/goalData";
 import GoalCard from "@/components/feature/createPocket/GoalCard";
 import PrimaryButton from "@/components/common/buttons/PrimaryButton";
@@ -17,6 +18,11 @@ import GoalDecorator from "@/assets/images/decorators/goalDecorator.svg";
 export default function SelectGoal() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { pocketType, setGoalTitle } = usePocketStore();
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-[#C3F0EC]");
+  }, []);
+  useFocusEffect(setSavColor);
 
   const GoToDetails = () => {
     router.push("pocket/create/Details");
