@@ -27,9 +27,9 @@ const keypad = [
 export default function PinCode() {
   const navigation = useNavigation(); // Get navigation object for advanced actions
   const params = useLocalSearchParams();
-  const { id, isSchedule } = params;
-
+  const { id, isSchedule, qris } = params;
   const [pin, setPin] = useState("");
+  const isQRIS = qris === "true";
   const toast = useToast();
 
   const {
@@ -58,66 +58,67 @@ export default function PinCode() {
     }
 
     if (newPin.length === PIN_LENGTH) {
-      try {
-        let result;
-        // ... (logika if/else untuk executeTopUp, executeWithdraw, dll. tetap sama)
-        if (type.id === "topup") {
-          result = await executeTopUp(id);
-        } else if (type.id === "withdraw") {
-          result = await executeWithdraw(id);
-        } else if (type.id === "transfer") {
-          result = await executeTransfer(id);
-        } else if (type.id === "transfer_bulanan") {
-          result = await executeScheduleTransfer(id);
-        }
-
-        if (result) {
-          // For completed transactions, go to the statement page
-          // Cek apakah statusnya pending DAN ada 'pesan' untuk menampilkan toast
-          if (
-            result.status === "pending" &&
-            params.successAction === "showApprovalToast"
-          ) {
-            // Tampilkan toast dengan pesan dari layar sebelumnya
-            toast.show({
-              placement: "top",
-              duration: 2500,
-              render: ({ id }) => {
-                return <CustomToast id={id} title={params.toastMessage} />;
-              },
-            });
-
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 2, // The active screen will be the last one in the routes array
-                routes: [
-                  { name: "home/index" },
-                  { name: "pocket/all/index" },
-                  { name: "pocket/[id]/index", params: { id } },
-                ],
-              }),
-            );
-
-            // Beri jeda 2 detik agar toast terbaca
-            setTimeout(() => {}, 2000);
-          } else {
-            router.push({
-              pathname: "/(main)/pocket/[id]/transaction/Statement",
-              params: { id, isSchedule },
-            });
+      if (!isQRIS) {
+        try {
+          let result;
+          if (type.id === "topup") {
+            result = await executeTopUp(id);
+          } else if (type.id === "withdraw") {
+            result = await executeWithdraw(id);
+          } else if (type.id === "transfer") {
+            result = await executeTransfer(id);
+          } else if (type.id === "transfer_bulanan") {
+            result = await executeScheduleTransfer(id);
           }
-        } else {
-          alert(`Transaction Failed: Could not retrieve transaction details.`);
+
+          if (result) {
+            if (
+              result.status === "pending" &&
+              params.successAction === "showApprovalToast"
+            ) {
+              toast.show({
+                placement: "top",
+                duration: 2500,
+                render: ({ id }) => {
+                  return <CustomToast id={id} title={params.toastMessage} />;
+                },
+              });
+
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 2,
+                  routes: [
+                    { name: "home/index" },
+                    { name: "pocket/all/index" },
+                    { name: "pocket/[id]/index", params: { id } },
+                  ],
+                }),
+              );
+
+              setTimeout(() => {}, 2000);
+            } else {
+              router.push({
+                pathname: "/(main)/pocket/[id]/transaction/Statement",
+                params: { id, isSchedule },
+              });
+            }
+          } else {
+            alert(
+              `Transaction Failed: Could not retrieve transaction details.`,
+            );
+            setPin("");
+          }
+        } catch (error) {
+          console.error(`PIN Screen: ${type.name} failed.`, error);
+          alert(
+            `Transaction Failed: ${
+              transactionError || "An unknown error occurred."
+            }`,
+          );
           setPin("");
         }
-      } catch (error) {
-        console.error(`PIN Screen: ${type.name} failed.`, error);
-        alert(
-          `Transaction Failed: ${
-            transactionError || "An unknown error occurred."
-          }`,
-        );
-        setPin("");
+      } else {
+        router.replace("home/qris/payment");
       }
     }
   };

@@ -15,6 +15,13 @@ export default function QRISIndex() {
     router.push("/home/SelectSource");
   };
 
+  const handleNext = () => {
+    router.push({
+      pathname: "pocket/[id]/transaction/PinCode",
+      params: { id: 0, isSchedule: false, qris: true },
+    });
+  };
+
   return (
     <Box className="flex-1 p-6 justify-between">
       <VStack className="gap-10">
@@ -38,7 +45,11 @@ export default function QRISIndex() {
         />
       </VStack>
 
-      <PrimaryButton buttonTitle="Tampilkan QR Code" className={"my-3"} />
+      <PrimaryButton
+        buttonAction={handleNext}
+        buttonTitle="Tampilkan QR Code"
+        className={"my-3"}
+      />
     </Box>
   );
 }

@@ -77,6 +77,10 @@ export default function MainLayout() {
         options={{ title: "Pilih sumber dana" }}
       />
       <Stack.Screen
+        name="home/qris/payment"
+        options={{ title: "Konfirmasi Pembayaran" }}
+      />
+      <Stack.Screen
         name="home/SelectSource"
         options={{ title: "Pilih sumber dana" }}
       />
