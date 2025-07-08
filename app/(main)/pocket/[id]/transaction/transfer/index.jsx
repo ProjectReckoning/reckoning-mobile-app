@@ -1,0 +1,150 @@
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
+import { HStack } from "@/components/ui/hstack";
+import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
+
+import { Search } from "lucide-react-native";
+import { useState, useEffect, useCallback } from "react";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
+
+import useAuthStore from "@/stores/authStore";
+import TabBar from "@/components/common/TabBar";
+import { WondrColors } from "@/utils/colorUtils";
+import { useGlobalStore } from "@/stores/globalStore";
+import { usePocketStore } from "@/stores/pocketStore";
+import FriendList from "@/components/common/FriendList";
+import { useTransactionStore } from "@/stores/transactionStore";
+import { transferFeatures } from "@/utils/mockData/featureData";
+import FeatureButton from "@/components/common/buttons/FeatureButton";
+
+const tabList = [
+  { key: "tersimpan", label: "Tersimpan" },
+  { key: "terakhir", label: "Terakhir" },
+];
+
+export default function Transfer() {
+  const { id } = useLocalSearchParams();
+  const { user } = useAuthStore();
+  const [activeTab, setActiveTab] = useState("tersimpan");
+  const isHomeTransfer = id === "0" || id === 0;
+
+  const {
+    selectedFriends,
+    setSelectedFriends,
+    setPocketType,
+    currentPocket,
+    fetchPocketById,
+  } = usePocketStore();
+  const { setType, setSource, setDestination, resetTransactionState } =
+    useTransactionStore();
+
+  const setSavColor = useCallback(() => {
+    useGlobalStore.getState().setSavColor("bg-light-gray-wondr");
+    return () => {
+      useGlobalStore.getState().setSavColor("bg-white");
+    };
+  }, []);
+  useFocusEffect(setSavColor);
+
+  useFocusEffect(
+    useCallback(() => {
+      resetTransactionState();
+      setType({ id: "transfer", name: "Transfer" });
+      if (!isHomeTransfer && id) {
+        fetchPocketById(id);
+      }
+
+      // Set source for home transfer
+      if (isHomeTransfer && user) {
+        setSource({
+          id: user?.user_id,
+          name: user?.name.toUpperCase() || "",
+          balance: user?.balance || 0,
+          category: {
+            bank: {
+              name: "BNI",
+              type: "TAPLUS PEGAWAI BNI",
+            },
+          },
+        });
+      }
+    }, [id, isHomeTransfer, user]),
+  );
+
+  useEffect(() => {
+    if (!isHomeTransfer && currentPocket) {
+      setSource({
+        id: currentPocket.account_number,
+        name: currentPocket.name,
+        balance: currentPocket.current_balance,
+        category: {
+          pocket: {
+            name: currentPocket.name,
+            type: "SHARED POCKET BNI",
+          },
+        },
+      });
+      setPocketType(currentPocket.type);
+    }
+  }, [id, currentPocket, isHomeTransfer]);
+
+  if (!currentPocket && !isHomeTransfer) {
+    return (
+      <Box className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </Box>
+    );
+  }
+
+  return (
+    <Box className="flex-1 bg-white">
+      <Box className="w-full h-56 bg-light-gray-wondr absolute top-0 left-0"></Box>
+      <Box className="flex-1 px-6">
+        <Box className="items-center z-10">
+          <HStack
+            space="lg"
+            className="items-start justify-center mt-4 mb-7 px-2 py-5 bg-white border border-gray-wondr-border rounded-2xl"
+          >
+            {transferFeatures.map((feature, i) => (
+              <Box key={i} className="w-1/4 items-center">
+                <FeatureButton {...feature} />
+              </Box>
+            ))}
+          </HStack>
+          <Box className="w-3/4 h-32 bg-gray-wondr-border rounded-2xl absolute bottom-5 -z-10"></Box>
+        </Box>
+
+        <Pressable>
+          <HStack
+            space="lg"
+            className="w-full h-14 bg-white p-3 items-center justify-start border border-dark-gray-wondr-deactive rounded-lg active:bg-gray-50"
+          >
+            <Search size={21} color={WondrColors["dark-gray-wondr-deactive"]} />
+            <Text size="lg" className="font-light">
+              Mau transfer ke siapa hari ini?
+            </Text>
+          </HStack>
+        </Pressable>
+
+        <TabBar
+          tabList={tabList}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          size={16}
+          marginVertical={21}
+        />
+
+        <Heading size="md" className="mb-5">
+          6/200 Penerima
+        </Heading>
+        <FriendList
+          mode="button"
+          selectedFriends={selectedFriends}
+          setSelectedFriends={setSelectedFriends}
+          setDestination={setDestination}
+        />
+      </Box>
+    </Box>
+  );
+}
