@@ -1,77 +1,55 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useColorScheme } from "@/components/useColorScheme";
-import { Slot } from "expo-router";
+// app/_layout.jsx
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "@/components/useColorScheme";
+import { ThemeProvider, DefaultTheme } from "@react-navigation/native";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import "@/global.css";
 
-import "../global.css";
+// --- Imports for Global Error Modal ---
+import { Platform } from "react-native";
+import useErrorStore from "@/stores/errorStore";
+import { useGlobalStore } from "@/stores/globalStore";
+import ErrorModal from "@/components/common/ErrorModal";
+import ErrorImage from "@/assets/images/ErrorImage.png";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-// export const unstable_settings = {
-//   // Ensure that reloading on `/modal` keeps a back button present.
-//   initialRouteName: "gluestack",
-// };
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+export { ErrorBoundary } from "expo-router";
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
-
-  // const [styleLoaded, setStyleLoaded] = useState(false);
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  // useLayoutEffect(() => {
-  //   setStyleLoaded(true);
-  // }, [styleLoaded]);
-
-  // if (!loaded || !styleLoaded) {
-  //   return null;
-  // }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { visible, status, message, hideError } = useErrorStore();
+  const savColor = useGlobalStore((state) => state.savColor);
+  const isAndroidPlatform = Platform.OS === "android";
+
+  console.log(`[RootLayout] Rendering. Error modal visibility is: ${visible}`);
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar style="auto" backgroundColor="#F2F2F2" translucent />
-        <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <Slot />
-          </ThemeProvider>
-        </GluestackUIProvider>
-      </SafeAreaView>
+      <GluestackUIProvider mode={colorScheme === "dark" ? "light" : "light"}>
+        <ThemeProvider value={DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(main)" options={{ headerShown: false }} />
+          </Stack>
+        </ThemeProvider>
+
+        {/* --- FIX: The ErrorModal is now MOVED INSIDE the GluestackUIProvider --- */}
+        <ErrorModal
+          isOpen={visible}
+          onClose={hideError}
+          title={status || "Something Went Wrong"}
+          subtitle={message || "An unexpected error has occurred."}
+          imageSource={ErrorImage}
+        />
+      </GluestackUIProvider>
+      <StatusBar
+        translucent={!isAndroidPlatform}
+        backgroundColor={isAndroidPlatform ? "black" : "transparent"}
+        style="dark"
+      />
+
+      {/* --- The ErrorModal was previously here, which was incorrect --- */}
     </SafeAreaProvider>
   );
 }
